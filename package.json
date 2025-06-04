@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "next-base",
+=======
+  "name": "frontend",
+>>>>>>> 506cca689fcc9a9834f0fa844aabce8c3f9ae8c7
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -17,12 +21,24 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+<<<<<<< HEAD
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
     "tailwindcss": "^4",
+=======
+    "@types/axios": "^0.9.36",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.3",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.8",
+>>>>>>> 506cca689fcc9a9834f0fa844aabce8c3f9ae8c7
     "typescript": "^5"
   }
 }
