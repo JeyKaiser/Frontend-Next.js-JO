@@ -1,103 +1,84 @@
-import Image from "next/image";
+'use client';
+import * as React from "react";
+import Link from 'next/link';
+
+
+interface Modelo {
+  id: number;
+  nombre: string;
+  // Agrega más propiedades según sea necesario
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const modelos : Modelo[] = []; // Aquí podrías traer datos dinámicos más adelante
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
+  return (
+    <>
+      <header className="colecciones-header">
+        <h2>COLECCIONES</h2>
+      </header>
+
+      <div className="coleccion-grid">
+        <Link href="/colecciones/winterSun">
+          <div className="card" style={{ '--bg': '#feea4d' } as React.CSSProperties}>
+            <img src="/img/winter-sun.jpg" alt="Winter Sun" />
+            <span>WINTER SUN</span>
+          </div>
+        </Link>
+
+        <Link href="/colecciones/resortRtw">
+          <div className="card" style={{ '--bg': '#70a7ff' } as React.CSSProperties}>
+            <img src="/img/resort-rtw.jpg" alt="Resort RTW" />
+            <span>RESORT RTW</span>
+          </div>
+        </Link>
+
+        <Link href="/colecciones/springSummer">
+          <div className="card" style={{ '--bg': '#81c963' } as React.CSSProperties}>
+            <img src="/img/spring-summer.jpg" alt="Spring Summer" />
+            <span>SPRING SUMMER</span>
+          </div>
+        </Link>
+
+        <Link href="/colecciones/summerVacation">
+          <div className="card" style={{ '--bg': '#ff935f' } as React.CSSProperties}>
+            <img src="/img/summer-vacation.jpg" alt="Summer Vacation" />
+            <span>SUMMER VACATION</span>
+          </div>
+        </Link>
+
+        <Link href="/colecciones/preFall">
+          <div className="card" style={{ '--bg': '#c6b9b1' } as React.CSSProperties}>
+            <img src="/img/pre-fall.jpg" alt="Pre Fall" />
+            <span>PRE - FALL</span>
+          </div>
+        </Link>
+
+        <Link href="/colecciones/fallWinter">
+          <div className="card" style={{ '--bg': '#b03c5c' } as React.CSSProperties}>
+            <img src="/img/fall-winter.jpg" alt="Fall Winter" />
+            <span>FALL WINTER</span>
+          </div>
+        </Link>
+
+        <Link href="/colecciones/capsules">
+          <div className="card" style={{ '--bg': '#939a24' } as React.CSSProperties}>
+            <img src="/img/capsule.jpg" alt="Capsule" />
+            <span>CAPSULES</span>
+          </div>
+        </Link>
+
+        {/* Bucle de modelos (dinámico, simulado aquí) */}
+        {modelos.map((modelo, index) => (
+          <a href="#" key={index}>
+            <div className="card" style={{ '--bg': '#939a24' } as React.CSSProperties}>
+              <img src={modelo.U_GSP_Picture} alt="Modelo" />
+              <span>{modelo.U_GSP_REFERENCE}</span>
+              <span>{modelo.U_GSP_Desc}</span>
+            </div>
           </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        ))}
+      </div>
+    </>
   );
 }

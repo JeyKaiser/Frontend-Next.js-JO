@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tabla Dinámica con Datos Simulados</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 2rem;
+            background: #f9f9f9;
+            color: #222;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        label {
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        select {
+            padding: 0.4rem 0.6rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+            border-radius: 8px;
+            background: #fff;
+            padding: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        thead {
+            background-color: #323232;
+            color: #ddd0c8;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f5f0eb;
+        }
+
+        .status-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+            display: inline-block;
+        }
+
+        .activo {
+            background-color: #5e503f;
+        }
+
+        .vacaciones {
+            background-color: #a86f4c;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #5e503f;
+            border-radius: 8px;
+            display: none;
+        }
+
+        @media (max-width: 700px) {
+            table {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Ejemplo de Tabla Dinámica</h1>
+
+    <label for="reference-select">Seleccione referencia:</label>
+    <select id="reference-select" aria-label="Seleccionar referencia">
+        <option value="" selected disabled>-- Elija una opción --</option>
+        <option value="productos">Inventario de Productos</option>
+        <option value="usuarios">Listado de Usuarios</option>
+    </select>
+
+    <div class="table-container" style="position: relative;">
+        <div id="loading" class="loading-overlay">Cargando datos...</div>
+
+        <table id="dynamic-table" aria-describedby="table-description" role="table">
+            <caption id="table-description" class="sr-only">Tabla dinámica con datos de la base</caption>
+            <thead>
+                <tr id="table-headers"></tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+
+        <div id="error-message" role="alert" style="color: #a86f4c; margin-top: 1rem; display: none;"></div>
+    </div>
+
+    <script>
+        // Datos simulados
+        const datos = {
+            productos: {
+                headers: ['ID', 'Nombre', 'Categoría', 'Precio', 'Stock'],
+                rows: [
+                    { id: 101, nombre: "Laptop Asus", categoria: "Tecnología", precio: 1200, stock: 15 },
+                    { id: 205, nombre: "Silla Ergonómica", categoria: "Mobiliario", precio: 450, stock: 8 },
+                    { id: 309, nombre: "Monitor 4K", categoria: "Tecnología", precio: 700, stock: 12 },
+                    { id: 412, nombre: "Mesa", categoria: "Mobiliario", precio: 320, stock: 5 },
+                    { id: 101, nombre: "Laptop X1", categoria: "Tecnología", precio: 1200, stock: 15 },
+                    { id: 205, nombre: "Silla Gamer", categoria: "Mobiliario", precio: 450, stock: 8 },
+                    { id: 309, nombre: "Monitor HD", categoria: "Tecnología", precio: 700, stock: 12 },
+                    { id: 412, nombre: "Mesa Oficina", categoria: "Mobiliario", precio: 320, stock: 5 }
+                ]
+            },
+            usuarios: {
+                headers: ['Nombre', 'Email', 'Rol', 'Departamento', 'Estado'],
+                rows: [
+                    { nombre: "Ana Pérez", email: "ana@corp.com", rol: "Developer", departamento: "TI", estado: "Activo" },
+                    { nombre: "Carlos Ruiz", email: "carlos@corp.com", rol: "Designer", departamento: "UX", estado: "Vacaciones" },
+                    { nombre: "Laura Gómez", email: "laura@corp.com", rol: "Product Manager", departamento: "Marketing", estado: "Activo" }
+                ]
+            }
+        };
+
+        const selectRef = document.getElementById('reference-select');
+        const tableHeaders = document.getElementById('table-headers');
+        const tableBody = document.getElementById('table-body');
+        const loadingOverlay = document.getElementById('loading');
+        const errorMessage = document.getElementById('error-message');
+
+        // Función para limpiar tabla y mensajes
+        function clearTable() {
+            tableHeaders.innerHTML = '';
+            tableBody.innerHTML = '';
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+        }
+
+        // Función para mostrar loading
+        function showLoading(show) {
+            loadingOverlay.style.display = show ? 'flex' : 'none';
+        }
+
+        // Función para renderizar encabezados
+        function renderHeaders(headers) {
+            tableHeaders.innerHTML = '';
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.scope = 'col';
+                th.textContent = header;
+                tableHeaders.appendChild(th);
+            });
+        }
+
+        // Función para renderizar filas dinámicas según referencia
+        function renderRows(ref) {
+            tableBody.innerHTML = '';
+            const data = datos[ref];
+            if (!data || !data.rows.length) {
+                errorMessage.textContent = 'No hay datos disponibles para esta referencia.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Creación eficiente con fragmento
+            const fragment = document.createDocumentFragment();
+
+            data.rows.forEach(row => {
+                const tr = document.createElement('tr');
+
+                if (ref === 'productos') {
+                    tr.innerHTML = `
+            <td>${row.id}</td>
+            <td>${row.nombre}</td>
+            <td>${row.categoria}</td>
+            <td>$${row.precio.toFixed(2)}</td>
+            <td>${row.stock} unidades</td>
+          `;
+                } else if (ref === 'usuarios') {
+                    tr.innerHTML = `
+            <td>${row.nombre}</td>
+            <td><a href="mailto:${row.email}">${row.email}</a></td>
+            <td>${row.rol}</td>
+            <td>${row.departamento}</td>
+            <td><span class="status-badge ${row.estado.toLowerCase()}">${row.estado}</span></td>
+          `;
+                }
+
+                fragment.appendChild(tr);
+            });
+
+            tableBody.appendChild(fragment);
+        }
+
+        // Simulación de carga asíncrona (fetch fake)
+        function fetchData(ref) {
+            return new Promise((resolve, reject) => {
+                showLoading(true);
+                clearTable();
+
+                setTimeout(() => {
+                    showLoading(false);
+                    if (!datos[ref]) {
+                        reject(new Error('Referencia no encontrada'));
+                    } else {
+                        resolve(datos[ref]);
+                    }
+                }, 800); // Simula retardo de red
+            });
+        }
+
+        // Evento cambio de selección
+        selectRef.addEventListener('change', () => {
+            const ref = selectRef.value;
+            if (!ref) return;
+
+            fetchData(ref)
+                .then(data => {
+                    renderHeaders(data.headers);
+                    renderRows(ref);
+                })
+                .catch(err => {
+                    errorMessage.textContent = err.message;
+                    errorMessage.style.display = 'block';
+                });
+        });
+    </script>
+</body>
+
+</html>
