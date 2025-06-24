@@ -72,9 +72,9 @@ export default function Home() {
         {modelos.map((modelo, index) => (
           <a href="#" key={index}>
             <div className="card" style={{ '--bg': '#939a24' } as React.CSSProperties}>
-              <img src={modelo.U_GSP_Picture} alt="Modelo" />
+              {/* <img src={modelo.U_GSP_Picture} alt="Modelo" />
               <span>{modelo.U_GSP_REFERENCE}</span>
-              <span>{modelo.U_GSP_Desc}</span>
+              <span>{modelo.U_GSP_Desc}</span> */}
             </div>
           </a>
         ))}
