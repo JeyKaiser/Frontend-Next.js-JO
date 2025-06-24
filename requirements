@@ -1,2 +1,7 @@
 npm install axios
 jwt-decode
+next react react-dom
+-D tailwindcss postcss autoprefixer        
+-D tailwindcss@3.4.3 postcss autoprefixer
+lucide-react
+

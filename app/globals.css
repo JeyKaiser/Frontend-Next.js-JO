@@ -1,4 +1,9 @@
-/* app/globals.css */
+/*app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 html,
 body {
   margin: 0;
@@ -23,3 +28,4 @@ body {
 a {
     text-decoration: none;
 }
+
