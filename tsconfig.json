@@ -19,7 +19,12 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/styles/*": ["./src/styles/*"], // Permite importar 'styles/...' como '@/styles/...'
+      "@/types/*": ["./src/types/*"],   // Permite importar 'types/...' como '@/types/...'
+      "@/lib/*": ["./src/lib/*"],     // Si tienes una carpeta 'lib'
+      "@/components/*": ["./src/components/*"] // Si tienes una carpeta 'components'
+      // Puedes usar '@/*' para mapear todo src/ si prefieres:
+      // "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

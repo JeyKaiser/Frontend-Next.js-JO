@@ -1,0 +1,25 @@
+/* app/globals.css */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* ... otros resets o estilos globales que necesites */
+}
+
+/* Variables globales que pueden ser usadas por tus CSS Modules */
+:root {
+    --primary-color: #2D323A;
+    --secondary-color: #FFFFFF;
+    --background-color: #CFC5C2;
+    --text-color: #333;
+    --hover-color: #444;
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-heavy: 0 8px 25px rgba(0, 0, 0, 0.2);
+    --border-radius: 5px;
+    --transition: 0.3s ease;
+}
+
+a {
+    text-decoration: none;
+}
