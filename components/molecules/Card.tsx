@@ -1,47 +1,47 @@
-import Image from "next/image";
+// /components/molecules/Card.tsx
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface CardProps {
   title: string;
   imageSrc: string;
   bgColor: string;
-  href: string;
-  // subtitle?: string;
+  href: string;          // La ruta a la que navegar (ej. /colecciones/winter_sun)
 }
 
 export default function Card({ title, imageSrc, bgColor, href }: CardProps) {
+   const handleClick = () => {
+    console.log('¡Clic en la tarjeta!', { title, href });
+  };
   return (
-    <a href={href}>
+    <Link href={href} className="block group">
       <div
-        className="card rounded-2xl overflow-hidden shadow-lg transform transition hover:scale-105 hover:-translate-y-1"
+        className="relative overflow-hidden rounded-2xl shadow-md transition-all duration-300 ease-in-out transform
+                   hover:scale-102 hover:shadow-lg hover:-translate-y-2.5
+                   flex flex-col h-auto cursor-pointer"
         style={{ backgroundColor: bgColor }}
+        onClick={handleClick}
       >
-        <Image
-          src={imageSrc}
-          alt={title}
-          className="w-full h-60 object-cover"
-          width={400}
-          height={240}
-        />
-        <span className="block text-center text-primary font-bold text-lg py-3 uppercase tracking-wide">
-          {title}
-        </span>
+        {/* Contenedor de la imagen (aproximadamente 75% de la altura de la tarjeta) */}
+        <div className="relative w-full pb-[75%] overflow-hidden rounded-t-2xl">
+          <Image
+            src={imageSrc}
+            alt={title}
+            fill // Ocupa todo el contenedor
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'cover' }}
+            className="transition-transform duration-300 ease-in-out group-hover:scale-105"
+            priority
+          />
+        </div>
+
+        {/* Etiqueta de la tarjeta */}
+        <div className="flex items-center justify-center p-3 text-center flex-grow">
+          <span className="text-gray-800 font-bold text-xl uppercase tracking-wide transition-all duration-300 ease-in-out group-hover:text-2xl">
+            {title}
+          </span>
+        </div>
       </div>
-    </a> 
-    
-    // <a href={href}>
-    //   <div
-    //     className="rounded-xl overflow-hidden shadow-md transition transform hover:scale-105 duration-300"
-    //     style={{ backgroundColor: bgColor, maxWidth: '280px', maxHeight: '360px', width: '100%' }}
-    //   >
-    //     <Image 
-    //       src={imageSrc} 
-    //       alt={title} 
-    //       className="w-full h-48 object-cover" />
-    //       <div className="p-4">
-    //         <h3 className="text-lg font-semibold text-gray-800 text-center">{title}</h3>
-    //         { {subtitle && <p className="text-sm text-gray-600 text-center mt-1">{subtitle}</p>}       }
-    //       </div>
-    //   </div>
-    // </a>
+    </Link>
   );
 }

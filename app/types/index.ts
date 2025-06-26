@@ -12,9 +12,7 @@ export interface AuthTokenResponse {
  * Interface para la respuesta de error de la API (ej. login fallido)
  */
 export interface ApiErrorResponse {
-  detail?: string;
-  // Puedes añadir otros campos de error que tu API pueda devolver
-  // ej: [key: string]: string[]; para errores de validación de campos
+  detail?: string; 
 }
 
 /**
@@ -40,5 +38,39 @@ export interface FormattedCollection {
   color: string;
 }
 
-// Puedes añadir más interfaces aquí para Productos, Técnicos, Telas, etc.
-// export interface Producto { ... }
+/**
+ * Interface para un objeto Año de Colección que viene de tu API de Django
+ */
+export interface AnioColeccionData {
+  id: string;
+  img: string; // Ruta relativa al public folder de Next.js (ej. /img/...)
+  bg: string; // Color de fondo
+  label: string; // Año (ej. '2024')
+}
+
+/**
+ * Interface para la respuesta de la API de Años de Colección
+ */
+export interface AnioColeccionApiResponse {
+  nombre_coleccion: string;
+  anios: AnioColeccionData[];
+}
+
+
+export interface TestDataApiResponse {
+  id: string;
+  message: string;
+  source: string;
+  timestamp: string;
+}
+
+/**
+ * Interface para un elemento de modelo/referencia (análogo a 'modelo' en tu template de Django)
+ */
+export interface ReferenciaData {
+  U_GSP_Picture: string; // URL de la imagen
+  U_GSP_REFERENCE: string; // Referencia/nombre
+  U_GSP_Desc: string; // Descripción
+  // Añade aquí cualquier otro campo que venga de modelsExample
+  [key: string]: any; // Para permitir campos adicionales dinámicos
+}

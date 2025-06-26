@@ -1,6 +1,7 @@
 'use client';
 
 import Card from '@/components/molecules/Card';
+// import CardAnio from '@/components/molecules/CardAnio';
 
 export default function DashboardPage() {
   return (
@@ -17,51 +18,52 @@ export default function DashboardPage() {
           title="Winter Sun"
           imageSrc="/img/winter-sun.jpg"
           bgColor="#feea4d"
-          href="/colecciones/winter_sun"
+          href="/ui-playground"
         />
         <Card
           title="Resort RTW"
           imageSrc="/img/resort-rtw.jpg"
           bgColor="#70a7ff"
-          href="/colecciones/resort_rtw"
+          href="/colecciones/resort-rtw"
         />
         <Card
           title="Spring Summer"
           imageSrc="/img/spring-summer.jpg"
           bgColor="#81c963"
-          href="/colecciones/spring_summer"
+          href="/colecciones/spring-summer"
         />
         <Card
           title="Summer Vacation"
           imageSrc="/img/summer-vacation.jpg"
           bgColor="#ff935f"
-          href="/colecciones/summer_vacation"
+          href="/colecciones/summer-vacation"
         />
         <Card
           title="Pre - Fall"
           imageSrc="/img/pre-fall.jpg"
           bgColor="#c6b9b1"
-          href="/colecciones/pre_fall"
+          href="/colecciones/pre-fall"
         />
         <Card
           title="Fall Winter"
           imageSrc="/img/fall-winter.jpg"
           bgColor="#b03c5c"
-          href="/colecciones/fall_winter"
+          href="/colecciones/fall-winter"
         />
+        
+
+
+         <Card
+          title="Prueba API Django"
+          imageSrc="/img/fall-winter.jpg" //
+          bgColor="#A0D9EF" // Un color distintivo
+          href="/test/mi-prueba-id" // Ruta de prueba con un ID de ejemplo
+          />
+
+          
+
       </div>
     </div>
   );
 }
-
-
-
-// export default function DashboardPage() {
-//   return (
-//     <div>
-//       <h2 className="text-2xl font-bold mb-4">Panel principal</h2>      
-//       <p className="mt-4">Aquí irá el contenido dinámico del dashboard.</p>
-//     </div>
-//   );
-// }
 

@@ -4,13 +4,10 @@ import Navbar  from '@/components/organisms/Navbar';
 import Sidebar from '@/components/organisms/Sidebar';
 import Footer  from '@/components/organisms/Footer';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'] });      //evaluar si se debe quitar
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // <html lang="es"></html>
-    <html>                               
-      <body className={inter.className}>
         <div className="flex flex-col min-h-screen">
           <Navbar />
           <div className="flex flex-1">
@@ -21,7 +18,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <Footer />
         </div>
-      </body>
-    </html>
   );
 }
