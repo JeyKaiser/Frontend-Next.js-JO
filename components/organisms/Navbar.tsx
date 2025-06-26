@@ -23,19 +23,9 @@ export default function Navbar() {
         </ul>
       </div>
       <form className="flex items-center gap-2">
-         <SearchBar />
+        <SearchBar />
       </form>
     </nav>
   );
 }
 
-
-
-
-// export default function Navbar() {
-//   return (
-//     <header className="bg-white shadow p-4 sticky top-0 z-10">
-//       <h1 className="text-xl font-bold">Mi Plataforma</h1>
-//     </header>
-//   );
-// }

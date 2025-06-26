@@ -1,7 +1,7 @@
+// app/(dashboard)/dashboard/page.tsx
 'use client';
 
 import Card from '@/components/molecules/Card';
-// import CardAnio from '@/components/molecules/CardAnio';
 
 export default function DashboardPage() {
   return (
@@ -12,13 +12,13 @@ export default function DashboardPage() {
         </h2>
         <div className="w-24 h-1 bg-gradient-to-r from-gray-700 via-yellow-400 to-gray-700 mx-auto mt-2 rounded-full" />
       </header>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+      
+      <div className="grid grid-cols-[repeat(auto-fit,_250px)] justify-center gap-6 px-4 py-8 items-start">        
         <Card
           title="Winter Sun"
           imageSrc="/img/winter-sun.jpg"
           bgColor="#feea4d"
-          href="/ui-playground"
+          href="/colecciones/winter-sun"
         />
         <Card
           title="Resort RTW"
@@ -50,20 +50,13 @@ export default function DashboardPage() {
           bgColor="#b03c5c"
           href="/colecciones/fall-winter"
         />
-        
-
-
-         <Card
+        <Card
           title="Prueba API Django"
-          imageSrc="/img/fall-winter.jpg" //
-          bgColor="#A0D9EF" // Un color distintivo
-          href="/test/mi-prueba-id" // Ruta de prueba con un ID de ejemplo
-          />
-
-          
-
+          imageSrc="/img/fall-winter.jpg"
+          bgColor="#A0D9EF"
+          href="/test/mi-prueba-id"
+        />
       </div>
     </div>
   );
 }
-

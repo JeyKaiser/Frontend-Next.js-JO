@@ -2,8 +2,8 @@
 'use client';
 
 import { useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../context/AuthContext';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '../app/context/AuthContext';
 
 interface AuthRouteGuardProps {
   children: ReactNode;
@@ -13,7 +13,7 @@ interface AuthRouteGuardProps {
 export default function AuthRouteGuard({ children, protectedPaths }: AuthRouteGuardProps) {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-  const currentPath = router.pathname; // Esto funciona en Client Components
+  const currentPath = usePathname(); // Usar usePathname para obtener la ruta actual
 
   const isProtected = protectedPaths.some(path => {
     // Para rutas dinámicas, necesitas una lógica más sofisticada si el patrón no es simple
