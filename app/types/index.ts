@@ -1,23 +1,17 @@
 // types/index.ts
 
-/**
- * Interface para la respuesta exitosa del token JWT de Django
- */
+/** Interface para la respuesta exitosa del token JWT de Django*/
 export interface AuthTokenResponse {
   access: string;
   refresh: string;
 }
 
-/**
- * Interface para la respuesta de error de la API (ej. login fallido)
- */
+/** Interface para la respuesta de error de la API (ej. login fallido) */
 export interface ApiErrorResponse {
   detail?: string; 
 }
 
-/**
- * Interface para un objeto Colección que viene de tu API de Django
- */
+/** Interface para un objeto Colección que viene de tu API de Django */
 export interface Collection {
   id: number;
   nombre: string;
@@ -27,9 +21,7 @@ export interface Collection {
   // Añade aquí cualquier otro campo que tus colecciones tengan en el backend
 }
 
-/**
- * Interface para los datos de la colección formateados para el frontend
- */
+/** Interface para los datos de la colección formateados para el frontend */
 export interface FormattedCollection {
   id: number;
   name: string;
@@ -38,9 +30,7 @@ export interface FormattedCollection {
   color: string;
 }
 
-/**
- * Interface para un objeto Año de Colección que viene de tu API de Django
- */
+/** Interface para un objeto Año de Colección que viene de tu API de Django */
 export interface AnioColeccionData {
   id: string;
   img: string; // Ruta relativa al public folder de Next.js (ej. /img/...)
@@ -48,9 +38,7 @@ export interface AnioColeccionData {
   label: string; // Año (ej. '2024')
 }
 
-/**
- * Interface para la respuesta de la API de Años de Colección
- */
+/** Interface para la respuesta de la API de Años de Colección*/
 export interface AnioColeccionApiResponse {
   nombre_coleccion: string;
   anios: AnioColeccionData[];
@@ -64,13 +52,20 @@ export interface TestDataApiResponse {
   timestamp: string;
 }
 
-/**
- * Interface para un elemento de modelo/referencia (análogo a 'modelo' en tu template de Django)
- */
+/** Interface para un elemento de modelo/referencia (análogo a 'modelo' en tu template de Django)*/
 export interface ReferenciaData {
-  U_GSP_Picture: string; // URL de la imagen
-  U_GSP_REFERENCE: string; // Referencia/nombre
-  U_GSP_Desc: string; // Descripción
-  // Añade aquí cualquier otro campo que venga de modelsExample
-  [key: string]: any; // Para permitir campos adicionales dinámicos
+  U_GSP_Picture: string;     // URL de la imagen
+  U_GSP_REFERENCE: string;   // Referencia/nombre (será el 'title' de la Card)
+  U_GSP_Desc: string;        // Descripción (será el 'subtitle' de la Card)
+  id?: string | number;      // Esto es crucial si lo usas como key. Si no, usa U_GSP_REFERENCE o el index.
+  color_fondo?: string; 
+  // Añade aquí cualquier otro campo que venga de modelsExample/tu API
+  [key: string]: any;        // Para permitir campos adicionales dinámicos que no uses directamente
 }
+// export interface ReferenciaData {
+//   U_GSP_Picture: string; // URL de la imagen
+//   U_GSP_REFERENCE: string; // Referencia/nombre
+//   U_GSP_Desc: string; // Descripción
+//   // Añade aquí cualquier otro campo que venga de modelsExample
+//   [key: string]: any; // Para permitir campos adicionales dinámicos
+// }

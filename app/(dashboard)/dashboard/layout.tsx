@@ -1,14 +1,10 @@
 //app/(dashboard)/dashboard/layout.tsx
 import '../../globals.css';
 import { Inter } from 'next/font/google';
-import Navbar from '@/components/organisms/Navbar';
-import Sidebar from '@/components/organisms/Sidebar';
-import Footer from '@/components/organisms/Footer';
 
-// Importa el AuthRouteGuard
 import AuthRouteGuard from '../../../components/AuthRouteGuard';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'] });    //evaluar si se debe quitar
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Define las rutas que quieres proteger con autenticación dentro de este grupo (dashboard)

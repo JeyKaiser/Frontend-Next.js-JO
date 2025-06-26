@@ -1,52 +1,59 @@
-// components/molecules/CardReferencia.tsx
+// components/molecules/Card.tsx
 import Image from 'next/image';
+import Link from 'next/link';
 
-interface CardReferenciaProps {
-  imageSrc: string;
-  title: string;
-  description: string;
-  // Puedes añadir más props si tu modelo tiene más campos que quieres mostrar
-  // href?: string; // Habilita esto si la tarjeta de referencia también es un enlace
+interface CardProps {
+  title: string;       // Será U_GSP_REFERENCE
+  imageSrc: string;    // Será U_GSP_Picture
+  bgColor?: string;    // Puede ser opcional
+  href?: string;       // Hacemos href opcional
+  id?: string | number;
+  subtitle?: string;   // Será U_GSP_Desc
 }
 
-export default function CardReferencia({ imageSrc, title, description }: CardReferenciaProps) {
-  const content = (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
-      {/* Imagen */}
-      <div className="relative w-full pb-[75%] overflow-hidden rounded-lg mb-4 flex justify-center items-center">
+export default function Card({ title, imageSrc, bgColor, href, id, subtitle }: CardProps) {
+  
+  const cardContent = (
+    <div
+      className="relative overflow-hidden rounded-2xl shadow-md transition-all duration-300 ease-in-out transform
+                 hover:scale-102 hover:shadow-lg hover:-translate-y-2.5
+                 flex flex-col cursor-pointer
+                 w-[200px] h-[200px] mx-auto flex-shrink-0" // <-- Tamaño fijo de la tarjeta
+      style={{ backgroundColor: bgColor || '#f0f0f0' }} // Color por defecto si no se proporciona
+     
+    >
+      {/* Contenedor de la imagen. Aspecto 1:1 y flex-grow */}
+      <div className="relative w-full aspect-w-2 aspect-h-1 overflow-hidden rounded-t-2xl flex-grow">
         <Image
-          src={imageSrc || '/img/placeholder.png'} // Fallback si la URL de la imagen es null/undefined
+          src={imageSrc}
           alt={title}
-          fill // Ocupa todo el contenedor
-          style={{ objectFit: 'contain' }} // Para que la imagen se ajuste sin recortarse
-          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw" // Mejora la optimización
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          style={{ objectFit: 'cover' }}
+          className="transition-transform duration-300 ease-in-out group-hover:scale-105"
+          priority
         />
       </div>
 
-      {/* Título y Descripción */}
-      <h3 className="text-xl font-semibold text-gray-800 text-center mb-2 truncate w-full">
-        {title}
-      </h3>
-      <p className="text-sm text-gray-600 text-center line-clamp-2">
-        {description}
-      </p>
+      {/* Contenedor del título y subtítulo/descripción */}
+      <div className="flex flex-col items-center justify-center p-3 text-center flex-shrink-0 min-h-[60px]">
+        <span className="text-gray-800 font-bold text-xl uppercase tracking-wide transition-all duration-300 ease-in-out group-hover:text-2xl">
+          {title}
+        </span>
+        {subtitle && (
+          <span className="text-gray-600 text-sm mt-1">
+            {subtitle}
+          </span>
+        )}
+      </div>
     </div>
   );
 
-  return (
-    <div
-      className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 ease-in-out
-                 overflow-hidden w-full h-80 flex flex-col justify-between" // Altura fija y flexbox para contenido
-    >
-      {/* Si CardReferencia necesita ser un enlace: */}
-      {/* {href ? (
-        <Link href={href} className="block w-full h-full">
-          {content}
-        </Link>
-      ) : (
-        content
-      )} */}
-      {content}
-    </div>
-  );
+  // *** CAMBIO CLAVE AQUÍ: Asegurar que href sea un string no vacío para Link ***
+  // También usamos !!href para convertirlo a booleano de forma segura.
+  if (typeof href === 'string' && href.length > 0) {
+    return <Link href={href} className="block group">{cardContent}</Link>;
+  } else {
+    return <div className="block group">{cardContent}</div>;
+  }
 }
