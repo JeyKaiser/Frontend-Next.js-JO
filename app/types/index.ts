@@ -71,3 +71,12 @@ export interface TelaData {
   BWidth1: number | null;    // Ancho (puede ser nulo)
   // Añade cualquier otro campo que tu consulta SQL pueda devolver
 }
+
+export interface InsumoData {
+  U_GSP_REFERENCE: string;   // Código de referencia (PT Code)
+  U_GSP_SchLinName: string;  // Uso en prenda
+  U_GSP_ItemCode: string;    // Código Insumo
+  U_GSP_ItemName: string;    // Descripción Insumo
+  BWidth1: number | null;    // Ancho (puede ser nulo, aunque para insumos quizás no aplique siempre)
+  // Si hay otras columnas específicas para insumos, añádelas aquí.
+}
