@@ -62,10 +62,12 @@ export interface ReferenciaData {
   // Añade aquí cualquier otro campo que venga de modelsExample/tu API
   [key: string]: any;        // Para permitir campos adicionales dinámicos que no uses directamente
 }
-// export interface ReferenciaData {
-//   U_GSP_Picture: string; // URL de la imagen
-//   U_GSP_REFERENCE: string; // Referencia/nombre
-//   U_GSP_Desc: string; // Descripción
-//   // Añade aquí cualquier otro campo que venga de modelsExample
-//   [key: string]: any; // Para permitir campos adicionales dinámicos
-// }
+
+export interface TelaData {
+  U_GSP_REFERENCE: string;   // Código de referencia (PT Code)
+  U_GSP_SchLinName: string;  // Uso en prenda
+  U_GSP_ItemCode: string;    // Código Tela
+  U_GSP_ItemName: string;    // Descripción Tela
+  BWidth1: number | null;    // Ancho (puede ser nulo)
+  // Añade cualquier otro campo que tu consulta SQL pueda devolver
+}

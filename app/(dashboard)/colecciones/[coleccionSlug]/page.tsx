@@ -1,7 +1,3 @@
-// app/(dashboard)/colecciones/[coleccionSlug]/page.tsx
-// 'use client'; // evaluar si se necesita (probablemente no, ya que es un Server Component)
-
-// Cambia la importación para usar el componente Card genérico
 import Card from '@/components/molecules/Card';
 import type { AnioColeccionApiResponse, AnioColeccionData } from '../../../types';
 
@@ -73,16 +69,15 @@ export default async function AnioColeccionPage({ params }: AnioColeccionPagePro
         {data.anios.length === 0 && ( //
             <p className="col-span-full text-center text-gray-600">No hay años disponibles para esta colección.</p>
         )}
-        {data.anios.map((anio: AnioColeccionData) => ( // Asegura el tipo 'anio'
+        {data.anios.map((anio: AnioColeccionData) => ( 
           <Card
             key={anio.id}
             id={anio.id}
-            title={anio.label} // El año (ej. "2024")
-            subtitle={displayCollectionName} // El nombre de la colección
-            imageSrc={anio.img} // "/img/..."
-            bgColor={anio.bg} //
-            // CRÍTICO: La URL para la siguiente página. Usamos el ID del año.
-            href={`/referencias/${anio.id}`} // Ajusta la ruta si es necesario (sin coleccionSlug)
+            title={anio.label}                // El año (ej. "2024")
+            subtitle={displayCollectionName}  // El nombre de la colección
+            imageSrc={anio.img}               // "/img/..."
+            bgColor={anio.bg}     
+            href={`/referencias/${anio.id}`}  // CRÍTICO: La URL para la siguiente página. Usamos el ID del año.
           />
         ))}
       </div>

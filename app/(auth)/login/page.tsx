@@ -1,4 +1,3 @@
-// src/app/login/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -13,12 +12,8 @@ export default function LoginPage() {
     const { loginUser, isAuthenticated, loading } = useAuth();
     const router = useRouter();
 
-    // Lógica para redirigir si ya está autenticado.
-    // Usamos un useEffect para asegurar que esto solo se ejecute en el cliente
-    // y después de que el AuthContext haya verificado el estado inicial.
+
     useEffect(() => {
-        // Solo redirige si loading es false (la verificación inicial ha terminado)
-        // Y el usuario está autenticado.
         if (!loading && isAuthenticated) {
             router.replace('/dashboard');
         }
@@ -35,10 +30,6 @@ export default function LoginPage() {
         }
     };
 
-    // Si `loading` es `true` (mientras se verifica el estado inicial)
-    // O si `isAuthenticated` es `true` (y estamos en el login pero deberíamos estar en dashboard)
-    // Mostramos un spinner para evitar parpadeos o el formulario de login innecesariamente.
-    // Esto es especialmente relevante en el SSR, donde `loading` será true inicialmente.
     if (loading) { // Mostramos 'Cargando...' mientras el contexto verifica el estado
         return (
             <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -47,10 +38,6 @@ export default function LoginPage() {
         );
     }
 
-    // Si llegamos aquí, `loading` es `false`. Ahora verificamos `isAuthenticated`.
-    // Si isAuthenticated es true, ya deberíamos haber sido redirigidos por el useEffect.
-    // Esta condición es una doble verificación para asegurar que el formulario no se muestre
-    // si el usuario ya está autenticado pero la redirección aún no se ha completado.
     if (isAuthenticated) {
         return null; // No renderizar nada, la redirección está en curso o ya se completó
     }
@@ -62,7 +49,7 @@ export default function LoginPage() {
                 <title>Iniciar Sesión - JO Project</title>
             </Head>
             <form onSubmit={handleSubmit}
-                  className="p-8 max-w-md w-full mx-auto mt-12 border border-gray-300 rounded-lg shadow-md bg-white">
+                className="p-8 max-w-md w-full mx-auto mt-12 border border-gray-300 rounded-lg shadow-md bg-white">
                 <h1 className="text-center text-gray-800 text-3xl font-semibold mb-6">Iniciar Sesión</h1>
 
                 {error && (
