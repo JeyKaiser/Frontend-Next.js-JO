@@ -1,5 +1,6 @@
 import Card from '@/components/molecules/Card';
 import type { AnioColeccionApiResponse, AnioColeccionData } from '../../../types';
+// Eliminamos: import React from 'react';
 
 interface AnioColeccionPageProps {
   params: {
@@ -7,172 +8,80 @@ interface AnioColeccionPageProps {
   };
 }
 
+// Función para obtener los años de la colección
 async function getAniosColeccion(coleccionSlug: string): Promise<AnioColeccionApiResponse | null> {
-  const DJANGO_API_BASE_URL = 'http://localhost:8000';
+  const DJANGO_API_BASE_URL = 'http://localhost:8000'; // Tu URL base de Django
 
   try {
     const apiUrl = `${DJANGO_API_BASE_URL}/api/colecciones/${coleccionSlug}/anios/`;
-    console.log(`[Next.js SC - Colecciones] Solicitando API: ${apiUrl}`); //
+    console.log(`[Next.js SC - Colecciones] Solicitando API: ${apiUrl}`);
 
     const res = await fetch(apiUrl, {
-      cache: 'no-store', // Para que no cachee viejas respuestas
+      cache: 'no-store', // Siempre obtiene los últimos datos
     });
 
-    console.log(`[Next.js SC - Colecciones] Estado de respuesta HTTP: ${res.status} (${res.statusText})`); //
+    console.log(`[Next.js SC - Colecciones] Estado de respuesta HTTP: ${res.status} (${res.statusText})`);
 
     if (!res.ok) {
       let errorBody = 'No body';
       try {
-          errorBody = await res.text();
+        errorBody = await res.text();
       } catch (e) {}
-      console.error(`[Next.js SC - Colecciones] Error al obtener años para '${coleccionSlug}': STATUS ${res.status}. Cuerpo: ${errorBody}`); //
+      console.error(`[Next.js SC - Colecciones] Error al obtener años para slug '${coleccionSlug}': STATUS ${res.status}. Cuerpo: ${errorBody}`);
       return null;
     }
 
     const data: AnioColeccionApiResponse = await res.json();
-    console.log(`[Next.js SC - Colecciones] Datos recibidos:`, data); //
+    console.log(`[Next.js SC - Colecciones] Datos recibidos:`, data);
     return data;
   } catch (error) {
-    console.error("[Next.js SC - Colecciones] Error de red o al parsear JSON:", error); //
+    console.error("[Next.js SC - Colecciones] Error de red o al parsear JSON:", error);
     return null;
   }
 }
 
 export default async function AnioColeccionPage({ params }: AnioColeccionPageProps) {
-  const { coleccionSlug } = params;
+  const { coleccionSlug } = params; // Acceso directo a params como antes
+
   const data = await getAniosColeccion(coleccionSlug);
 
-  if (!data || !data.anios) { // Aseguramos que 'anios' exista
+  if (!data || !data.anios) {          // Aseguramos que 'anios' exista
     return (
       <div className="text-center p-8 text-gray-700">
-        <h1 className="text-3xl font-bold mb-4">Colección no encontrada o error de carga.</h1>
-        <p>Por favor, verifica la URL o intenta de nuevo más tarde.</p>
-        <p className="text-sm text-gray-500">Slug: {coleccionSlug}</p>
+        <h1 className="text-3xl font-bold mb-4">Error al cargar los años de la colección.</h1>
+        <p>Verifica la API de Django o la conexión.</p>
+        <p className="text-sm text-gray-500">Slug de Colección: {coleccionSlug}</p>
       </div>
     );
   }
 
-  // Si el nombre viene como slug, lo formateamos para mostrarlo
-  const displayCollectionName = data.nombre_coleccion.replace(/-/g, ' ').toUpperCase();
+  const anios = data.anios;
+  const displayCollectionName = data.nombre_coleccion; 
 
   return (
     <>
       <header className="text-center mb-10 relative">
         <h2 className="text-3xl font-semibold uppercase tracking-wider text-gray-800">
-          AÑOS DE LA COLECCIÓN: {displayCollectionName}
+          AÑOS DE: {displayCollectionName.toUpperCase()}
         </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-gray-700 via-blue-400 to-gray-700 mx-auto mt-2 rounded-full" />
+        {/* <div className="w-20 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto mt-2 rounded-full" /> */}
       </header>
 
-      {/* Usar el mismo estilo de grid flexible del dashboard */}
       <div className="grid grid-cols-[repeat(auto-fit,_250px)] justify-center gap-6 px-4 py-8 items-start">
-        {data.anios.length === 0 && ( //
-            <p className="col-span-full text-center text-gray-600">No hay años disponibles para esta colección.</p>
+        {anios.length === 0 && (
+          <p className="col-span-full text-center text-gray-600">No hay años disponibles para esta colección.</p>
         )}
-        {data.anios.map((anio: AnioColeccionData) => ( 
+        {anios.map((anio) => (
           <Card
             key={anio.id}
-            id={anio.id}
-            title={anio.label}                // El año (ej. "2024")
-            subtitle={displayCollectionName}  // El nombre de la colección
-            imageSrc={anio.img}               // "/img/..."
-            bgColor={anio.bg}     
-            href={`/referencias/${anio.id}`}  // CRÍTICO: La URL para la siguiente página. Usamos el ID del año.
+            title={anio.label}
+            subtitle={displayCollectionName} // Mostrar el nombre de la colección como subtítulo
+            imageSrc={anio.img}
+            bgColor={anio.bg}
+            href={`/referencias/${anio.id}`} // Redirige a la página de referencias con el ID del año
           />
         ))}
       </div>
     </>
   );
 }
-
-
-// app/(dashboard)/colecciones/[coleccionSlug]/page.tsx
-// // 'use client'; // evaluar si se necesita
-
-// import Card from '@/components/molecules/Card'; 
-// import type { AnioColeccionApiResponse } from '../../../types'; 
-
-// interface AnioColeccionPageProps {
-//   params: {
-//     coleccionSlug: string;
-//   };
-// }
-
-// async function getAniosColeccion(coleccionSlug: string): Promise<AnioColeccionApiResponse | null> {
-//   const DJANGO_API_BASE_URL = 'http://localhost:8000';
-
-//   try {
-//     const apiUrl = `${DJANGO_API_BASE_URL}/api/colecciones/${coleccionSlug}/anios/`;
-//     console.log(`[Next.js SC - Colecciones] Solicitando API: ${apiUrl}`);
-
-//     const res = await fetch(apiUrl, {
-//       cache: 'no-store', // Para que no cachee viejas respuestas
-//     });
-
-//     console.log(`[Next.js SC - Colecciones] Estado de respuesta HTTP: ${res.status} (${res.statusText})`);
-
-//     if (!res.ok) {
-//       let errorBody = 'No body';
-//       try {
-//           errorBody = await res.text();
-//       } catch (e) {}
-//       console.error(`[Next.js SC - Colecciones] Error al obtener años para '${coleccionSlug}': STATUS ${res.status}. Cuerpo: ${errorBody}`);
-//       return null;
-//     }
-
-//     const data: AnioColeccionApiResponse = await res.json();
-//     console.log(`[Next.js SC - Colecciones] Datos recibidos:`, data);
-//     return data;
-//   } catch (error) {
-//     console.error("[Next.js SC - Colecciones] Error de red o al parsear JSON:", error);
-//     return null;
-//   }
-// }
-
-// export default async function AnioColeccionPage({ params }: AnioColeccionPageProps) {
-//   const { coleccionSlug } = params;
-//   const data = await getAniosColeccion(coleccionSlug);
-
-//   if (!data || !data.anios) { // Aseguramos que 'anios' exista
-//     return (
-//       <div className="text-center p-8 text-gray-700">
-//         <h1 className="text-3xl font-bold mb-4">Colección no encontrada o error de carga.</h1>
-//         <p>Por favor, verifica la URL o intenta de nuevo más tarde.</p>
-//         <p className="text-sm text-gray-500">Slug: {coleccionSlug}</p>
-//       </div>
-//     );
-//   }
-
-//   // Si el nombre viene como slug, lo formateamos para mostrarlo
-//   const displayCollectionName = data.nombre_coleccion.replace(/-/g, ' ').toUpperCase();
-
-//   return (
-//     <>
-//       <header className="text-center mb-10 relative">
-//         <h2 className="text-3xl font-semibold uppercase tracking-wider text-gray-800">
-//           AÑOS DE LA COLECCIÓN: {displayCollectionName}
-//         </h2>
-//         <div className="w-24 h-1 bg-gradient-to-r from-gray-700 via-blue-400 to-gray-700 mx-auto mt-2 rounded-full" />
-//       </header>
-
-//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-8">
-//         {data.anios.length === 0 && (
-//             <p className="col-span-full text-center text-gray-600">No hay años disponibles para esta colección.</p>
-//         )}
-//         {data.anios.map((anio) => ( // 'anio' es de tipo AnioColeccionData
-//           <Card
-//             key={anio.id}
-//             id={anio.id}
-//             title={anio.label} // El año (ej. "2024")
-//             subtitle={displayCollectionName} // El nombre de la colección
-//             imageSrc={anio.img} // "/img/..."
-//             bgColor={anio.bg}
-//             // CRÍTICO: La URL para la siguiente página. Usamos el ID del año.
-//             href={`/referencias/${anio.id}`}
-//           />
-//         ))}
-//       </div>
-//     </>
-//   );
-// }
-

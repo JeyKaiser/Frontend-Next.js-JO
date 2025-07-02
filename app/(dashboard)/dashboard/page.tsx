@@ -10,7 +10,7 @@ export default function DashboardPage() {
         <h2 className="text-3xl font-semibold uppercase tracking-wider text-gray-800">
           COLECCIONES
         </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-gray-700 via-yellow-400 to-gray-700 mx-auto mt-2 rounded-full" />
+        {/* <div className="w-24 h-1 bg-gradient-to-r from-gray-700 via-yellow-400 to-gray-700 mx-auto mt-2 rounded-full" /> */}
       </header>
       
       <div className="grid grid-cols-[repeat(auto-fit,_250px)] justify-center gap-6 px-4 py-8 items-start">        

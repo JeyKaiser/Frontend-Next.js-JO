@@ -7,16 +7,17 @@ interface ReferenciasPageProps {
   };
 }
 
+// Función para obtener referencias (sin cambios en la lógica de obtención)
 async function getReferencias(collectionId: string): Promise<ReferenciaData[] | null> {
   const DJANGO_API_BASE_URL = 'http://localhost:8000';
 
   try {
-    const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias/${collectionId}/`; // Tu URL de API actual
+    const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias/${collectionId}/`;
 
     console.log(`[Next.js SC - Referencias] Solicitando API: ${apiUrl}`);
 
     const res = await fetch(apiUrl, {
-      cache: 'no-store', // Siempre obtiene los últimos datos
+      cache: 'no-store',
     });
 
     console.log(`[Next.js SC - Referencias] Estado de respuesta HTTP: ${res.status} (${res.statusText})`);
@@ -24,7 +25,7 @@ async function getReferencias(collectionId: string): Promise<ReferenciaData[] | 
     if (!res.ok) {
       let errorBody = 'No body';
       try {
-        errorBody = await res.text();
+          errorBody = await res.text();
       } catch (e) {}
       console.error(`[Next.js SC - Referencias] Error al obtener referencias para ID '${collectionId}': STATUS ${res.status}. Cuerpo: ${errorBody}`);
       return null;
@@ -41,9 +42,9 @@ async function getReferencias(collectionId: string): Promise<ReferenciaData[] | 
 
 export default async function ReferenciasPage({ params }: ReferenciasPageProps) {
   const { collectionId } = params;
-  const modelos = await getReferencias(collectionId); // 'modelos' es ahora ReferenciaData[] | null
+  const modelos = await getReferencias(collectionId);
 
-  if (!modelos) { // Si es null, hubo un error de carga o API
+  if (!modelos) {
     return (
       <div className="text-center p-8 text-gray-700">
         <h1 className="text-3xl font-bold mb-4">Error al cargar las referencias.</h1>
@@ -53,9 +54,7 @@ export default async function ReferenciasPage({ params }: ReferenciasPageProps) 
     );
   }
 
-  const displayTitle = `REFERENCIAS PARA ID: ${collectionId}`;
-  const DJANGO_API_BASE_URL = 'http://localhost:8000';
-
+  const displayTitle = `REFERENCIAS DEL AÑO: ${collectionId}`;
 
   return (
     <>
@@ -63,7 +62,12 @@ export default async function ReferenciasPage({ params }: ReferenciasPageProps) 
         <h2 className="text-3xl font-semibold uppercase tracking-wider text-gray-800">
           {displayTitle}
         </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 mx-auto mt-2 rounded-full" />
+        {/* <div className="w-24 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 mx-auto mt-2 rounded-full" /> */}
+        {collectionId && (
+          <p className="text-gray-600 text-lg mt-2">
+            (Colección: {collectionId})
+          </p>
+        )}
       </header>
 
       <div className="grid grid-cols-[repeat(auto-fit,_200px)] justify-center gap-6 px-4 py-8 items-start">
@@ -71,10 +75,9 @@ export default async function ReferenciasPage({ params }: ReferenciasPageProps) 
             <p className="col-span-full text-center text-gray-600">No hay referencias disponibles para este ID.</p>
         )}
         {modelos.map((modelo, index) => {
-          // Si U_GSP_Picture es null, usa la imagen local 'palma.png'
           const fullImageSrc = modelo.U_GSP_Picture
-            ? `${modelo.U_GSP_Picture.replace(/\\/g, '/')}` // Ya viene con la URL completa si no es null
-            : '/img/palma.png'; // Ruta a tu imagen local en public/image/palma.png
+            ? `${modelo.U_GSP_Picture.replace(/\\/g, '/')}`
+            : '/img/SIN FOTO.png';
 
           return (
             <CardReferencia
@@ -82,8 +85,8 @@ export default async function ReferenciasPage({ params }: ReferenciasPageProps) 
               imageSrc={fullImageSrc}
               title={modelo.U_GSP_REFERENCE}
               subtitle={modelo.U_GSP_Desc}
-              referencePt={modelo.U_GSP_REFERENCE} // El código PT de la tarjeta
-              collectionId={collectionId}          // El ID de la colección actual
+              referencePt={modelo.U_GSP_REFERENCE}
+              collectionId={collectionId}
             />
           );
         })}
@@ -91,4 +94,3 @@ export default async function ReferenciasPage({ params }: ReferenciasPageProps) 
     </>
   );
 }
-

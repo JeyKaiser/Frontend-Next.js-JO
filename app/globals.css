@@ -14,7 +14,7 @@ body {
 
 /* Variables globales que pueden ser usadas por tus CSS Modules */
 :root {
-    --primary-color: #2D323A;
+    --primary-color: #262c36;
     --secondary-color: #FFFFFF;
     --background-color: #CFC5C2;
     --text-color: #333;

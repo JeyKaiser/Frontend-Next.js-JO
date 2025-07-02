@@ -15,9 +15,9 @@ export interface ApiErrorResponse {
 export interface Collection {
   id: number;
   nombre: string;
-  slug?: string; // slug podría ser opcional si no todos lo tienen
-  imagen_url: string; // La URL relativa de la imagen de Django
-  color_fondo?: string; // Color, opcional si no siempre está presente
+  slug?: string;         // slug podría ser opcional si no todos lo tienen
+  imagen_url: string;    // La URL relativa de la imagen de Django
+  color_fondo?: string;  // Color, opcional si no siempre está presente
   // Añade aquí cualquier otro campo que tus colecciones tengan en el backend
 }
 
