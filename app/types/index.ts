@@ -80,3 +80,14 @@ export interface InsumoData {
   BWidth1: number | null;    // Ancho (puede ser nulo, aunque para insumos quizás no aplique siempre)
   // Si hay otras columnas específicas para insumos, añádelas aquí.
 }
+
+export interface PTSearchResult {
+  U_GSP_REFERENCE: string;
+  U_GSP_COLLECTION: string; // Necesitamos la colección para redirigir a la página de telas
+  // Puedes añadir más campos si la búsqueda devuelve información adicional
+}
+ // NUEVA INTERFAZ PARA LA RESPUESTA COMBINADA DEL MODELO DETALLE
+export interface ModeloDetalleResponse {
+  telas: TelaData[];
+  insumos: InsumoData[];
+}
