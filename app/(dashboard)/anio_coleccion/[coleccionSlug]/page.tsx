@@ -13,7 +13,7 @@ async function getAniosColeccion(coleccionSlug: string): Promise<AnioColeccionAp
   const DJANGO_API_BASE_URL = 'http://localhost:8000'; // Tu URL base de Django
 
   try {
-    const apiUrl = `${DJANGO_API_BASE_URL}/api/colecciones/${coleccionSlug}/anios/`;
+    const apiUrl = `${DJANGO_API_BASE_URL}/api/anio_coleccion/${coleccionSlug}/anios/`;
     console.log(`[Next.js SC - Colecciones] Solicitando API: ${apiUrl}`);
 
     const res = await fetch(apiUrl, {

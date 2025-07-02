@@ -10,6 +10,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Define las rutas que quieres proteger con autenticación dentro de este grupo (dashboard)
   const protectedPaths = [
     '/',
+    '/anio_coleccion',
+    '/anio_coleccion/*',
     '/colecciones',
     '/colecciones/*',         
     '/productos/*',
