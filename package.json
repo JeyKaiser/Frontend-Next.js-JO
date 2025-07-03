@@ -12,7 +12,7 @@
     "axios": "^1.10.0",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.523.0",
-    "next": "^15.3.3",
+    "next": "^15.3.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
@@ -22,14 +22,15 @@
     "@tailwindcss/postcss": "^4.1.10",
     "@types/axios": "^0.9.36",
     "@types/jwt-decode": "^2.2.1",
-    "@types/node": "^20",
-    "@types/react": "^19",
+    "@types/node": "^20.19.4",
+    "@types/react": "^19.1.8",
     "@types/react-dom": "^19",
+    "@types/tailwindcss": "^3.0.11",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.3",
-    "typescript": "^5"
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3"
   }
 }

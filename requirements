@@ -1,7 +1,13 @@
-npm install axios
+axios
 jwt-decode
 next react react-dom
 -D tailwindcss postcss autoprefixer        
 -D tailwindcss@3.4.3 postcss autoprefixer
 lucide-react
 -D @tailwindcss/aspect-ratio
+react react-dom next tailwindcss postcss autoprefixer
+-D typescript @types/react @types/node @types/tailwindcss
+
+
+--Inicialization of Tailwind CSS--
+npx tailwindcss init -p
