@@ -7,6 +7,8 @@ lucide-react
 -D @tailwindcss/aspect-ratio
 react react-dom next tailwindcss postcss autoprefixer
 -D typescript @types/react @types/node @types/tailwindcss
+-D @types/clsx
+clsx tailwind-merge
 
 
 --Inicialization of Tailwind CSS--

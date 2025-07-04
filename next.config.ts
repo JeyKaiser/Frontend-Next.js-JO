@@ -1,33 +1,41 @@
 // next.config.js
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Elimina 'images.domains' si existe y reemplázalo con 'images.remotePatterns'
   images: {
-    domains: ['localhost', 
-      '127.0.0.1', 
-      'johannaortiz.net', 
-      'placehold.co'
+    // domains: ['localhost'], // <--- ELIMINA ESTO si existe
+    remotePatterns: [
+      {
+        protocol: 'http', // O 'https' si tu Django usa HTTPS
+        hostname: 'localhost',
+        port: '8000',
+        pathname: '/media/**', // Permite cualquier path bajo /media/
+      },
+      // Si tienes otros dominios para imágenes, agrégalos aquí:
+      // {
+      //   protocol: 'https',
+      //   hostname: 'otro-dominio.com',
+      //   port: '',
+      //   pathname: '/**',
+      // },
     ],
   },
 };
 
 module.exports = nextConfig;
 
-
-// // next.config.ts
-// import type { NextConfig } from 'next';
-
-// const nextConfig: NextConfig = {
-//   reactStrictMode: true,
-
-//   // --- Sección de configuración de imágenes ---
+// // next.config.js
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
 //   images: {
-//     // Aquí defines los dominios de los cuales Next.js está permitido cargar imágenes externas.
-//     // Esto es por seguridad y para que Next.js pueda optimizar las imágenes.
-//     domains: [      
-//       'localhost',    // Si tu Django sirve imágenes desde localhost (ej. /media/ o /static/)
-//       '127.0.0.1',    // Otra posible IP para tu servidor Django local      
-//     ],    
+//     domains: ['localhost', 
+//       '127.0.0.1', 
+//       'johannaortiz.net', 
+//       'placehold.co'
+//     ],
 //   },
 // };
 
-// export default nextConfig;
+// module.exports = nextConfig;
+

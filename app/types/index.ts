@@ -44,7 +44,6 @@ export interface AnioColeccionApiResponse {
   anios: AnioColeccionData[];
 }
 
-
 export interface TestDataApiResponse {
   id: string;
   message: string;
@@ -52,16 +51,49 @@ export interface TestDataApiResponse {
   timestamp: string;
 }
 
-/** Interface para un elemento de modelo/referencia (análogo a 'modelo' en tu template de Django)*/
-export interface ReferenciaData {
-  U_GSP_Picture: string;     // URL de la imagen
-  U_GSP_REFERENCE: string;   // Referencia/nombre (será el 'title' de la Card)
-  U_GSP_Desc: string;        // Descripción (será el 'subtitle' de la Card)
-  id?: string | number;      // Esto es crucial si lo usas como key. Si no, usa U_GSP_REFERENCE o el index.
-  color_fondo?: string; 
-  // Añade aquí cualquier otro campo que venga de modelsExample/tu API
-  [key: string]: any;        // Para permitir campos adicionales dinámicos que no uses directamente
+
+/** -----------------FASES------------------ */
+// Asegúrate de que los nombres de los campos coincidan EXACTAMENTE con lo que Django envía.
+export interface FaseDisponible {
+  slug: string;
+  nombre: string;
 }
+
+export interface ReferenciaData {
+  codigo_referencia: string; // Coincide con el campo 'codigo_referencia' de Django
+  nombre: string;            // Coincide con el campo 'nombre' de Django
+  imagen_url: string;        // Coincide con el campo 'imagen_url' de Django
+  fases_disponibles: FaseDisponible[]; // Coincide con el campo 'fases_disponibles' de Django
+}
+
+export interface ReferenciaDetalleAPI {
+  codigo_referencia: string;
+  nombre: string;
+  imagen_url: string;
+  fases_disponibles: FaseDisponible[];
+}
+
+export interface ReferenciaCardData {
+  U_GSP_Picture: string;
+  U_GSP_REFERENCE: string;
+  U_GSP_Desc: string;
+  id?: string | number;
+  color_fondo?: string;  
+  // Si tu API de lista de referencias devuelve otros campos, añádelos aquí.
+}
+
+
+
+// /** Interface para un elemento de modelo/referencia (análogo a 'modelo' en tu template de Django)*/
+// export interface ReferenciaData {
+//   U_GSP_Picture: string;     // URL de la imagen
+//   U_GSP_REFERENCE: string;   // Referencia/nombre (será el 'title' de la Card)
+//   U_GSP_Desc: string;        // Descripción (será el 'subtitle' de la Card)
+//   id?: string | number;      // Esto es crucial si lo usas como key. Si no, usa U_GSP_REFERENCE o el index.
+//   color_fondo?: string; 
+//   // Añade aquí cualquier otro campo que venga de modelsExample/tu API
+//   [key: string]: any;        // Para permitir campos adicionales dinámicos que no uses directamente
+// }
 
 export interface TelaData {
   U_GSP_REFERENCE: string;   // Código de referencia (PT Code)

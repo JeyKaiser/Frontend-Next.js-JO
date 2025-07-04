@@ -19,13 +19,15 @@
       }
     ],
     "paths": {
+      "@/*": ["../*"],                      // Puedes usar '@/*' para mapear todo src/ si prefieres:
       "@/styles/*": ["./styles/*"],         // Permite importar 'styles/...' como '@/styles/...'
       "@/types/*": ["./types/*"],           // Permite importar 'types/...' como '@/types/...'
       "@/lib/*": ["./lib/*"],               // Si tienes una carpeta 'lib'
-      "@/components/*": ["./components/*"], // Si tienes una carpeta 'components'      
-      "@/*": ["../*"]                            // Puedes usar '@/*' para mapear todo src/ si prefieres:
+      "@/components/*": ["./components/*"]  //Si tienes una carpeta 'components'            
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
+
+

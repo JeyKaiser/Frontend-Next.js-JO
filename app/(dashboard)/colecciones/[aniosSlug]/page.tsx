@@ -40,9 +40,10 @@ async function getAniosColeccion(aniosSlug: string): Promise<AnioColeccionApiRes
   }
 }
 
-export default async function AnioColeccionPage({ params }: AnioColeccionPageProps) {
-  const { aniosSlug } = params;
 
+export default async function AnioColeccionPage({ params }: AnioColeccionPageProps) {
+
+  const { aniosSlug } = await params;
   const data = await getAniosColeccion(aniosSlug);
 
   if (!data || !data.anios) {
@@ -79,7 +80,7 @@ export default async function AnioColeccionPage({ params }: AnioColeccionPagePro
             subtitle={displayCollectionName}
             imageSrc={anio.img}
             bgColor={anio.bg}
-            href={`/referencias/${anio.id}`} // Redirige a la página de referencias con el ID del año
+            href={`/referencias-por-anio/${anio.id}`} // Redirige a la página de referencias con el ID del año
           />
         ))}
       </div>

@@ -1,5 +1,5 @@
 import Card from '@/components/molecules/Card';
-import type { AnioColeccionApiResponse, AnioColeccionData } from '../../../types';
+import type { AnioColeccionApiResponse } from '../../../types';
 // Eliminamos: import React from 'react';
 
 interface AnioColeccionPageProps {
