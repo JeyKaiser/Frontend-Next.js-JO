@@ -1,5 +1,5 @@
 import Card from '@/components/molecules/Card';
-import type { AnioColeccionApiResponse, AnioColeccionData } from '../../../types';
+import type { AniosColeccionApiResponse, AnioColeccionData } from '../../../types';
 
 interface AnioColeccionPageProps {
   params: {
@@ -8,7 +8,7 @@ interface AnioColeccionPageProps {
 }
 
 // Función para obtener los años de la colección
-async function getAniosColeccion(aniosSlug: string): Promise<AnioColeccionApiResponse | null> {
+async function getAniosColeccion(aniosSlug: string): Promise<AniosColeccionApiResponse | null> {
   const DJANGO_API_BASE_URL = 'http://localhost:8000'; // Tu URL base de Django
 
   try {
@@ -17,7 +17,7 @@ async function getAniosColeccion(aniosSlug: string): Promise<AnioColeccionApiRes
     console.log(`[Next.js SC - Colecciones] Solicitando API: ${apiUrl}`);
 
     const res = await fetch(apiUrl, {
-      cache: 'no-store', // Siempre obtiene los últimos datos
+      cache: 'no-store',               // Siempre obtiene los últimos datos
     });
 
     console.log(`[Next.js SC - Colecciones] Estado de respuesta HTTP: ${res.status} (${res.statusText})`);
@@ -31,7 +31,7 @@ async function getAniosColeccion(aniosSlug: string): Promise<AnioColeccionApiRes
       return null;
     }
 
-    const data: AnioColeccionApiResponse = await res.json();
+    const data: AniosColeccionApiResponse = await res.json();
     console.log(`[Next.js SC - Colecciones] Datos recibidos:`, data);
     return data;
   } catch (error) {
@@ -55,15 +55,16 @@ export default async function AnioColeccionPage({ params }: AnioColeccionPagePro
       </div>
     );
   }
-
+ 
   const anios = data.anios;
   const displayCollectionName = data.nombre_coleccion;
 
   return (
     <>
       <header className="text-center mb-10 relative">
+        <h3>COLECCIÓN</h3>
         <h2 className="text-3xl font-semibold uppercase tracking-wider text-gray-800">
-          AÑOS DE: {displayCollectionName.toUpperCase()}
+          {displayCollectionName.toUpperCase()}
         </h2>
         <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto mt-2 rounded-full" />
       </header>

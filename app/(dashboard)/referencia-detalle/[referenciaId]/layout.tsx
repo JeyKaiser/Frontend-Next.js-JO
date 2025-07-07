@@ -45,7 +45,7 @@ export default async function ReferenciaDetalleLayout({ children, params }: Refe
         <img
           src={referenciaData.imagen_url}
           alt={`Imagen de la referencia ${referenciaData.nombre}`}
-          className="mb-6 max-w-xs h-auto rounded shadow-lg" // Estilos de Tailwind
+          className="mb-6 max-w-xs h-auto rounded shadow-lg" 
         />
       )}
       {/* Barra de pestañas */}
