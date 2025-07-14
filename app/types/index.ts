@@ -11,6 +11,39 @@ export interface ApiErrorResponse {
   detail?: string; 
 }
 
+
+/** Interface para la respuesta a la solicitud de años de una coleccion (Cards)*/
+export interface AniosColeccionApiResponse {
+  nombre_coleccion: string;
+  anios: AnioColeccionData[];
+}
+
+
+/** Interface para la respuesta a la solicitud de PT's de un año de una coleccion (Cards)*/
+export interface ReferenciasAnioApiResponse {
+  U_GSP_Picture: string;
+  U_GSP_REFERENCE: string;
+  U_GSP_Desc: string;
+  id?: string | number;
+  color_fondo?: string;  
+  // Si tu API de lista de referencias devuelve otros campos, añádelos aquí.
+}
+
+
+
+
+
+
+export interface ReferenciaData {
+  codigo_referencia: string; // Coincide con el campo 'codigo_referencia' de Django
+  nombre: string;            // Coincide con el campo 'nombre' de Django
+  imagen_url: string;        // Coincide con el campo 'imagen_url' de Django
+  fases_disponibles: FaseDisponible[]; // Coincide con el campo 'fases_disponibles' de Django
+}
+
+
+
+
 /** Interface para un objeto Colección que viene de tu API de Django */
 export interface Collection {
   id: number;
@@ -33,16 +66,13 @@ export interface FormattedCollection {
 /** Interface para un objeto Año de Colección que viene de tu API de Django */
 export interface AnioColeccionData {
   id: string;
-  img: string; // Ruta relativa al public folder de Next.js (ej. /img/...)
-  bg: string; // Color de fondo
-  label: string; // Año (ej. '2024')
+  img: string;    // Ruta relativa al public folder de Next.js (ej. /img/...)
+  bg: string;     // Color de fondo
+  label: string;  // Año (ej. '2024')
 }
 
-/** Interface para la respuesta de la API de Años de Colección*/
-export interface AnioColeccionApiResponse {
-  nombre_coleccion: string;
-  anios: AnioColeccionData[];
-}
+
+
 
 export interface TestDataApiResponse {
   id: string;
@@ -59,13 +89,6 @@ export interface FaseDisponible {
   nombre: string;
 }
 
-export interface ReferenciaData {
-  codigo_referencia: string; // Coincide con el campo 'codigo_referencia' de Django
-  nombre: string;            // Coincide con el campo 'nombre' de Django
-  imagen_url: string;        // Coincide con el campo 'imagen_url' de Django
-  fases_disponibles: FaseDisponible[]; // Coincide con el campo 'fases_disponibles' de Django
-}
-
 export interface ReferenciaDetalleAPI {
   codigo_referencia: string;
   nombre: string;
@@ -73,14 +96,7 @@ export interface ReferenciaDetalleAPI {
   fases_disponibles: FaseDisponible[];
 }
 
-export interface ReferenciaCardData {
-  U_GSP_Picture: string;
-  U_GSP_REFERENCE: string;
-  U_GSP_Desc: string;
-  id?: string | number;
-  color_fondo?: string;  
-  // Si tu API de lista de referencias devuelve otros campos, añádelos aquí.
-}
+
 
 
 

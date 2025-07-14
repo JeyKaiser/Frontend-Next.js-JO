@@ -1,28 +1,35 @@
 // app/(dashboard)/referencias-por-anio/[collectionId]/page.tsx
 
 import CardReferencia from '@/components/molecules/CardReferencia';
-import type { ReferenciaCardData } from '../../../../app/types';
+import type { ReferenciasAnioApiResponse } from '../../../../app/types';
 
+<<<<<<< HEAD
 // Definición de la interfaz de props. Sencilla y directa.
+=======
+>>>>>>> 0a4aad9b8c29d92ff11db95fab1bd4908b1a9143
 interface ReferenciasListPageProps { 
   params: {
     collectionId: string; // El ID del AÑO/COLECCIÓN (ej. "063", "085")
   };
-  // Si Next.js pasa otras props como `searchParams`, las añadiríamos aquí.
-  // Pero para este error, lo importante es 'params'.
 }
 
 // Función para obtener referencias (sin cambios en la lógica de obtención)
-async function getReferenciasList(collectionId: string): Promise<ReferenciaCardData[] | null> {
+async function getReferenciasList(collectionId: string): Promise<ReferenciasAnioApiResponse[] | null> {
   const DJANGO_API_BASE_URL = 'http://localhost:8000';
 
   try {
+<<<<<<< HEAD
     const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias-por-anio/${collectionId}/`;   // Esta API DEBE devolver un array de ReferenciaCardData
     console.log(`[Next.js SC - Referencias List] Solicitando API: ${apiUrl}`);
+=======
+    const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias-por-anio/${collectionId}/`; // Esta API DEBE devolver un array de ReferenciaCardData
+    console.log(`[Next.js SC - Referencias List] Solicitando API: ${apiUrl}, con ID de colección: ${collectionId}`);
+>>>>>>> 0a4aad9b8c29d92ff11db95fab1bd4908b1a9143
     const res = await fetch(apiUrl, {
       cache: 'no-store',
     });
     console.log(`[Next.js SC - Referencias List] Estado de respuesta HTTP: ${res.status} (${res.statusText})`);
+    
     if (!res.ok) {
       let errorBody = 'No body';
       try {
@@ -33,7 +40,7 @@ async function getReferenciasList(collectionId: string): Promise<ReferenciaCardD
       // lo que activa el mensaje "Error al cargar las referencias." en el UI.
       return null;
     }
-    const data: ReferenciaCardData[] = await res.json();
+    const data: ReferenciasAnioApiResponse[] = await res.json();
     console.log(`[Next.js SC - Referencias List] Datos recibidos:`, data);
     return data;
   } catch (error) {

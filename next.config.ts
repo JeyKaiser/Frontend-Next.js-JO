@@ -11,6 +11,17 @@ const nextConfig = {
         hostname: 'localhost',
         port: '8000',
         pathname: '/media/**', // Permite cualquier path bajo /media/
+
+      },    
+      {
+        protocol: 'https',
+        hostname: 'johannaortiz.net',
+        pathname: '/media/**', // Permite cualquier path bajo /media/
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+        pathname: '/**', 
       },
       {
         protocol: 'https', // Las URLs que proporcionaste usan HTTPS

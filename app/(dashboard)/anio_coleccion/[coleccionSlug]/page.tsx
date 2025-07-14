@@ -1,5 +1,5 @@
 import Card from '@/components/molecules/Card';
-import type { AnioColeccionApiResponse } from '../../../types';
+import type { AniosColeccionApiResponse } from '../../../types';
 // Eliminamos: import React from 'react';
 
 interface AnioColeccionPageProps {
@@ -9,7 +9,7 @@ interface AnioColeccionPageProps {
 }
 
 // Función para obtener los años de la colección
-async function getAniosColeccion(coleccionSlug: string): Promise<AnioColeccionApiResponse | null> {
+async function getAniosColeccion(coleccionSlug: string): Promise<AniosColeccionApiResponse | null> {
   const DJANGO_API_BASE_URL = 'http://localhost:8000'; // Tu URL base de Django
 
   try {
@@ -31,7 +31,7 @@ async function getAniosColeccion(coleccionSlug: string): Promise<AnioColeccionAp
       return null;
     }
 
-    const data: AnioColeccionApiResponse = await res.json();
+    const data: AniosColeccionApiResponse = await res.json();
     console.log(`[Next.js SC - Colecciones] Datos recibidos:`, data);
     return data;
   } catch (error) {
