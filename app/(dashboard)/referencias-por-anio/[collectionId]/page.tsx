@@ -4,7 +4,7 @@ import CardReferencia from '@/components/molecules/CardReferencia';
 import type { ReferenciaCardData } from '../../../../app/types';
 
 // Definición de la interfaz de props. Sencilla y directa.
-interface ReferenciasListPageProps { // Renombro a ListPageProps para claridad
+interface ReferenciasListPageProps { 
   params: {
     collectionId: string; // El ID del AÑO/COLECCIÓN (ej. "063", "085")
   };
@@ -17,7 +17,7 @@ async function getReferenciasList(collectionId: string): Promise<ReferenciaCardD
   const DJANGO_API_BASE_URL = 'http://localhost:8000';
 
   try {
-    const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias-por-anio/${collectionId}/`; // Esta API DEBE devolver un array de ReferenciaCardData
+    const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias-por-anio/${collectionId}/`;   // Esta API DEBE devolver un array de ReferenciaCardData
     console.log(`[Next.js SC - Referencias List] Solicitando API: ${apiUrl}`);
     const res = await fetch(apiUrl, {
       cache: 'no-store',

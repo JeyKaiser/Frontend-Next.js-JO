@@ -7,7 +7,7 @@ export async function getReferenciaData(referenciaId: string): Promise<Referenci
   const DJANGO_API_BASE_URL = 'http://localhost:8000';
 
   try {
-    const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias/${referenciaId}/`; // Esta URL llama a tu ReferenciaDetailView en Django
+    const apiUrl = `${DJANGO_API_BASE_URL}/api/detalle-referencia/${referenciaId}/`; // Esta URL llama a tu ReferenciaDetailView en Django
     console.log(`[Next.js SC - Referencia Detalle] Solicitando API: ${apiUrl}`);
 
     const res = await fetch(apiUrl, {

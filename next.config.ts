@@ -12,30 +12,18 @@ const nextConfig = {
         port: '8000',
         pathname: '/media/**', // Permite cualquier path bajo /media/
       },
-      // Si tienes otros dominios para imágenes, agrégalos aquí:
-      // {
-      //   protocol: 'https',
-      //   hostname: 'otro-dominio.com',
-      //   port: '',
-      //   pathname: '/**',
-      // },
+      {
+        protocol: 'https', // Las URLs que proporcionaste usan HTTPS
+        hostname: 'johannaortiz.net',
+        // No se especifica 'port' si usa el puerto estándar (80 para HTTP, 443 para HTTPS)
+        // No se especifica 'pathname' si quieres permitir cualquier path desde ese hostname
+        // Si solo quieres permitir /media/ImagesJOServer/ desde ese dominio, puedes ser más específico:
+        pathname: '/media/ImagesJOServer/**', 
+      },
+      
     ],
   },
 };
 
 module.exports = nextConfig;
-
-// // next.config.js
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   images: {
-//     domains: ['localhost', 
-//       '127.0.0.1', 
-//       'johannaortiz.net', 
-//       'placehold.co'
-//     ],
-//   },
-// };
-
-// module.exports = nextConfig;
 

@@ -2,9 +2,11 @@
 // Este layout ahora es el ENCARGADO de obtener los detalles de UNA referencia
 // y mostrar la barra de pestañas para sus fases.
 
-import { getReferenciaData } from '@/lib/api'; // Asegúrate de que esta ruta sea correcta
+import { getReferenciaData } from '@/lib/api';        // Asegúrate de que esta ruta sea correcta
 import TabList from '@/components/molecules/TabList'; // Componente que crearemos
 import { notFound, redirect } from 'next/navigation'; // Importa redirect
+import { console } from 'inspector';
+// import Image from 'next/image'; // Importa el componente Image de Next.js
 
 interface ReferenciaDetalleLayoutProps {
   children: React.ReactNode;
@@ -26,9 +28,12 @@ export default async function ReferenciaDetalleLayout({ children, params }: Refe
   }
 
   if (!referenciaData || referenciaData.fases_disponibles.length === 0) {
+    console.error(`[ReferenciaDetalleLayout] Referencia con ID ${referenciaId} no encontrada o sin fases.`);
     // Si no hay datos o no hay fases, también 404
     notFound();
   }
+
+  console.log("Referencia Detalle Layout cargado para ID:");
 
   // Para manejar la redirección a la primera fase si se llega a la URL base
   // http://localhost:3000/referencia-detalle/PT01660
@@ -39,15 +44,16 @@ export default async function ReferenciaDetalleLayout({ children, params }: Refe
       <h1 className="text-3xl font-bold mb-6 text-gray-800">
         Referencia: {referenciaData.nombre} ({referenciaData.codigo_referencia})
       </h1>
-      {referenciaData.imagen_url && (
-        // Asumiendo que tienes un componente ImageDisplay o que next/image es suficiente
-        // Si no tienes ImageDisplay, puedes usar el <Image> de next/image directamente
-        <img
+      {/* {referenciaData.imagen_url && (
+        // Usando el componente <Image> de next/image para optimización
+        <Image
           src={referenciaData.imagen_url}
           alt={`Imagen de la referencia ${referenciaData.nombre}`}
-          className="mb-6 max-w-xs h-auto rounded shadow-lg" // Estilos de Tailwind
+          width={320}
+          height={240}
+          className="mb-6 max-w-xs h-auto rounded shadow-lg" 
         />
-      )}
+      )} */}
       {/* Barra de pestañas */}
       <TabList referenciaId={referenciaId} fases={referenciaData.fases_disponibles} />
       {/* Aquí se renderizará el contenido de la fase activa (children) */}
