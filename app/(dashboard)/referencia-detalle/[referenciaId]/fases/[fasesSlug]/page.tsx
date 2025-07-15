@@ -1,31 +1,49 @@
-// app/(dashboard)/referencia-detalle/[referenciaId]/fases/[faseSlug]/page.tsx
+// app/(dashboard)/referencia-detalle/[referenciaId]/fases/[fasesSlug]/page.tsx
+// Este archivo es el que MUESTRA los detalles de la fase
+
+import { getFaseData } from '@/lib/api';
+import { notFound } from 'next/navigation';
 
 interface ReferenciaFasePageProps {
   params: {
     referenciaId: string;
-    faseSlug: string; // Este es el slug de la fase actual, ej. 'jo', 'md-creacion-ficha'
+    fasesSlug: string;
+  };
+  searchParams: {
+    collectionId?: string;
   };
 }
 
-// Puedes (opcionalmente) obtener datos específicos de la fase si tu API lo soporta.
-// Por ahora, simplemente mostraremos el slug de la fase.
+export default async function ReferenciaFasePage({ params, searchParams }: ReferenciaFasePageProps) {
+  const { referenciaId, fasesSlug } = await params;
+  // Accede a collectionId de forma segura
+  const collectionId = (await searchParams)?.collectionId; 
 
-export default async function ReferenciaFasePage({ params }: ReferenciaFasePageProps) {
-  // Asegúrate de que params se 'await'ee
-  const { referenciaId, faseSlug } = await params;
+  console.log("Contenido de params en ReferenciaFasePage (después de await):", { referenciaId, fasesSlug });
+  console.log("Contenido de searchParams.collectionId en ReferenciaFasePage:", collectionId);
 
-  // En un caso real, aquí cargarías el contenido específico de la fase
-  // ej: const faseContent = await getFaseContent(referenciaId, faseSlug);
+  if (!collectionId) {
+    console.error(`[ReferenciaFasePage] collectionId es requerido para la fase ${fasesSlug} de la referencia ${referenciaId}.`);
+    notFound(); // Esto activará un 404 si el collectionId no llega
+  }
+
+  const faseData = await getFaseData(referenciaId, fasesSlug, collectionId);
+
+  if (!faseData) {
+    console.error(`[ReferenciaFasePage] No se pudieron obtener datos para la fase ${fasesSlug} de la referencia ${referenciaId}.`);
+    notFound();
+  }
 
   return (
     <div className="p-4 bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-700">Contenido de la Fase: {faseSlug.toUpperCase()}</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-gray-700">Contenido de la Fase: {fasesSlug.toUpperCase()}</h2>
       <p className="text-gray-600">
-        Esta es la página para la fase **{faseSlug.toUpperCase()}** de la referencia **{referenciaId}**.
+        Esta es la página para la fase **{fasesSlug.toUpperCase()}** de la referencia **{referenciaId}**.
         Aquí es donde se cargará el contenido específico de cada fase (tablas, imágenes, formularios, etc.).
       </p>
-      {/* Puedes añadir la imagen de la card si quieres aquí */}
-      {/* <img src={referenciaData.imagen_url} alt={referenciaData.nombre} className="mt-4 max-w-sm rounded-lg" /> */}
+      <pre className="mt-4 p-4 bg-gray-100 rounded-lg text-sm overflow-auto">
+        {JSON.stringify(faseData, null, 2)}
+      </pre>
     </div>
   );
 }

@@ -1,45 +1,46 @@
 // app/(dashboard)/referencia-detalle/[referenciaId]/page.tsx
-// Este archivo manejará la URL: /referencia-detalle/PT00001 (sin la fase)
+// Este archivo es el ENCARGADO de la redirección inicial
 
-import { getReferenciaData } from '@/lib/api';
-import { notFound, redirect } from 'next/navigation';
-import type { FaseDisponible } from '../../../../app/types';
+import { getReferenciaData } from '@/lib/api'; // Asegúrate de importar la función correcta
+import { redirect } from 'next/navigation';
 
-interface ReferenciaBasePageProps {
+interface ReferenciaDetallePageProps {
   params: {
     referenciaId: string;
   };
+  searchParams: { // Necesitas esto para capturar el collectionId cuando la URL sea /referencia-detalle/PT01660?collectionId=063
+    collectionId?: string;
+  };
 }
 
-export default async function ReferenciaBasePage({ params }: ReferenciaBasePageProps) {
+export default async function ReferenciaDetallePage({ params, searchParams }: ReferenciaDetallePageProps) {
+  // 1. Desestructurar y esperar params y searchParams
   const { referenciaId } = await params;
+  // Accede a collectionId de forma segura
+  const collectionId = (await searchParams)?.collectionId; 
 
-  const referenciaData = await getReferenciaData(referenciaId);
-
-  if (!referenciaData) {
-    console.error(`[ReferenciaBasePage] Referencia con ID ${referenciaId} no encontrada para redirección.`);
-    notFound();
+  // 2. Verificar si collectionId está presente ANTES de intentar redirigir
+  if (!collectionId) {
+    console.error("[ReferenciaDetallePage] Collection ID faltante en la URL inicial de la referencia. No se puede redirigir a una fase específica.");
+    // Redirige a una página segura o muestra un error si el collectionId es indispensable desde el inicio
+    redirect('/colecciones'); // Ejemplo: redirige a la página de selección de colecciones
   }
 
-  // Si no hay fases disponibles, puedes redirigir a una página de "no fases" o mostrar un mensaje
-  if (!referenciaData.fases_disponibles || referenciaData.fases_disponibles.length === 0) {
-    console.warn(`[ReferenciaBasePage] Referencia ${referenciaId} no tiene fases disponibles para redirección.`);
-    // Podrías redirigir a una ruta como /referencia-detalle/PT00001/no-fases
-    // Por ahora, solo muestra un mensaje simple o lanza un error si es un caso no esperado.
+  // 3. Obtener los datos de la referencia para saber sus fases
+  const referenciaData = await getReferenciaData(referenciaId);
+  const fases = referenciaData?.fases_disponibles || [];
+
+  // 4. Redirigir a la primera fase si existe
+  if (fases.length > 0) {
+    // IMPORTANTE: Construir la URL de redirección incluyendo el collectionId
+    console.log(`[ReferenciaDetallePage] Redirigiendo a la primera fase: ${fases[0].slug} con collectionId: ${collectionId}`);
+    redirect(`/referencia-detalle/${referenciaId}/fases/${fases[0].slug}?collectionId=${collectionId}`);
+  } else {
+    // Si no hay fases, mostrar un mensaje de que no hay nada que ver
     return (
-        <div className="container mx-auto p-8 text-center">
-            <h1 className="text-3xl font-bold mb-4">Referencia {referenciaId}</h1>
-            <p className="text-red-500">No hay fases disponibles para esta referencia.</p>
-        </div>
+      <div className="p-4">
+        <p className="text-gray-600">No hay fases disponibles para esta referencia.</p>
+      </div>
     );
   }
-
-  // Redirigir a la primera fase disponible si no se ha especificado ninguna en la URL
-  const primeraFaseSlug = referenciaData.fases_disponibles[0].slug;
-  console.log(`[ReferenciaBasePage] Redirigiendo a la primera fase: ${primeraFaseSlug}`);
-  redirect(`/referencia-detalle/${referenciaId}/fases/${primeraFaseSlug}`);
-
-  // Este componente nunca debería renderizar directamente nada si la redirección ocurre
-  // return null; // O un spinner si la redirección tarda mucho, aunque es instantáneo.
 }
-

@@ -1,64 +1,57 @@
 // app/(dashboard)/referencia-detalle/[referenciaId]/layout.tsx
-// Este layout ahora es el ENCARGADO de obtener los detalles de UNA referencia
-// y mostrar la barra de pestañas para sus fases.
 
-import { getReferenciaData } from '@/lib/api';        // Asegúrate de que esta ruta sea correcta
-import TabList from '@/components/molecules/TabList'; // Componente que crearemos
-import { notFound, redirect } from 'next/navigation'; // Importa redirect
-import { console } from 'inspector';
-// import Image from 'next/image'; // Importa el componente Image de Next.js
+import { getReferenciaData } from '@/lib/api';
+import TabList from '@/components/molecules/TabList';
+import { redirect } from 'next/navigation';
 
 interface ReferenciaDetalleLayoutProps {
   children: React.ReactNode;
   params: {
-    referenciaId: string; // Este es el ID de la referencia (ej. PT01660)
+    referenciaId: string;
+  };
+  searchParams: { 
+    collectionId?: string;
   };
 }
 
-export default async function ReferenciaDetalleLayout({ children, params }: ReferenciaDetalleLayoutProps) {
-  const referenciaId = params.referenciaId;
+export default async function ReferenciaDetalleLayout({
+  children,
+  params,
+  searchParams,
+}: ReferenciaDetalleLayoutProps) {
+  const { referenciaId } = await params;
+  // Accede a collectionId de forma segura
+  const collectionId = (await searchParams)?.collectionId; 
+
+  if (!collectionId) {
+      console.warn(`[Layout] collectionId no proporcionado para referencia ${referenciaId}.`);
+      // No redirijas aquí directamente, el page.tsx raíz maneja la redirección inicial.
+  }
+
   let referenciaData;
-
   try {
-    referenciaData = await getReferenciaData(referenciaId);
+      referenciaData = await getReferenciaData(referenciaId);
   } catch (error) {
-    console.error(`Error fetching referencia data for layout ${referenciaId}:`, error);
-    // Si la referencia no se encuentra, o hay un error de fetch, muestra un 404
-    notFound();
+      console.error(`[Layout] Error al obtener referenciaData para ${referenciaId}:`, error);
+      redirect('/error-generico');
+  }
+  
+  if (!referenciaData) {
+    redirect('/404'); 
   }
 
-  if (!referenciaData || referenciaData.fases_disponibles.length === 0) {
-    console.error(`[ReferenciaDetalleLayout] Referencia con ID ${referenciaId} no encontrada o sin fases.`);
-    // Si no hay datos o no hay fases, también 404
-    notFound();
-  }
-
-  console.log("Referencia Detalle Layout cargado para ID:");
-
-  // Para manejar la redirección a la primera fase si se llega a la URL base
-  // http://localhost:3000/referencia-detalle/PT01660
-  // el `children` será el `page.tsx` de esta carpeta, que redirigirá.
+  const fases = referenciaData.fases_disponibles || [];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">
-        Referencia: {referenciaData.nombre} ({referenciaData.codigo_referencia})
-      </h1>
-      {/* {referenciaData.imagen_url && (
-        // Usando el componente <Image> de next/image para optimización
-        <Image
-          src={referenciaData.imagen_url}
-          alt={`Imagen de la referencia ${referenciaData.nombre}`}
-          width={320}
-          height={240}
-          className="mb-6 max-w-xs h-auto rounded shadow-lg" 
-        />
-      )} */}
-      {/* Barra de pestañas */}
-      <TabList referenciaId={referenciaId} fases={referenciaData.fases_disponibles} />
-      {/* Aquí se renderizará el contenido de la fase activa (children) */}
-      <div className="mt-4 p-6 bg-white rounded-lg shadow-md">
-        {children}
+    <div className="flex flex-col h-full bg-gray-50">
+      <header className="bg-white shadow p-4 mb-4">
+        <h1 className="text-3xl font-bold text-gray-800">
+          Detalles de la Referencia:{referenciaData.nombre} ({referenciaId})
+        </h1>
+      </header>
+      <div className="container mx-auto px-4 flex-grow">
+        <TabList referenciaId={referenciaId} fases={fases} currentCollectionId={collectionId} />
+        <div className="mt-4">{children}</div>
       </div>
     </div>
   );

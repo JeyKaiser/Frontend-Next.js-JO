@@ -1,13 +1,9 @@
 // app/(dashboard)/referencias-por-anio/[collectionId]/page.tsx
-
 import CardReferencia from '@/components/molecules/CardReferencia';
 import type { ReferenciasAnioApiResponse } from '../../../../app/types';
 
-<<<<<<< HEAD
 // Definición de la interfaz de props. Sencilla y directa.
-=======
->>>>>>> 0a4aad9b8c29d92ff11db95fab1bd4908b1a9143
-interface ReferenciasListPageProps { 
+interface ReferenciasListPageProps {
   params: {
     collectionId: string; // El ID del AÑO/COLECCIÓN (ej. "063", "085")
   };
@@ -18,18 +14,13 @@ async function getReferenciasList(collectionId: string): Promise<ReferenciasAnio
   const DJANGO_API_BASE_URL = 'http://localhost:8000';
 
   try {
-<<<<<<< HEAD
     const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias-por-anio/${collectionId}/`;   // Esta API DEBE devolver un array de ReferenciaCardData
     console.log(`[Next.js SC - Referencias List] Solicitando API: ${apiUrl}`);
-=======
-    const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias-por-anio/${collectionId}/`; // Esta API DEBE devolver un array de ReferenciaCardData
-    console.log(`[Next.js SC - Referencias List] Solicitando API: ${apiUrl}, con ID de colección: ${collectionId}`);
->>>>>>> 0a4aad9b8c29d92ff11db95fab1bd4908b1a9143
     const res = await fetch(apiUrl, {
       cache: 'no-store',
     });
     console.log(`[Next.js SC - Referencias List] Estado de respuesta HTTP: ${res.status} (${res.statusText})`);
-    
+
     if (!res.ok) {
       let errorBody = 'No body';
       try {
@@ -98,7 +89,8 @@ export default async function ReferenciasListPage({ params }: ReferenciasListPag
             ? `${modelo.U_GSP_Picture.replace(/\\/g, '/')}`
             : '/img/SIN FOTO.png';
 
-          const destinationUrl = `/referencia-detalle/${modelo.U_GSP_REFERENCE}`;
+          // *** CAMBIO CRUCIAL AQUÍ: Añadir collectionId como query parameter ***
+          const destinationUrl = `/referencia-detalle/${modelo.U_GSP_REFERENCE}?collectionId=${collectionId}`;
 
           return (
             <CardReferencia
