@@ -1,4 +1,4 @@
-// app/(dashboard)/referencia-detalle/[referenciaId]/layout.tsx
+// app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/layout.tsx
 
 import { getReferenciaData } from '@/lib/api';
 import TabList from '@/components/molecules/TabList';
@@ -7,29 +7,32 @@ import { redirect } from 'next/navigation';
 interface ReferenciaDetalleLayoutProps {
   children: React.ReactNode;
   params: {
+    collectionId: string; // <-- Ahora es un parámetro de ruta
     referenciaId: string;
   };
-  searchParams: { 
-    collectionId?: string;
-  };
+  // searchParams ya no es necesario aquí para obtener collectionId
+  // searchParams: {
+  //   collectionId?: string;
+  // };
 }
 
 export default async function ReferenciaDetalleLayout({
   children,
   params,
-  searchParams,
+  // searchParams, // <-- Ya no se recibe searchParams aquí
 }: ReferenciaDetalleLayoutProps) {
-  const { referenciaId } = await params;
-  // Accede a collectionId de forma segura
-  const collectionId = (await searchParams)?.collectionId; 
+  // Desestructurar ambos de params
+  const { referenciaId, collectionId } = await params;
+  console.log(`[ReferenciaDetalle-Layout] Recibido referenciaId: ${referenciaId}, collectionId: ${collectionId} (desde params)`);
 
-  if (!collectionId) {
-      console.warn(`[Layout] collectionId no proporcionado para referencia ${referenciaId}.`);
-      // No redirijas aquí directamente, el page.tsx raíz maneja la redirección inicial.
+  if (!referenciaId || !collectionId) {
+    console.error("[ReferenciaDetalle-Layout] referenciaId o collectionId no proporcionados.");
+    redirect('/404');
   }
 
   let referenciaData;
   try {
+      // getReferenciaData no necesita collectionId si es solo para datos generales de la referencia
       referenciaData = await getReferenciaData(referenciaId);
   } catch (error) {
       console.error(`[Layout] Error al obtener referenciaData para ${referenciaId}:`, error);
@@ -37,7 +40,7 @@ export default async function ReferenciaDetalleLayout({
   }
   
   if (!referenciaData) {
-    redirect('/404'); 
+    redirect('/404');
   }
 
   const fases = referenciaData.fases_disponibles || [];
@@ -50,6 +53,7 @@ export default async function ReferenciaDetalleLayout({
         </h1>
       </header>
       <div className="container mx-auto px-4 flex-grow">
+        {/* Pasar collectionId a TabList */}
         <TabList referenciaId={referenciaId} fases={fases} currentCollectionId={collectionId} />
         <div className="mt-4">{children}</div>
       </div>

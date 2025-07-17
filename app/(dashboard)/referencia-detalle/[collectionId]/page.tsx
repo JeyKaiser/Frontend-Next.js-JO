@@ -1,7 +1,7 @@
 // app/(dashboard)/referencia-detalle/[referenciaId]/page.tsx
-// Este archivo es el ENCARGADO de la redirección inicial
+// Este es un Server Component por defecto - pagina de redireccion inicial para una referencia específica
 
-import { getReferenciaData } from '@/lib/api'; // Asegúrate de importar la función correcta
+import { getReferenciaData } from '@/lib/api';
 import { redirect } from 'next/navigation';
 
 interface ReferenciaDetallePageProps {
@@ -15,13 +15,15 @@ interface ReferenciaDetallePageProps {
 
 export default async function ReferenciaDetallePage({ params, searchParams }: ReferenciaDetallePageProps) {
   // 1. Desestructurar y esperar params y searchParams
-  const { referenciaId } = await params;
+  const { referenciaId } = params;
   // Accede a collectionId de forma segura
-  const collectionId = (await searchParams)?.collectionId; 
+  const collectionId = (searchParams)?.collectionId; 
 
   // 2. Verificar si collectionId está presente ANTES de intentar redirigir
   if (!collectionId) {
-    console.error("[ReferenciaDetallePage] Collection ID faltante en la URL inicial de la referencia. No se puede redirigir a una fase específica.");
+    console.log(`[ReferenciaDetalle-Page] Contenido COMPLETO de params recibido:`, params);
+    // console.error("[ReferenciaDetalle-Page] Collection ID faltante en la URL inicial de la referencia. No se puede redirigir a una fase específica.");
+
     // Redirige a una página segura o muestra un error si el collectionId es indispensable desde el inicio
     redirect('/colecciones'); // Ejemplo: redirige a la página de selección de colecciones
   }
@@ -33,7 +35,8 @@ export default async function ReferenciaDetallePage({ params, searchParams }: Re
   // 4. Redirigir a la primera fase si existe
   if (fases.length > 0) {
     // IMPORTANTE: Construir la URL de redirección incluyendo el collectionId
-    console.log(`[ReferenciaDetallePage] Redirigiendo a la primera fase: ${fases[0].slug} con collectionId: ${collectionId}`);
+    console.log(`[ReferenciaDetalle-Page] Redirigiendo a la primera fase: ${fases[0].slug} con collectionId: ${collectionId}`);
+    // Esto asegura que la URL final de la fase sea algo como /fases/jo?collectionId=063
     redirect(`/referencia-detalle/${referenciaId}/fases/${fases[0].slug}?collectionId=${collectionId}`);
   } else {
     // Si no hay fases, mostrar un mensaje de que no hay nada que ver
