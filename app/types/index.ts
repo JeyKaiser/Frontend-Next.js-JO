@@ -97,20 +97,6 @@ export interface ReferenciaDetalleAPI {
 }
 
 
-
-
-
-// /** Interface para un elemento de modelo/referencia (análogo a 'modelo' en tu template de Django)*/
-// export interface ReferenciaData {
-//   U_GSP_Picture: string;     // URL de la imagen
-//   U_GSP_REFERENCE: string;   // Referencia/nombre (será el 'title' de la Card)
-//   U_GSP_Desc: string;        // Descripción (será el 'subtitle' de la Card)
-//   id?: string | number;      // Esto es crucial si lo usas como key. Si no, usa U_GSP_REFERENCE o el index.
-//   color_fondo?: string; 
-//   // Añade aquí cualquier otro campo que venga de modelsExample/tu API
-//   [key: string]: any;        // Para permitir campos adicionales dinámicos que no uses directamente
-// }
-
 export interface TelaData {
   U_GSP_REFERENCE: string;   // Código de referencia (PT Code)
   U_GSP_SchLinName: string;  // Uso en prenda

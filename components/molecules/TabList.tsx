@@ -16,7 +16,7 @@ const TabList: React.FC<TabListProps> = ({ referenciaId, fases, currentCollectio
   console.log(`[TabList] Recibido referenciaId: ${referenciaId}, currentCollectionId: ${currentCollectionId}`);
 
   return (
-    <nav className="flex space-x-1 border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
+    <nav className="flex space-x-1 border-b border-gray-200 mb-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
       {fases.map((fase) => {
         // *** CAMBIO CLAVE: Construcción del href con collectionId como parámetro de ruta ***
         // Asegúrate de que currentCollectionId exista para construir la URL correctamente
@@ -37,7 +37,7 @@ const TabList: React.FC<TabListProps> = ({ referenciaId, fases, currentCollectio
               className={`
                 px-4 py-2 text-sm font-medium rounded-t-lg
                 ${isActive
-                  ? 'bg-blue-600 text-white shadow-md'
+                  ? 'bg-slate-800 text-white shadow-md'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                 }
                 transition-colors duration-200 ease-in-out cursor-pointer

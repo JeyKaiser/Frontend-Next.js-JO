@@ -49,7 +49,8 @@ export default async function ReferenciaDetalleLayout({
     <div className="flex flex-col h-full bg-gray-50">
       <header className="bg-white shadow p-4 mb-4">
         <h1 className="text-3xl font-bold text-gray-800">
-          Detalles de la Referencia:{referenciaData.nombre} ({referenciaId})
+          {/* Detalles de la Referencia:{referenciaData.nombre} ({referenciaId}) */}
+          {referenciaData.nombre}
         </h1>
       </header>
       <div className="container mx-auto px-4 flex-grow">
