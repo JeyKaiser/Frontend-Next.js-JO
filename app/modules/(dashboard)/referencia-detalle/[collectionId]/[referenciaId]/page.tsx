@@ -1,7 +1,7 @@
 // app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/page.tsx
 // Este archivo es el ENCARGADO de la redirección inicial
 
-import { getReferenciaData } from '@/lib/api';
+import { getReferenciaData } from '../../../../../globals/lib/api';
 import { redirect } from 'next/navigation';
 
 interface ReferenciaDetallePageProps {

@@ -1,7 +1,7 @@
 // app/(dashboard)/referencias-por-anio/[collectionId]/page.tsx
-import CardReferencia from '@/components/molecules/CardReferencia';
-import type { ReferenciasAnioApiResponse } from '../../../../app/types';
-import Link from 'next/link';
+import CardReferencia from '../../../globals/components/molecules/CardReferencia';
+import type { ReferenciasAnioApiResponse } from '../../../modules/types/index';
+// import Link from 'next/link';
 
 interface ReferenciasListPageProps {
   params: {

@@ -1,9 +1,9 @@
 // app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/fases/[fasesSlug]/page.tsx
 
-import { getFaseData } from '../../../../../../../app/services/api';
+import { getFaseData } from '../../../../../../../globals/lib/api';
 import { notFound } from 'next/navigation';
-import FaseMdCreacionFicha from '../../../../../../globals/components/organisms/FaseMdCreacionFicha'; // <-- Importa el nuevo componente
-import { MdCreacionFichaData } from '../../../../../../../app/modules/types/index'; // <-- Importa el tipo específico de datos de la fase
+import FaseMdCreacionFicha from '@/components/organisms/FaseMdCreacionFicha'; // <-- Importa el nuevo componente
+import { MdCreacionFichaData } from '../../../../../../types/index'; // <-- Importa el tipo específico de datos de la fase
 
 interface ReferenciaFasePageProps {
   params: {

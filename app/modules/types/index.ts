@@ -32,8 +32,6 @@ export interface ReferenciasAnioApiResponse {
 
 
 
-
-
 export interface ReferenciaData {
   codigo_referencia: string; // Coincide con el campo 'codigo_referencia' de Django
   nombre: string;            // Coincide con el campo 'nombre' de Django

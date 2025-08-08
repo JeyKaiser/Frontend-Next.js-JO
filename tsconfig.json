@@ -21,8 +21,7 @@
     "paths": {
       "@/*": ["../*"],                      // Puedes usar '@/*' para mapear todo src/ si prefieres:
       "@/styles/*": ["./styles/*"],         // Permite importar 'styles/...' como '@/styles/...'
-      "@/types/*": ["./types/*"],           // Permite importar 'types/...' como '@/types/...'
-      "@/lib/*": ["./lib/*"],               // Si tienes una carpeta 'lib'
+      "@/types/*": ["./types/*"],           // Permite importar 'types/...' como '@/types/...'      
       "@/components/*": ["./components/*"]  //Si tienes una carpeta 'components'            
     }
   },

@@ -2,7 +2,7 @@
 import '../../globals.css';
 import { Inter } from 'next/font/google';
 
-import AuthRouteGuard from '../../globals/components/AuthRouteGuard';
+import AuthRouteGuard from '../../../components/AuthRouteGuard';
 
 const inter = Inter({ subsets: ['latin'] });    //evaluar si se debe quitar
 

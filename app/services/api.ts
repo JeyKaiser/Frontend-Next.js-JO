@@ -1,6 +1,6 @@
 // lib/api.ts
 
-import type { ReferenciaDetalleAPI, FaseDisponible } from '../app/types';
+import type { ReferenciaDetalleAPI, FaseDisponible } from '../modules/types/index';
 
 const DJANGO_API_BASE_URL = 'http://localhost:8000';
 
