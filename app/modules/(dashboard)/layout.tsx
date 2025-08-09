@@ -1,6 +1,6 @@
-import Navbar from '@/components/organisms/Navbar';
-import Sidebar from '@/components/organisms/Sidebar';
-import Footer from '@/components/organisms/Footer';
+import Navbar from '../../globals/components/organisms/Navbar';
+import Sidebar from '../../globals/components/organisms/Sidebar';
+import Footer from '../../globals/components/organisms/Footer';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (

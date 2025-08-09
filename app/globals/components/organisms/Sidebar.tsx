@@ -36,7 +36,7 @@ export default function Sidebar() {
           </li>
           <li>
             <Link href="/productos" className="flex items-center gap-2 hover:text-yellow-400 transition">
-              <Package size={18} /> Productos
+              <Package size={18} /> Consumos
             </Link>
           </li>
           <li>

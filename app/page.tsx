@@ -1,8 +1,11 @@
+//archivo encargado de redirigir al usuario a la página de inicio o al login
+// Este archivo es el punto de entrada para la aplicación Next.js y maneja la lógica de autenticación.
+
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from './(auth)/context/AuthContext';
+import { useAuth } from '../app/modules/(auth)/context/AuthContext';
 
 export default function HomePage() {
   const router = useRouter();
@@ -11,7 +14,7 @@ export default function HomePage() {
   useEffect(() => {
     if (!loading) {
       if (isAuthenticated) {
-        router.push('/dashboard');
+        router.push('modules/dashboard');
       } else {
         router.push('/login');
       }

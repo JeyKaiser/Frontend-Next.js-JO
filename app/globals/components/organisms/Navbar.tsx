@@ -1,4 +1,4 @@
-import SearchBar from '@/components/molecules/SearchBar';
+import SearchBar from '../../components/molecules/SearchBar';
 
 export default function Navbar() {
   return (

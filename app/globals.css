@@ -1,4 +1,7 @@
+/* Archivo encargado de los estilos globales */
+/* exporta los estilos globales para la aplicación */
 /*app/globals.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,7 +12,6 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* ... otros resets o estilos globales que necesites */
 }
 
 /* Variables globales que pueden ser usadas por tus CSS Modules */
