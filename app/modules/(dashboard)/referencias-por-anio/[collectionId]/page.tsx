@@ -1,5 +1,5 @@
 // app/(dashboard)/referencias-por-anio/[collectionId]/page.tsx
-import CardReferencia from '@/components/molecules/CardReferencia';
+import CardReferencia from '../../../../globals/components/molecules/CardReferencia';
 import type { ReferenciasAnioApiResponse } from '../../../types';
 import Link from 'next/link';
 
@@ -55,7 +55,7 @@ export default async function ReferenciasListPage({ params }: ReferenciasListPag
     );
   }
 
-  const displayTitle = `REFERENCIAS PARA EL AÑO: ${collectionId}`;
+  const displayTitle = `REFERENCIAS DEL AÑO: ${collectionId}`;
   return (
     <>
       <header className="text-center mb-10 relative">

@@ -6,11 +6,12 @@ interface CardReferenciaProps {
   imageSrc: string;
   title: string;
   subtitle: string;
-  href: string; // El href completo con el query parameter
+  href: string; 
 }
 
 const CardReferencia: React.FC<CardReferenciaProps> = ({ imageSrc, title, subtitle, href }) => {
   console.log(`[CardReferencia] Recibido href: ${href} collectionId: ${href.includes('collectionId') ? href.split('collectionId=')[1] : 'N/A'}`);
+  
    return (
     <Link href={href} className="block group">
       <div className="relative overflow-hidden rounded-2xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg hover:-translate-y-2.5 bg-white border border-gray-200">

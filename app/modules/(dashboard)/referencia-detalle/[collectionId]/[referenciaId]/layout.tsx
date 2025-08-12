@@ -1,14 +1,14 @@
 // app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/layout.tsx
 
 import { getReferenciaData } from '../../../../../globals/lib/api';
-import TabList from '@/components/molecules/TabList';
+import TabList from '../../../../../globals/components/molecules/TabList';
 import { redirect } from 'next/navigation';
 
-interface ReferenciaDetalleLayoutProps {
-  children: React.ReactNode;
-  params: {
-    collectionId: string; // <-- Ahora es un parámetro de ruta
-    referenciaId: string;
+interface ReferenciaDetalleLayoutProps { 
+  children: React.ReactNode; 
+  params: { 
+      collectionId: string;
+      referenciaId: string;
   };
   // searchParams ya no es necesario aquí para obtener collectionId
   // searchParams: {
@@ -16,11 +16,7 @@ interface ReferenciaDetalleLayoutProps {
   // };
 }
 
-export default async function ReferenciaDetalleLayout({
-  children,
-  params,
-  // searchParams, // <-- Ya no se recibe searchParams aquí
-}: ReferenciaDetalleLayoutProps) {
+export default async function ReferenciaDetalleLayout({children, params,}: ReferenciaDetalleLayoutProps) {
   // Desestructurar ambos de params
   const { referenciaId, collectionId } = await params;
   console.log(`[ReferenciaDetalle-Layout] Recibido referenciaId: ${referenciaId}, collectionId: ${collectionId} (desde params)`);

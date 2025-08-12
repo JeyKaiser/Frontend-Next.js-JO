@@ -2,7 +2,7 @@
 
 import { getFaseData } from '../../../../../../../globals/lib/api';
 import { notFound } from 'next/navigation';
-import FaseMdCreacionFicha from '@/components/organisms/FaseMdCreacionFicha'; // <-- Importa el nuevo componente
+import FaseMdCreacionFicha from '../../../../../../../../app/globals/components/organisms/FaseMdCreacionFicha'; // <-- Importa el nuevo componente
 import { MdCreacionFichaData } from '../../../../../../types/index'; // <-- Importa el tipo específico de datos de la fase
 
 interface ReferenciaFasePageProps {

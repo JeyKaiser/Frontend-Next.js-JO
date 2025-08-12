@@ -1,14 +1,14 @@
 // app/(dashboard)/colecciones/page.tsx
-'use client'; // Necesario si usas hooks o interacciones del cliente
+'use client';
 
-import Card from '@/components/molecules/Card'; // Asegúrate de que la ruta sea correcta
+import Card from '../../../globals/components/molecules/Card'; // Asegúrate de que la ruta sea correcta
 
 export default function ColeccionesPage() {
   const colecciones = [
     {
       id: 'winter-sun',           // Usamos el slug como ID para la URL
       label: 'Winter Sun',
-      img: '/img/winter-sun.jpg', // Asegúrate de que estas imágenes existan en public/img/
+      img: '/img/winter-sun.jpg', 
       bg: '#feea4d',
     },
     {
@@ -55,8 +55,6 @@ export default function ColeccionesPage() {
         <h2 className="text-3xl font-semibold uppercase tracking-wider text-gray-800">
           COLECCIONES
         </h2>
-        {/* Puedes descomentar la línea decorativa si la quieres */}
-        {/* <div className="w-24 h-1 bg-gradient-to-r from-gray-700 via-yellow-400 to-gray-700 mx-auto mt-2 rounded-full" /> */}
       </header>
 
       <div className="grid grid-cols-[repeat(auto-fit,_250px)] justify-center gap-10 px-4 py-8 items-start">

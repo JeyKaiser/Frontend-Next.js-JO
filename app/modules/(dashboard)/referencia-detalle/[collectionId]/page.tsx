@@ -24,8 +24,8 @@ export default async function ReferenciaDetallePage({ params, searchParams }: Re
     console.log(`[ReferenciaDetalle-Page] Contenido COMPLETO de params recibido:`, params);
     // console.error("[ReferenciaDetalle-Page] Collection ID faltante en la URL inicial de la referencia. No se puede redirigir a una fase específica.");
 
-    // Redirige a una página segura o muestra un error si el collectionId es indispensable desde el inicio
-    redirect('/colecciones'); // Ejemplo: redirige a la página de selección de colecciones
+    //return redirect('/colecciones');   //arreglar redirecccion 
+    redirect('/colecciones');            //arreglar redirecccion
   }
 
   // 3. Obtener los datos de la referencia para saber sus fases
