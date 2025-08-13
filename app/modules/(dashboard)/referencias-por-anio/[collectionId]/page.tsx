@@ -75,7 +75,7 @@ export default async function ReferenciasListPage({ params }: ReferenciasListPag
             : '/img/SIN FOTO.png';
 
           // *** CAMBIO CRUCIAL: Incluir collectionId como parte de la ruta ***
-          const destinationUrl = `/referencia-detalle/${collectionId}/${modelo.U_GSP_REFERENCE}`;
+          const destinationUrl = `/modules/referencia-detalle/${collectionId}/${modelo.U_GSP_REFERENCE}`;
           console.log(`[ReferenciasListPage] Generando enlace para ${modelo.U_GSP_REFERENCE}: ${destinationUrl} collectionId: ${collectionId}`);
 
           return (

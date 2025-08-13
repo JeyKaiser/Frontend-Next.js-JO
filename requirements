@@ -9,6 +9,8 @@ react react-dom next tailwindcss postcss autoprefixer
 -D typescript @types/react @types/node @types/tailwindcss
 -D @types/clsx
 clsx tailwind-merge
+js-cookie
+install --save-dev @types/js-cookie
 
 
 --Inicialization of Tailwind CSS--

@@ -41,12 +41,12 @@ export default function ColeccionesPage() {
       img: '/img/fall-winter.jpg',
       bg: '#b03c5c',
     },
-    {
-      id: 'prueba-api-django', // Un ID descriptivo para la URL
-      label: 'Prueba API Django',
-      img: '/img/fall-winter.jpg', // Usa una imagen existente o crea una para esto
-      bg: '#A0D9EF',
-    },
+    // {
+    //   id: 'prueba-api-django', // Un ID descriptivo para la URL
+    //   label: 'Prueba API Django',
+    //   img: '/img/fall-winter.jpg', // Usa una imagen existente o crea una para esto
+    //   bg: '#A0D9EF',
+    // },
   ];
 
   return (
@@ -68,7 +68,7 @@ export default function ColeccionesPage() {
               imageSrc={anios.img}
               bgColor={anios.bg}
               // El href ahora apunta a la página de años de la colección, usando el ID/slug
-              href={`/colecciones/${anios.id}`}
+              href={`/modules/colecciones/${anios.id}`}
             />
           ))
         )}

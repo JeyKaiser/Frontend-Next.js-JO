@@ -1,3 +1,4 @@
+//app/page.tsx
 //archivo encargado de redirigir al usuario a la página de inicio o al login
 // Este archivo es el punto de entrada para la aplicación Next.js y maneja la lógica de autenticación.
 
@@ -14,9 +15,9 @@ export default function HomePage() {
   useEffect(() => {
     if (!loading) {
       if (isAuthenticated) {
-        router.push('modules/dashboard');
+        router.push('/modules/dashboard');
       } else {
-        router.push('/login');
+        router.push('/modules/login');
       }
     }
   }, [isAuthenticated, loading, router]);
@@ -37,3 +38,20 @@ export default function HomePage() {
   );
 }
 
+
+// // app/page.tsx
+// 'use client';
+
+// import { useEffect } from 'react';
+// import { useRouter } from 'next/navigation';
+
+// export default function HomePage() {
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     // Redirige inmediatamente al usuario a la página de login
+//     router.replace('/modules/login');
+//   }, [router]);
+
+//   return null; // No renderiza nada en esta página, ya que la redirección es inmediata
+// }

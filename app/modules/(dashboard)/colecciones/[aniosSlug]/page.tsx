@@ -66,7 +66,7 @@ export default async function AnioColeccionPage({ params }: AnioColeccionPagePro
         <h2 className="text-3xl font-semibold uppercase tracking-wider text-gray-800">
           {displayCollectionName.toUpperCase()}
         </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto mt-2 rounded-full" />
+        {/* <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto mt-2 rounded-full" /> */}
       </header>
 
       {/* Gap ajustado a 'gap-10' para más separación entre las tarjetas de años */}
@@ -81,7 +81,7 @@ export default async function AnioColeccionPage({ params }: AnioColeccionPagePro
             subtitle={displayCollectionName}
             imageSrc={anio.img}
             bgColor={anio.bg}
-            href={`/referencias-por-anio/${anio.id}`} // Redirige a la página de referencias con el ID del año
+            href={`/modules/referencias-por-anio/${anio.id}`} // Redirige a la página de referencias con el ID del año
           />
         ))}
       </div>

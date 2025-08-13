@@ -1,4 +1,4 @@
-// app/components/AuthRouteGuard.tsx
+//app/components/AuthRouteGuard.tsx
 'use client';
 
 import { useEffect, ReactNode } from 'react';
@@ -18,8 +18,8 @@ export default function AuthRouteGuard({ children, protectedPaths }: AuthRouteGu
   const isProtected = protectedPaths.some(path => {
     // Para rutas dinámicas, necesitas una lógica más sofisticada si el patrón no es simple
     // Ej: /colecciones/[slug] coincide con /colecciones
-    if (path.endsWith('/*')) { // Si la ruta protegida es un patrón como '/dashboard/*'
-      const base = path.slice(0, -2); // Elimina '/*'
+    if (path.endsWith('/*')) {                  // Si la ruta protegida es un patrón como '/dashboard/*'
+      const base = path.slice(0, -2);           // Elimina '/*'
       return currentPath.startsWith(base);
     }
     return currentPath === path;
@@ -32,14 +32,15 @@ export default function AuthRouteGuard({ children, protectedPaths }: AuthRouteGu
     // Y el usuario NO está autenticado, entonces redirige a /login.
     if (!loading && isProtected && !isAuthenticated) {
       console.log(`[AuthRouteGuard] Redirigiendo a /login desde ${currentPath}. (isProtected: ${isProtected}, isAuthenticated: ${isAuthenticated})`);
-      router.replace('/login');
+      router.replace('/modules/login');
     }
     // Si la verificación inicial ha terminado (loading es false)
     // Y el usuario está autenticado
     // Y la ruta actual es /login, entonces redirige a /dashboard.
-    if (!loading && !isProtected && isAuthenticated && currentPath === '/login') {
+    if (!loading && !isProtected && isAuthenticated && currentPath === '/modules/login') {
       console.log(`[AuthRouteGuard] Redirigiendo a /dashboard desde ${currentPath}. (isAuthenticated: ${isAuthenticated})`);
-      router.replace('/dashboard');
+      router.replace('/modules/colecciones');
+      // router.replace('/modules/dashboard');
     }
 
   }, [isAuthenticated, loading, router, isProtected, currentPath]);

@@ -1,3 +1,4 @@
+//app/modules/(dashboard)/layout.tsx
 import Navbar from '../../globals/components/organisms/Navbar';
 import Sidebar from '../../globals/components/organisms/Sidebar';
 import Footer from '../../globals/components/organisms/Footer';

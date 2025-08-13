@@ -50,8 +50,9 @@ export default async function ReferenciaDetalleLayout({children, params,}: Refer
         </h1>
       </header>
       <div className="container mx-auto px-4 flex-grow">
-        {/* Pasar collectionId a TabList */}
-        <TabList referenciaId={referenciaId} fases={fases} currentCollectionId={collectionId} />
+        
+        <TabList referenciaId={referenciaId} fases={fases} currentCollectionId={collectionId} />     {/* Pasar collectionId a TabList */}
+
         <div className="mt-4">{children}</div>
       </div>
     </div>

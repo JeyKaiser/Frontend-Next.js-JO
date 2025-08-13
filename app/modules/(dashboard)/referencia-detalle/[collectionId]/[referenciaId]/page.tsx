@@ -34,7 +34,7 @@ export default async function ReferenciaDetallePage({ params }: ReferenciaDetall
   if (fases.length > 0) {
     console.log(`[ReferenciaDetalle-Page] Redirigiendo a la primera fase: ${fases[0].slug} con collectionId: ${collectionId} (ahora como param)`);
     // *** CAMBIO CLAVE: La URL de redirección usa collectionId como parámetro de ruta ***
-    redirect(`/referencia-detalle/${collectionId}/${referenciaId}/fases/${fases[0].slug}`);
+    redirect(`/modules/referencia-detalle/${collectionId}/${referenciaId}/fases/${fases[0].slug}`);
   } else {
     // Si no hay fases, mostrar un mensaje de que no hay nada que ver
     return (

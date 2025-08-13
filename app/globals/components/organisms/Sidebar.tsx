@@ -25,29 +25,29 @@ export default function Sidebar() {
         {/* Menú lateral */}
         <ul className="space-y-3 text-sm font-medium">
           <li>
-            <Link href="/dashboard" className="flex items-center gap-2 hover:text-yellow-400 transition">
+            <Link href="/modules/dashboard" className="flex items-center gap-2 hover:text-yellow-400 transition">
               <LayoutDashboard size={18} /> Inicio
-            </Link>             {/* //arreglar redirecccion */}
+            </Link>           
           </li>
           <li>
-            <Link href="/colecciones" className="flex items-center gap-2 hover:text-yellow-400 transition">
+            <Link href="/modules/colecciones" className="flex items-center gap-2 hover:text-yellow-400 transition">
               <Layers size={18} /> Colecciones
-            </Link>             {/* //arreglar redirecccion */}
+            </Link>           
           </li>
           <li>
-            <Link href="/productos" className="flex items-center gap-2 hover:text-yellow-400 transition">
+            <Link href="/modules/consumos" className="flex items-center gap-2 hover:text-yellow-400 transition">
               <Package size={18} /> Consumos
-            </Link>             {/* //arreglar redirecccion */}
+            </Link>           
           </li>
           <li>
-            <Link href="/categorias" className="flex items-center gap-2 hover:text-yellow-400 transition">
+            <Link href="/modules/categorias" className="flex items-center gap-2 hover:text-yellow-400 transition">
               <Tag size={18} /> Categorías
-            </Link>             {/* //arreglar redirecccion */}
+            </Link>           
           </li>
           <li>
-            <Link href="/configuracion" className="flex items-center gap-2 hover:text-yellow-400 transition">
+            <Link href="/modules/configuracion" className="flex items-center gap-2 hover:text-yellow-400 transition">
               <Settings size={18} /> Configuración
-            </Link>             {/* //arreglar redirecccion */}
+            </Link>           
           </li>
         </ul>
       </div>

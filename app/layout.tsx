@@ -1,3 +1,4 @@
+//app/layout.tsx
 // Archivo encargado de definir el layout raíz de la aplicación Next.js
 // Este archivo es el punto de entrada para todos los layouts específicos de la aplicación.
 // Aquí se importan los estilos globales y se define el proveedor de autenticación.
