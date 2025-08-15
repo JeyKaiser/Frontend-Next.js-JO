@@ -1,11 +1,11 @@
 'use client'; // Este componente necesita ser un Client Component para usar useState y useRouter
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Importa useRouter
-import Input from '../atoms/Input';
-import Button from '../atoms/Button';
-import Modal from '../atoms/Modal';
-import type { PTSearchResult } from '../../app/types'; // Importa el tipo de resultado de búsqueda
+import { useRouter } from 'next/navigation'; 
+import Input from '@/app/globals/components/atoms/Input';
+import Button from '@/app/globals/components/atoms/Button';
+import Modal from '@/app/globals/components/atoms/Modal'; 
+import type { PTSearchResult } from '@/app/modules/types'; 
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState<string>('');

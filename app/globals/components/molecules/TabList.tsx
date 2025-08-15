@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaseDisponible } from '../../app/types';
+import { FaseDisponible } from '@/app/modules/types';
 
 interface TabListProps {
   referenciaId: string;

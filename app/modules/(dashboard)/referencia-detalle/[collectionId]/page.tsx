@@ -1,7 +1,7 @@
 // app/(dashboard)/referencia-detalle/[referenciaId]/page.tsx
 // Este es un Server Component por defecto - pagina de redireccion inicial para una referencia específica
 
-import { getReferenciaData } from '../../../../globals/lib/api';
+import { getReferenciaData } from '@/app/globals/lib/api';
 import { redirect } from 'next/navigation';
 
 interface ReferenciaDetallePageProps {

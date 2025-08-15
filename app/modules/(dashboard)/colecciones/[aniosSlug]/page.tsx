@@ -1,5 +1,5 @@
-import Card from '../../../../globals/components/molecules/Card'; // Asegúrate de que la ruta sea correcta
-import type { AniosColeccionApiResponse, AnioColeccionData } from '../../../types';
+import Card from '@/app/globals/components/molecules/Card'; // Asegúrate de que la ruta sea correcta
+import type { AniosColeccionApiResponse, AnioColeccionData } from '@/app/modules/types';
 
 interface AnioColeccionPageProps {
   params: {

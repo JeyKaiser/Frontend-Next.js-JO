@@ -1,7 +1,7 @@
 // app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/layout.tsx
 
-import { getReferenciaData } from '../../../../../globals/lib/api';
-import TabList from '../../../../../globals/components/molecules/TabList';
+import { getReferenciaData } from '@/app/globals/lib/api';
+import TabList from '@/app/globals/components/molecules/TabList';
 import { redirect } from 'next/navigation';
 
 interface ReferenciaDetalleLayoutProps { 

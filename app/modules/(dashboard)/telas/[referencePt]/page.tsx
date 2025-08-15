@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import type { ModeloDetalleResponse, TelaData, InsumoData } from '../../../types';
+import type { ModeloDetalleResponse, TelaData, InsumoData } from '@/app/modules/types';
 
 interface TelasPageProps {
   params: {

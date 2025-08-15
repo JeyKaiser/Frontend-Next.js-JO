@@ -1,7 +1,7 @@
 //app/modules/(dashboard)/layout.tsx
-import Navbar from '../../globals/components/organisms/Navbar';
-import Sidebar from '../../globals/components/organisms/Sidebar';
-import Footer from '../../globals/components/organisms/Footer';
+import Navbar from '@/app/globals/components/organisms/Navbar';
+import Sidebar from '@/app/globals/components/organisms/Sidebar';
+import Footer from '@/app/globals/components/organisms/Footer';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (

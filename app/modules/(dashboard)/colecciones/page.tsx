@@ -1,7 +1,7 @@
 // app/(dashboard)/colecciones/page.tsx
 'use client';
 
-import Card from '../../../globals/components/molecules/Card'; // Asegúrate de que la ruta sea correcta
+import Card from '@/app/globals/components/molecules/Card'; // Asegúrate de que la ruta sea correcta
 
 export default function ColeccionesPage() {
   const colecciones = [
