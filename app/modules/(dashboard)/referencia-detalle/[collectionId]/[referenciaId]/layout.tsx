@@ -1,6 +1,6 @@
 // app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/layout.tsx
 
-import { getReferenciaData } from '@/app/globals/lib/api';
+import { getReferenciaData, getCollectionName, getFormattedReferenceName } from '@/app/globals/lib/api';
 import TabList from '@/app/globals/components/molecules/TabList';
 import { redirect } from 'next/navigation';
 
@@ -28,8 +28,8 @@ export default async function ReferenciaDetalleLayout({children, params,}: Refer
 
   let referenciaData;
   try {
-      // getReferenciaData no necesita collectionId si es solo para datos generales de la referencia
-      referenciaData = await getReferenciaData(referenciaId);
+      // Enhanced: Pass collectionId to get complete information
+      referenciaData = await getReferenciaData(referenciaId, collectionId);
   } catch (error) {
       console.error(`[Layout] Error al obtener referenciaData para ${referenciaId}:`, error);
       redirect('/error-generico');
@@ -40,20 +40,38 @@ export default async function ReferenciaDetalleLayout({children, params,}: Refer
   }
 
   const fases = referenciaData.fases_disponibles || [];
+  
+  // Get enhanced names
+  const collectionName = referenciaData.collection_name || getCollectionName(collectionId);
+  const referenceName = referenciaData.reference_name || getFormattedReferenceName(referenciaId);
+  
+  // Extract descriptive name from the API response if available
+  const descriptiveName = referenciaData.nombre && referenciaData.nombre !== `Referencia ${referenciaId}` 
+    ? referenciaData.nombre 
+    : `Referencia ${referenciaId}`;
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
-      <header className="bg-white shadow p-4 mb-4">
-        <h1 className="text-3xl font-bold text-gray-800">
-          {/* Detalles de la Referencia:{referenciaData.nombre} ({referenciaId}) */}
-          {referenciaData.nombre}
-        </h1>
+    <div className="flex flex-col h-full bg-secondary-50">
+      <header className="bg-white shadow-soft border-b border-secondary-200 p-6 mb-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="heading-2">
+            {descriptiveName}
+          </h1>
+          <p className="body-medium text-secondary-600 mt-2">
+            Nombre: {referenceName} • Colección: {collectionName}
+          </p>
+        </div>
       </header>
-      <div className="container mx-auto px-4 flex-grow">
+      <div className="max-w-7xl mx-auto px-6 flex-grow w-full">
         
-        <TabList referenciaId={referenciaId} fases={fases} currentCollectionId={collectionId} />     {/* Pasar collectionId a TabList */}
+        <TabList 
+          referenciaId={referenciaId} 
+          fases={fases} 
+          currentCollectionId={collectionId}
+          collectionName={collectionName}
+        />
 
-        <div className="mt-4">{children}</div>
+        <div className="mt-6">{children}</div>
       </div>
     </div>
   );

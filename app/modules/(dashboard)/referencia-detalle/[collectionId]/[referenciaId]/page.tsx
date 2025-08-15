@@ -26,8 +26,8 @@ export default async function ReferenciaDetallePage({ params }: ReferenciaDetall
   //   redirect('/colecciones');
   // }
 
-  // Obtener los datos de la referencia para saber sus fases
-  const referenciaData = await getReferenciaData(referenciaId);
+  // Obtener los datos de la referencia para saber sus fases (con collectionId)
+  const referenciaData = await getReferenciaData(referenciaId, collectionId);
   const fases = referenciaData?.fases_disponibles || [];
 
   // Redirigir a la primera fase si existe

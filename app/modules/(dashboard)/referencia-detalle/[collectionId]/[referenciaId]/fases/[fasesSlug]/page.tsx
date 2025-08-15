@@ -1,6 +1,6 @@
 // app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/fases/[fasesSlug]/page.tsx
 
-import { getFaseData } from '@/app/globals/lib/api';
+import { getFaseData, getCollectionName, getFormattedReferenceName } from '@/app/globals/lib/api';
 import { notFound } from 'next/navigation';
 import FaseMdCreacionFicha from '@/app/globals/components/organisms/FaseMdCreacionFicha';
 import { MdCreacionFichaData } from '@/app/modules/types/index'; 
@@ -32,6 +32,10 @@ export default async function ReferenciaFasePage({ params }: ReferenciaFasePageP
     notFound();
   }
 
+  // Get enhanced names for display
+  const collectionName = getCollectionName(collectionId);
+  const referenceName = getFormattedReferenceName(referenciaId);
+
   // Renderizado condicional del contenido de la fase
   let content;
   switch (fasesSlug) {
@@ -47,36 +51,156 @@ export default async function ReferenciaFasePage({ params }: ReferenciaFasePageP
       break;
     case 'jo':
       content = (
-        <div className="p-4 bg-white rounded-lg shadow">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Contenido de la Fase: JO</h2>
-          <p className="text-gray-600">
-            Esta es la página para la fase **JO** de la referencia **{referenciaId}** de la colección **{collectionId}**.
-          </p>
-          <pre className="mt-4 p-4 bg-gray-100 rounded-lg text-sm overflow-auto">
-            {JSON.stringify(faseData, null, 2)}
-          </pre>
+        <div className="phase-container">
+          <div className="phase-header">
+            <h2 className="phase-title">Fase JO</h2>
+            <p className="phase-subtitle">
+              Gestión y procesamiento de datos para la referencia {referenceName} de la colección {collectionName}
+            </p>
+          </div>
+          <div className="phase-content">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="content-section">
+                <div className="section-header">
+                  <h3 className="section-title">Información General</h3>
+                </div>
+                <div className="section-body">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="body-medium font-medium">Referencia:</span>
+                      <span className="status-info">{referenceName}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="body-medium font-medium">Colección:</span>
+                      <span className="status-info">{collectionName}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="body-medium font-medium">Estado:</span>
+                      <span className="status-success">Activo</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="content-section">
+                <div className="section-header">
+                  <h3 className="section-title">Progreso de la Fase</h3>
+                </div>
+                <div className="section-body">
+                  <div className="space-y-4">
+                    <div className="w-full bg-secondary-200 rounded-full h-2">
+                      <div className="bg-primary-500 h-2 rounded-full w-3/4"></div>
+                    </div>
+                    <p className="body-small">75% completado</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {faseData && (
+              <div className="content-section">
+                <div className="section-header">
+                  <h3 className="section-title">Datos de la Fase</h3>
+                </div>
+                <div className="section-body">
+                  <div className="data-preview">
+                    <pre className="data-preview-code">
+                      {JSON.stringify(faseData, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       );
       break;
     // Añade más casos para otras fases según sea necesario
     default:
       content = (
-        <div className="p-4 bg-white rounded-lg shadow">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Contenido de la Fase: {fasesSlug.toUpperCase()}</h2>
-          <p className="text-gray-600">
-            Esta es la página para la fase **{fasesSlug.toUpperCase()}** de la referencia **{referenciaId}** de la colección **{collectionId}**.
-            Aquí es donde se cargará el contenido específico de cada fase (tablas, imágenes, formularios, etc.).
-          </p>
-          <pre className="mt-4 p-4 bg-gray-100 rounded-lg text-sm overflow-auto">
-            {JSON.stringify(faseData, null, 2)}
-          </pre>
+        <div className="phase-container">
+          <div className="phase-header">
+            <h2 className="phase-title">Fase {fasesSlug.toUpperCase()}</h2>
+            <p className="phase-subtitle">
+              Gestión y procesamiento de datos para la referencia {referenceName} de la colección {collectionName}
+            </p>
+          </div>
+          <div className="phase-content">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="content-section">
+                <div className="section-header">
+                  <h3 className="section-title">Información General</h3>
+                </div>
+                <div className="section-body">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="body-medium font-medium">Fase:</span>
+                      <span className="status-info">{fasesSlug.toUpperCase()}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="body-medium font-medium">Referencia:</span>
+                      <span className="status-info">{referenceName}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="body-medium font-medium">Colección:</span>
+                      <span className="status-info">{collectionName}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="body-medium font-medium">Estado:</span>
+                      <span className="status-warning">En desarrollo</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="content-section">
+                <div className="section-header">
+                  <h3 className="section-title">Próximas Funcionalidades</h3>
+                </div>
+                <div className="section-body">
+                  <div className="space-y-3">
+                    <p className="body-medium">Esta fase está siendo desarrollada y contendrá:</p>
+                    <ul className="space-y-2 body-small ml-4">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
+                        Tablas de datos específicas
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
+                        Formularios de gestión
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
+                        Herramientas de visualización
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {faseData && (
+              <div className="content-section">
+                <div className="section-header">
+                  <h3 className="section-title">Datos de la Fase</h3>
+                </div>
+                <div className="section-body">
+                  <div className="data-preview">
+                    <pre className="data-preview-code">
+                      {JSON.stringify(faseData, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       );
       break;
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
+    <div className="page-container">
       {content}
     </div>
   );

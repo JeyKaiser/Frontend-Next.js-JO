@@ -37,6 +37,9 @@ export interface ReferenciaData {
   nombre: string;            // Coincide con el campo 'nombre' de Django
   imagen_url: string;        // Coincide con el campo 'imagen_url' de Django
   fases_disponibles: FaseDisponible[]; // Coincide con el campo 'fases_disponibles' de Django
+  collection_id?: string;    // ID de la colección
+  collection_name?: string;  // Nombre de la colección
+  reference_name?: string;   // Nombre descriptivo de la referencia
 }
 
 
@@ -92,6 +95,9 @@ export interface ReferenciaDetalleAPI {
   nombre: string;
   imagen_url: string;
   fases_disponibles: FaseDisponible[];
+  collection_id?: string;    // ID de la colección
+  collection_name?: string;  // Nombre de la colección
+  reference_name?: string;   // Nombre descriptivo de la referencia
 }
 
 
@@ -117,6 +123,32 @@ export interface PTSearchResult {
   U_GSP_REFERENCE: string;
   U_GSP_COLLECTION: string; // Necesitamos la colección para redirigir a la página de telas
   // Puedes añadir más campos si la búsqueda devuelve información adicional
+}
+
+// Enhanced search interfaces for multiple search types
+export interface SearchResult {
+  id: string;
+  title: string;
+  description: string;
+  type: 'reference' | 'collection' | 'phase' | 'document';
+  url: string;
+  collection?: string;
+  reference?: string;
+  phase?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface SearchResponse {
+  results: SearchResult[];
+  total: number;
+  query: string;
+  searchType: 'pt' | 'md' | 'collection' | 'general';
+}
+
+export interface SearchError {
+  message: string;
+  code: string;
+  suggestions?: string[];
 }
  // NUEVA INTERFAZ PARA LA RESPUESTA COMBINADA DEL MODELO DETALLE
 export interface ModeloDetalleResponse {
