@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '@/app/globals/components/molecules/Card';
 import Breadcrumb from '@/app/globals/components/molecules/Breadcrumb';
 import { Search, Filter, Plus, Grid, List, Layers } from 'lucide-react';
@@ -13,82 +13,58 @@ interface Collection {
   status: 'active' | 'archived' | 'planning';
   references: number;
   lastUpdated: string;
-  season: 'Spring/Summer' | 'Fall/Winter' | 'Resort' | 'Pre-Fall';
+  season: 'Spring/Summer' | 'Fall/Winter' | 'Resort' | 'Pre-Fall' | 'Summer Vacation' | 'Winter Sun';
 }
 
 export default function ColeccionesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSeason, setSelectedSeason] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  
-  const colecciones: Collection[] = [
-    {
-      id: 'winter-sun',
-      label: 'Winter Sun',
-      img: '/img/winter-sun.jpg', 
-      bg: '#feea4d',
-      status: 'active',
-      references: 45,
-      lastUpdated: '2024-01-15',
-      season: 'Fall/Winter',
-    },
-    {
-      id: 'resort-rtw',
-      label: 'Resort RTW',
-      img: '/img/resort-rtw.jpg',
-      bg: '#70a7ff',
-      status: 'active',
-      references: 32,
-      lastUpdated: '2024-01-12',
-      season: 'Resort',
-    },
-    {
-      id: 'spring-summer',
-      label: 'Spring Summer',
-      img: '/img/spring-summer.jpg',
-      bg: '#81c963',
-      status: 'planning',
-      references: 18,
-      lastUpdated: '2024-01-10',
-      season: 'Spring/Summer',
-    },
-    {
-      id: 'summer-vacation',
-      label: 'Summer Vacation',
-      img: '/img/summer-vacation.jpg',
-      bg: '#ff935f',
-      status: 'active',
-      references: 28,
-      lastUpdated: '2024-01-08',
-      season: 'Spring/Summer',
-    },
-    {
-      id: 'pre-fall',
-      label: 'Pre - Fall',
-      img: '/img/pre-fall.jpg',
-      bg: '#c6b9b1',
-      status: 'archived',
-      references: 52,
-      lastUpdated: '2023-12-20',
-      season: 'Pre-Fall',
-    },
-    {
-      id: 'fall-winter',
-      label: 'Fall Winter',
-      img: '/img/fall-winter.jpg',
-      bg: '#b03c5c',
-      status: 'active',
-      references: 67,
-      lastUpdated: '2024-01-14',
-      season: 'Fall/Winter',
-    },
-  ];
+  const [colecciones, setColecciones] = useState<Collection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchColecciones = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/colecciones', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.details || `Error del servidor: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+          throw new Error('Formato de respuesta inválido');
+        }
+        
+        setColecciones(data);
+      } catch (err) {
+        console.error('Error fetching collections:', err);
+        setError(err instanceof Error ? err.message : 'Error desconocido al cargar las colecciones');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchColecciones();
+  }, []);
 
   const breadcrumbItems = [
     { label: 'Colecciones', current: true },
   ];
 
-  const seasons = ['all', 'Spring/Summer', 'Fall/Winter', 'Resort', 'Pre-Fall'];
+  const seasons = ['all', 'Winter Sun', 'Spring/Summer', 'Fall/Winter', 'Resort', 'Pre-Fall', 'Summer Vacation'];
 
   const filteredCollections = colecciones.filter(collection => {
     const matchesSearch = collection.label.toLowerCase().includes(searchTerm.toLowerCase());
@@ -127,7 +103,7 @@ export default function ColeccionesPage() {
               Gestión de Colecciones
             </h1>
             <p className="page-subtitle">
-              Administra y organiza todas las colecciones de temporada
+              Administra y organiza todas las colecciones
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -189,7 +165,7 @@ export default function ColeccionesPage() {
             >
               {seasons.map((season) => (
                 <option key={season} value={season}>
-                  {season === 'all' ? 'Todas las temporadas' : season}
+                  {season === 'all' ? 'Todas las colecciones' : season}
                 </option>
               ))}
             </select>
@@ -261,7 +237,37 @@ export default function ColeccionesPage() {
 
       {/* Collections Grid/List */}
       <div className="bg-white rounded-xl shadow-soft border border-secondary-200">
-        {filteredCollections.length === 0 ? (
+        {loading ? (
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <Layers className="w-8 h-8 text-secondary-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-secondary-900 mb-2">
+              Cargando colecciones...
+            </h3>
+            <p className="text-secondary-600">
+              Por favor espera mientras obtenemos los datos.
+            </p>
+          </div>
+        ) : error ? (
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Layers className="w-8 h-8 text-red-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-red-900 mb-2">
+              Error al cargar colecciones
+            </h3>
+            <p className="text-red-600 mb-4">
+              {error}
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-primary"
+            >
+              Intentar de nuevo
+            </button>
+          </div>
+        ) : filteredCollections.length === 0 ? (
           <div className="p-12 text-center">
             <div className="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Layers className="w-8 h-8 text-secondary-400" />
@@ -294,7 +300,7 @@ export default function ColeccionesPage() {
                     imageSrc={collection.img}
                     bgColor={collection.bg}
                     href={`/modules/colecciones/${collection.id}`}
-                    subtitle={`${collection.references} referencias • ${collection.season}`}
+                    // subtitle={`${collection.references} referencias • ${collection.season}`}
                   />
                   
                   {/* Additional info overlay */}
