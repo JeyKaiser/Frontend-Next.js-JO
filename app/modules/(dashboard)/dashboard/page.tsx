@@ -148,7 +148,7 @@ export default function DashboardPage() {
                 <p className="text-sm font-medium text-secondary-600">Colecciones Activas</p>
                 <p className="text-3xl font-bold text-secondary-900">{stats.activeCollections}</p>
                 <p className="text-sm text-secondary-500 mt-1">
-                  6 temporadas activas
+                  40 temporadas activas
                 </p>
               </div>
               <div className="p-3 bg-accent-100 rounded-lg">

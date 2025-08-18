@@ -3,6 +3,18 @@ import { NextResponse } from 'next/server';
 interface CollectionDB {
   U_GSP_SEASON: string;
   Name: string;
+  id?: string | number; // Add ID field
+}
+
+interface Reference {
+  codigo_coleccion: string;
+  codigo_referencia: string;
+  label: string;
+  img: string;
+  bg: string;
+  status: 'active' | 'archived' | 'planning';
+  lastUpdated: string;
+  season: 'Spring/Summer' | 'Fall/Winter' | 'Resort' | 'Pre-Fall' | 'Summer Vacation' | 'Winter Sun';
 }
 
 interface Collection {
@@ -11,12 +23,15 @@ interface Collection {
   img: string;
   bg: string;
   status: 'active' | 'archived' | 'planning';
-  references: number;
+  references: Reference[];
   lastUpdated: string;
   season: 'Spring/Summer' | 'Fall/Winter' | 'Resort' | 'Pre-Fall' | 'Summer Vacation' | 'Winter Sun';
 }
 
 const getImageByCollectionName = (name: string): string => {
+  if (!name || typeof name !== 'string') {
+    return '/img/default-collection.jpg';
+  }
   const normalizedName = name.toLowerCase().replace(/\s+/g, ' ').trim();
   
   if (normalizedName.includes('spring summer')) return '/img/spring-summer.jpg';
@@ -31,6 +46,9 @@ const getImageByCollectionName = (name: string): string => {
 };
 
 const getBgColorByCollectionName = (name: string): string => {
+  if (!name || typeof name !== 'string') {
+    return '#9ca3af';
+  }
   const normalizedName = name.toLowerCase().replace(/\s+/g, ' ').trim();
   
   if (normalizedName.includes('spring summer')) return '#81c963';
@@ -45,6 +63,9 @@ const getBgColorByCollectionName = (name: string): string => {
 };
 
 const getSeasonFromName = (name: string): Collection['season'] => {
+  if (!name || typeof name !== 'string') {
+    return 'Spring/Summer';
+  }
   const normalizedName = name.toLowerCase().replace(/\s+/g, ' ').trim();
   
   if (normalizedName.includes('spring summer')) return 'Spring/Summer';
@@ -59,6 +80,9 @@ const getSeasonFromName = (name: string): Collection['season'] => {
 };
 
 const generateId = (name: string): string => {
+  if (!name || typeof name !== 'string') {
+    return 'unknown-collection';
+  }
   return name.toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '');
@@ -87,16 +111,36 @@ export async function GET() {
     }
 
     // Transformar los datos del backend al formato esperado por el frontend
-    const collections: Collection[] = backendData.map((dbCollection) => ({
-      id: generateId(dbCollection.Name),
-      label: dbCollection.Name,
-      img: getImageByCollectionName(dbCollection.Name),
-      bg: getBgColorByCollectionName(dbCollection.Name),
-      status: 'active' as const,
-      references: Math.floor(Math.random() * 50) + 10, // Temporal, puedes obtener esto de otra tabla
-      lastUpdated: new Date().toISOString().split('T')[0],
-      season: getSeasonFromName(dbCollection.Name)
-    }));
+    const collections: Collection[] = backendData.map((dbCollection) => {
+      // Verificar que dbCollection.Name existe
+      const collectionName = dbCollection.Name || 'Unknown Collection';
+      if (!dbCollection.Name) {
+        console.warn('Collection without name found:', dbCollection);
+      }
+      
+      // Generar referencias mock hasta que el backend las proporcione
+      const mockReferences: Reference[] = Array.from({ length: Math.floor(Math.random() * 50) + 10 }, (_, index) => ({
+        codigo_coleccion: dbCollection.id ? String(dbCollection.id).padStart(3, '0') : '001',
+        codigo_referencia: `PT${String(index + 1).padStart(5, '0')}`,
+        label: `Referencia ${index + 1} - ${collectionName}`,
+        img: getImageByCollectionName(collectionName),
+        bg: getBgColorByCollectionName(collectionName),
+        status: ['active', 'archived', 'planning'][Math.floor(Math.random() * 3)] as 'active' | 'archived' | 'planning',
+        lastUpdated: new Date().toISOString().split('T')[0],
+        season: getSeasonFromName(collectionName)
+      }));
+      
+      return {
+        id: dbCollection.U_GSP_SEASON || generateId(collectionName),
+        label: collectionName,
+        img: getImageByCollectionName(collectionName),
+        bg: getBgColorByCollectionName(collectionName),
+        status: 'active' as const,
+        references: mockReferences,
+        lastUpdated: new Date().toISOString().split('T')[0],
+        season: getSeasonFromName(collectionName)
+      };
+    });
 
     return NextResponse.json(collections);
   } catch (error) {

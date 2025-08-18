@@ -5,13 +5,24 @@ import Card from '@/app/globals/components/molecules/Card';
 import Breadcrumb from '@/app/globals/components/molecules/Breadcrumb';
 import { Search, Filter, Plus, Grid, List, Layers } from 'lucide-react';
 
+interface Reference {
+  codigo_coleccion: string;
+  codigo_referencia: string;
+  label: string;
+  img: string;
+  bg: string;
+  status: 'active' | 'archived' | 'planning';
+  lastUpdated: string;
+  season: 'Spring/Summer' | 'Fall/Winter' | 'Resort' | 'Pre-Fall' | 'Summer Vacation' | 'Winter Sun';
+}
+
 interface Collection {
   id: string;
   label: string;
   img: string;
   bg: string;
   status: 'active' | 'archived' | 'planning';
-  references: number;
+  references: Reference[];
   lastUpdated: string;
   season: 'Spring/Summer' | 'Fall/Winter' | 'Resort' | 'Pre-Fall' | 'Summer Vacation' | 'Winter Sun';
 }
@@ -227,9 +238,9 @@ export default function ColeccionesPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-secondary-900">
-                {filteredCollections.reduce((sum, c) => sum + c.references, 0)}
+                {filteredCollections.filter(c => c.status === 'archived').length}
               </p>
-              <p className="text-sm text-secondary-600">Referencias</p>
+              <p className="text-sm text-secondary-600">Archivadas</p>
             </div>
           </div>
         </div>
@@ -286,8 +297,8 @@ export default function ColeccionesPage() {
         ) : viewMode === 'grid' ? (
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCollections.map((collection) => (
-                <div key={collection.id} className="relative group">
+              {filteredCollections.map((collection, index) => (
+                <div key={`${collection.id}-${index}`} className="relative group">
                   {/* Status badge */}
                   <div className="absolute top-3 right-3 z-10">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadge(collection.status)}`}>
@@ -299,8 +310,7 @@ export default function ColeccionesPage() {
                     title={collection.label}
                     imageSrc={collection.img}
                     bgColor={collection.bg}
-                    href={`/modules/colecciones/${collection.id}`}
-                    // subtitle={`${collection.references} referencias • ${collection.season}`}
+                    href={`/modules/colecciones/${collection.id}/referencias-por-anio`}
                   />
                   
                   {/* Additional info overlay */}
@@ -316,8 +326,8 @@ export default function ColeccionesPage() {
         ) : (
           /* List view */
           <div className="divide-y divide-secondary-200">
-            {filteredCollections.map((collection) => (
-              <div key={collection.id} className="p-6 hover:bg-secondary-50 transition-colors duration-200">
+            {filteredCollections.map((collection, index) => (
+              <div key={`${collection.id}-${index}`} className="p-6 hover:bg-secondary-50 transition-colors duration-200">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0" style={{ backgroundColor: collection.bg }}>
                     <img 
@@ -338,18 +348,19 @@ export default function ColeccionesPage() {
                     </div>
                     
                     <div className="flex items-center gap-6 text-sm text-secondary-600">
-                      <span>{collection.references} referencias</span>
+                      <span>ID: {collection.id}</span>
                       <span>{collection.season}</span>
+                      <span>{collection.references?.length || 0} referencias</span>
                       <span>Última act.: {new Date(collection.lastUpdated).toLocaleDateString('es-ES')}</span>
                     </div>
                   </div>
                   
                   <div className="flex-shrink-0">
                     <a
-                      href={`/modules/colecciones/${collection.id}`}
+                      href={`/modules/colecciones/${collection.id}/referencias-por-anio`}
                       className="btn-secondary"
                     >
-                      Ver detalles
+                      Ver referencias
                     </a>
                   </div>
                 </div>
