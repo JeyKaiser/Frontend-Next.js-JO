@@ -155,3 +155,69 @@ export interface ModeloDetalleResponse {
   telas: TelaData[];
   insumos: InsumoData[];
 }
+
+// User Management Interfaces
+export interface Usuario {
+  ID_USUARIO: number;
+  CODIGO_USUARIO: string;
+  NOMBRE_COMPLETO: string;
+  EMAIL?: string;
+  AREA: string;
+  ROL: string;
+  ESTADO: 'ACTIVO' | 'INACTIVO';
+  FECHA_CREACION: string;
+}
+
+export interface CreateUsuarioRequest {
+  CODIGO_USUARIO: string;
+  NOMBRE_COMPLETO: string;
+  EMAIL?: string;
+  AREA: string;
+  ROL: string;
+  ESTADO?: 'ACTIVO' | 'INACTIVO';
+}
+
+export interface UpdateUsuarioRequest {
+  CODIGO_USUARIO?: string;
+  NOMBRE_COMPLETO?: string;
+  EMAIL?: string;
+  AREA?: string;
+  ROL?: string;
+  ESTADO?: 'ACTIVO' | 'INACTIVO';
+}
+
+export interface UsuariosResponse {
+  success: boolean;
+  data?: Usuario[];
+  count?: number;
+  pagination?: {
+    offset: number;
+    limit: number;
+    hasMore: boolean;
+  };
+  error?: string;
+}
+
+// Tipos para el módulo de consumos
+export interface ConsumoData {
+  COLECCION: string;           // T3."Name" AS "COLECCION"
+  NOMBRE_REF: string;          // T1."U_GSP_Desc" AS "NOMBRE REF"
+  USO_EN_PRENDA: string;       // T2."U_GSP_SchLinName" AS "USO EN PRENDA"
+  COD_TELA: string;            // T2."U_GSP_ItemCode" AS "COD TELA"
+  NOMBRE_TELA: string;         // T2."U_GSP_ItemName" AS "NOMBRE TELA"
+  CONSUMO: number | null;      // T2."U_GSP_QuantMsr" AS "CONSUMO"
+  GRUPO_TALLAS: string;        // T1."U_GSP_GroupSizeCode" AS "GRUPO TALLAS"
+  LINEA: string;               // T4."Name" AS "LINEA"
+  TIPO: string;                // T2."U_GSP_SchName" AS "tipo"
+}
+
+export interface ConsumosResponse {
+  success: boolean;
+  data?: ConsumoData[];
+  count?: number;
+  error?: string;
+  referenceCode?: string;
+}
+
+// Re-export production types for convenience
+export * from './production';

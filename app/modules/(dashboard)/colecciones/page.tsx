@@ -142,10 +142,10 @@ export default function ColeccionesPage() {
               </button>
             </div>
             
-            <button className="btn-primary">
+            {/* <button className="btn-primary">
               <Plus className="w-4 h-4" />
               Nueva Colección
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

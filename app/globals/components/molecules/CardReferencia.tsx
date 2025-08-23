@@ -15,7 +15,7 @@ const CardReferencia: React.FC<CardReferenciaProps> = ({ imageSrc, title, subtit
    return (
     <Link href={href} className="block group">
       <div className="relative overflow-hidden rounded-2xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg hover:-translate-y-2.5 bg-white border border-gray-200">
-        <div className="w-full h-48 relative overflow-hidden rounded-t-2xl">
+        <div className="w-full relative overflow-hidden rounded-t-2xl aspect-w-4 aspect-h-3 bg-gray-200">
           <Image
             src={imageSrc}
             alt={title}

@@ -254,6 +254,16 @@
   .skeleton {
     @apply animate-pulse bg-secondary-200 rounded;
   }
+  
+  /* Scrollbar utilities */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Link reset */

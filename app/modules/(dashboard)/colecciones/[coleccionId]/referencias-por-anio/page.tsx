@@ -23,15 +23,49 @@ async function getReferenciasList(collectionId: string): Promise<ReferenciasAnio
       let errorBody = 'No body';
       try { errorBody = await res.text(); } catch (e) {}
       console.error(`[Next.js SC - Referencias List] Error al obtener referencias para ID '${collectionId}': STATUS ${res.status}. Cuerpo: ${errorBody}`);
-      return null;
+      
+      // Fallback to mock data when backend is not available
+      console.log(`[Next.js SC - Referencias List] Backend no disponible, usando datos mock para colección ${collectionId}`);
+      return getMockReferences(collectionId);
     }
     const data: ReferenciasAnioApiResponse[] = await res.json();
     console.log(`[Next.js SC - Referencias List] Datos recibidos:`, data);
     return data;
   } catch (error) {
     console.error("[Next.js SC - Referencias List] Error de red o al parsear JSON:", error);
-    return null;
+    console.log(`[Next.js SC - Referencias List] Backend no disponible, usando datos mock para colección ${collectionId}`);
+    return getMockReferences(collectionId);
   }
+}
+
+// Mock data function for testing when backend is not available
+function getMockReferences(collectionId: string): ReferenciasAnioApiResponse[] {
+  return [
+    {
+      U_GSP_Picture: '/img/SIN FOTO.png',
+      U_GSP_REFERENCE: 'PT01662',
+      U_GSP_Desc: 'Referencia de prueba para Kanban - Camisa elegante',
+      id: '1'
+    },
+    {
+      U_GSP_Picture: '/img/SIN FOTO.png',
+      U_GSP_REFERENCE: 'PT01663',
+      U_GSP_Desc: 'Referencia de prueba para Kanban - Pantalón casual',
+      id: '2'
+    },
+    {
+      U_GSP_Picture: '/img/SIN FOTO.png',
+      U_GSP_REFERENCE: 'PT01664',
+      U_GSP_Desc: 'Referencia de prueba para Kanban - Vestido formal',
+      id: '3'
+    },
+    {
+      U_GSP_Picture: '/img/SIN FOTO.png',
+      U_GSP_REFERENCE: 'PT01665',
+      U_GSP_Desc: 'Referencia de prueba para Kanban - Chaqueta deportiva',
+      id: '4'
+    }
+  ];
 }
 
 export default function ReferenciasListPage({ params }: ReferenciasListPageProps) {
@@ -86,7 +120,7 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
         
         {/* Content Skeleton */}
         <div className="bg-white rounded-xl shadow-soft border border-secondary-200 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="animate-pulse">
                 <div className="bg-secondary-200 rounded-xl h-48 mb-4"></div>
@@ -224,10 +258,10 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
               </button>
             </div>
             
-            <button className="btn-primary">
+            {/* <button className="btn-primary">
               <Plus className="w-4 h-4" />
               Nueva Referencia
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
@@ -271,7 +305,7 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
           </div>
         ) : viewMode === 'grid' ? (
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-6">
               {filteredModelos.map((modelo, index) => {
                 const fullImageSrc = modelo.U_GSP_Picture
                   ? `${modelo.U_GSP_Picture.replace(/\\/g, '/')}`

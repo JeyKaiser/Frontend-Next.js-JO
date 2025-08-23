@@ -1,7 +1,8 @@
 // app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/layout.tsx
 
 import { getReferenciaData, getCollectionName, getFormattedReferenceName } from '@/app/globals/lib/api';
-import TabList from '@/app/globals/components/molecules/TabList';
+import PhaseProgress from '@/app/globals/components/molecules/PhaseProgress';
+import PhaseKanbanCarousel from '@/app/globals/components/organisms/PhaseKanbanCarousel';
 import { redirect } from 'next/navigation';
 
 interface ReferenciaDetalleLayoutProps { 
@@ -64,12 +65,21 @@ export default async function ReferenciaDetalleLayout({children, params,}: Refer
       </header>
       <div className="max-w-7xl mx-auto px-6 flex-grow w-full">
         
-        <TabList 
-          referenciaId={referenciaId} 
-          fases={fases} 
-          currentCollectionId={collectionId}
-          collectionName={collectionName}
+        {/* New Kanban View */}
+        <PhaseKanbanCarousel
+          referenciaId={referenciaId}
+          collectionId={collectionId}
+          fases={fases}
+          currentPhaseSlug="jo" // This would be dynamic based on current phase
+          onPhaseAction={async (phaseSlug, action, notes) => {
+            'use server';
+            console.log(`Phase action: ${action} on ${phaseSlug}`, notes);
+            // Here you would implement the actual phase action logic
+          }}
+          
         />
+
+        
 
         <div className="mt-6">{children}</div>
       </div>

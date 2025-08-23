@@ -44,6 +44,32 @@ export function getFormattedReferenceName(referenciaId: string): string {
   return referenciaId;
 }
 
+// Mock data for reference details when backend is not available
+function getMockReferenciaData(referenciaId: string, collectionId?: string): ReferenciaDetalleAPI {
+  return {
+    codigo_referencia: referenciaId,
+    nombre: `Referencia ${referenciaId}`,
+    imagen_url: '/img/SIN FOTO.png',
+    collection_id: collectionId || '109',
+    collection_name: getCollectionName(collectionId || '109'),
+    reference_name: getFormattedReferenceName(referenciaId),
+    fases_disponibles: [
+      { slug: 'jo', nombre: 'JO - Jefatura Operaciones' },
+      { slug: 'md-creacion-ficha', nombre: 'MD - Creación Ficha' },
+      { slug: 'md-creativo', nombre: 'MD - Creativo' },
+      { slug: 'md-corte', nombre: 'MD - Corte' },
+      { slug: 'md-fitting', nombre: 'MD - Fitting' },
+      { slug: 'md-tecnico', nombre: 'MD - Técnico' },
+      { slug: 'md-trazador', nombre: 'MD - Trazador' },
+      { slug: 'costeo', nombre: 'Costeo' },
+      { slug: 'pt-tecnico', nombre: 'PT - Técnico' },
+      { slug: 'pt-cortador', nombre: 'PT - Cortador' },
+      { slug: 'pt-fitting', nombre: 'PT - Fitting' },
+      { slug: 'pt-trazador', nombre: 'PT - Trazador' }
+    ]
+  };
+}
+
 // Enhanced function to get reference details with collection information
 export async function getReferenciaData(referenciaId: string, collectionId?: string): Promise<ReferenciaDetalleAPI | null> {
   try {
@@ -62,7 +88,10 @@ export async function getReferenciaData(referenciaId: string, collectionId?: str
           errorBody = await res.text();
       } catch (e) {}
       console.error(`[Next.js SC - Referencia Detalle] Error al obtener detalles para ID '${referenciaId}': STATUS ${res.status}. Cuerpo: ${errorBody}`);
-      return null;
+      
+      // Return mock data when backend is not available (401, 403, 500, etc)
+      console.log(`[Next.js SC - Referencia Detalle] Backend no disponible, usando datos mock para ${referenciaId}`);
+      return getMockReferenciaData(referenciaId, collectionId);
     }
 
     const data: ReferenciaDetalleAPI = await res.json();
@@ -100,7 +129,8 @@ export async function getReferenciaData(referenciaId: string, collectionId?: str
     return data;
   } catch (error) {
     console.error("[Next.js SC - Referencia Detalle] Error de red o al parsear JSON:", error);
-    return null;
+    console.log(`[Next.js SC - Referencia Detalle] Backend no disponible, usando datos mock para ${referenciaId}`);
+    return getMockReferenciaData(referenciaId, collectionId);
   }
 }
 

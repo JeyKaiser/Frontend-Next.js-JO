@@ -9,7 +9,10 @@
       "Bash(cmd /c:*)",
       "Bash(powershell:*)",
       "Bash(rm:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(rg:*)",
+      "Bash(mkdir:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": [],

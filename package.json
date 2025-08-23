@@ -6,9 +6,13 @@
     "dev": "kill-port 3000 && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:init": "npx tsx scripts/init-database.ts",
+    "db:health": "curl http://localhost:3000/api/database/health || echo 'Start the dev server first with npm run dev'"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@sap/hana-client": "^2.25.31",
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",
@@ -36,6 +40,7 @@
     "kill-port": "^2.0.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.20.4",
     "typescript": "^5.8.3"
   }
 }
