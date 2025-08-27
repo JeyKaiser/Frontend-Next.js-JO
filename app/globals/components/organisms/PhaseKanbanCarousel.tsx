@@ -140,7 +140,7 @@ const PhaseKanbanCarousel: React.FC<PhaseKanbanCarouselProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-sm border border-secondary-200">
+    <div className="w-full p-6 bg-white rounded-xl shadow-sm border border-secondary-200">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-primary-600 mb-4">
           Gestión de Fases de la Referencia

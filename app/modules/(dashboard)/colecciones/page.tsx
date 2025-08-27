@@ -182,10 +182,10 @@ export default function ColeccionesPage() {
             </select>
           </div>
           
-          <button className="btn-secondary flex items-center gap-2">
+          {/* <button className="btn-secondary flex items-center gap-2">
             <Filter className="w-4 h-4" />
             Filtros
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -296,7 +296,7 @@ export default function ColeccionesPage() {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
               {filteredCollections.map((collection, index) => (
                 <div key={`${collection.id}-${index}`} className="relative group">
                   {/* Status badge */}

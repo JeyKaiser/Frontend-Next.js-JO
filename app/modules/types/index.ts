@@ -24,6 +24,7 @@ export interface ReferenciasAnioApiResponse {
   U_GSP_Picture: string;
   U_GSP_REFERENCE: string;
   U_GSP_Desc: string;
+  Name: string; // Estado de la referencia
   id?: string | number;
   color_fondo?: string;  
   // Si tu API de lista de referencias devuelve otros campos, añádelos aquí.
@@ -202,13 +203,14 @@ export interface UsuariosResponse {
 export interface ConsumoData {
   COLECCION: string;           // T3."Name" AS "COLECCION"
   NOMBRE_REF: string;          // T1."U_GSP_Desc" AS "NOMBRE REF"
+  ESTADO: string;              // T5."Name" AS "ESTADO"
   USO_EN_PRENDA: string;       // T2."U_GSP_SchLinName" AS "USO EN PRENDA"
   COD_TELA: string;            // T2."U_GSP_ItemCode" AS "COD TELA"
   NOMBRE_TELA: string;         // T2."U_GSP_ItemName" AS "NOMBRE TELA"
   CONSUMO: number | null;      // T2."U_GSP_QuantMsr" AS "CONSUMO"
   GRUPO_TALLAS: string;        // T1."U_GSP_GroupSizeCode" AS "GRUPO TALLAS"
   LINEA: string;               // T4."Name" AS "LINEA"
-  TIPO: string;                // T2."U_GSP_SchName" AS "tipo"
+  TIPO: string;                // T2."U_GSP_SchName" AS "TIPO"
 }
 
 export interface ConsumosResponse {
@@ -217,6 +219,18 @@ export interface ConsumosResponse {
   count?: number;
   error?: string;
   referenceCode?: string;
+}
+
+// Tipos adicionales para manejo de pestañas por tipo
+export interface ConsumosPorTipo {
+  [tipo: string]: ConsumoData[];
+}
+
+export interface TipoConsumo {
+  id: string;
+  nombre: string;
+  data: ConsumoData[];
+  count: number;
 }
 
 // Re-export production types for convenience

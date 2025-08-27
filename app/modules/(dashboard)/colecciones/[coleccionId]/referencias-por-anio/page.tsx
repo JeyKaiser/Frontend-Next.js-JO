@@ -5,7 +5,35 @@ import CardReferencia from '@/app/globals/components/molecules/CardReferencia';
 import Breadcrumb from '@/app/globals/components/molecules/Breadcrumb';
 import type { ReferenciasAnioApiResponse } from '@/app/modules/types';
 import Link from 'next/link';
-import { ArrowLeft, Grid, List, Filter, Search, Package, Eye, Plus } from 'lucide-react';
+import { ArrowLeft, Grid, List, Search, Package, Eye, Plus } from 'lucide-react';
+
+// Helper function to determine status chip styles
+const getStatusChipProps = (status: string | null): { className: string; label: string } => {
+  if (!status) {
+    return { className: 'bg-gray-200 text-gray-800', label: 'Sin estado' };
+  }
+  const trimmedStatus = status.trim();
+  switch (trimmedStatus) {
+    case 'Aprobado sujeto a cambios':
+      return { className: 'bg-teal-100 text-teal-800 border border-teal-300', label: 'Por cambios' };
+    case 'Aprobada y terminada':
+      return { className: 'bg-green-100 text-green-800 border border-green-300', label: 'Aprobada' };
+    case 'En Proceso':
+      return { className: 'bg-yellow-100 text-yellow-800 border border-yellow-300', label: trimmedStatus };
+    case 'Cancelada':
+      return { className: 'bg-gray-200 text-gray-800 border border-gray-300', label: trimmedStatus };
+    default:
+      return { className: 'bg-gray-200 text-gray-800', label: trimmedStatus };
+  }
+};
+
+const ALL_STATUSES = ["Aprobado sujeto a cambios", "Aprobada y terminada", "En Proceso", "Cancelada"];
+
+// Helper function to normalize status strings
+const normalizeStatus = (status: string | null | undefined): string => {
+  if (!status) return '';
+  return status.trim().replace(/\s+/g, ' '); // Elimina espacios múltiples y caracteres invisibles
+};
 
 interface ReferenciasListPageProps {
   params: {
@@ -45,26 +73,9 @@ function getMockReferences(collectionId: string): ReferenciasAnioApiResponse[] {
       U_GSP_Picture: '/img/SIN FOTO.png',
       U_GSP_REFERENCE: 'PT01662',
       U_GSP_Desc: 'Referencia de prueba para Kanban - Camisa elegante',
+      Name: 'En Proceso',
       id: '1'
-    },
-    {
-      U_GSP_Picture: '/img/SIN FOTO.png',
-      U_GSP_REFERENCE: 'PT01663',
-      U_GSP_Desc: 'Referencia de prueba para Kanban - Pantalón casual',
-      id: '2'
-    },
-    {
-      U_GSP_Picture: '/img/SIN FOTO.png',
-      U_GSP_REFERENCE: 'PT01664',
-      U_GSP_Desc: 'Referencia de prueba para Kanban - Vestido formal',
-      id: '3'
-    },
-    {
-      U_GSP_Picture: '/img/SIN FOTO.png',
-      U_GSP_REFERENCE: 'PT01665',
-      U_GSP_Desc: 'Referencia de prueba para Kanban - Chaqueta deportiva',
-      id: '4'
-    }
+    }    
   ];
 }
 
@@ -75,6 +86,7 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [collectionId, setCollectionId] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
   useEffect(() => {
     async function loadData() {
@@ -101,10 +113,21 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
     { label: collectionId || 'Cargando...', current: true },
   ];
 
-  const filteredModelos = modelos?.filter(modelo =>
-    modelo.U_GSP_REFERENCE.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    modelo.U_GSP_Desc.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredModelos = modelos?.filter(modelo => {
+    const searchMatch = modelo.U_GSP_REFERENCE.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        modelo.U_GSP_Desc.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (selectedStatus === 'all') {
+      return searchMatch;
+    }
+
+    // Normalizamos el estado para eliminar espacios en blanco y caracteres invisibles
+    const cleanStatus = normalizeStatus(modelo.Name);
+    const normalizedSelectedStatus = normalizeStatus(selectedStatus);
+    console.log(`[DEBUG] Comparando: "${cleanStatus}" === "${normalizedSelectedStatus}" (Original: "${modelo.Name}")`);
+    const statusMatch = cleanStatus === normalizedSelectedStatus;
+    return searchMatch && statusMatch;
+  }) || [];
 
   if (loading) {
     return (
@@ -238,30 +261,17 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
             <div className="flex items-center bg-secondary-100 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md transition-colors duration-200 ${
-                  viewMode === 'grid'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-secondary-600 hover:text-secondary-900'
-                }`}
+                className={`p-2 rounded-md transition-colors duration-200 ${viewMode === 'grid' ? 'bg-white text-primary-600 shadow-sm' : 'text-secondary-600 hover:text-secondary-900'}`}
               >
                 <Grid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-md transition-colors duration-200 ${
-                  viewMode === 'list'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-secondary-600 hover:text-secondary-900'
-                }`}
+                className={`p-2 rounded-md transition-colors duration-200 ${viewMode === 'list' ? 'bg-white text-primary-600 shadow-sm' : 'text-secondary-600 hover:text-secondary-900'}`}
               >
                 <List className="w-4 h-4" />
               </button>
             </div>
-            
-            {/* <button className="btn-primary">
-              <Plus className="w-4 h-4" />
-              Nueva Referencia
-            </button> */}
           </div>
         </div>
       </div>
@@ -269,6 +279,7 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
       {/* Search and Filters */}
       <div className="bg-white rounded-xl shadow-soft border border-secondary-200 p-4">
         <div className="flex flex-col md:flex-row gap-4">
+          {/* Search */}
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 w-4 h-4" />
@@ -282,10 +293,21 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
             </div>
           </div>
           
-          <button className="btn-secondary flex items-center gap-2">
-            <Filter className="w-4 h-4" />
-            Filtros
-          </button>
+          {/* Status Filter */}
+          <div className="md:w-48">
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="form-input"
+            >
+              <option value="all">Todos los estados</option>
+              {ALL_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -307,21 +329,24 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
           <div className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-6">
               {filteredModelos.map((modelo, index) => {
-                const fullImageSrc = modelo.U_GSP_Picture
-                  ? `${modelo.U_GSP_Picture.replace(/\\/g, '/')}`
-                  : '/img/SIN FOTO.png';
-
+                const fullImageSrc = modelo.U_GSP_Picture || '/img/SIN FOTO.png';
                 const destinationUrl = `/modules/referencia-detalle/${collectionId}/${modelo.U_GSP_REFERENCE}`;
                 console.log(`[ReferenciasListPage] Generando enlace para ${modelo.U_GSP_REFERENCE}: ${destinationUrl} collectionId: ${collectionId}`);
 
                 return (
-                  <CardReferencia
-                    key={modelo.U_GSP_REFERENCE || modelo.id || index}
-                    imageSrc={fullImageSrc}
-                    title={modelo.U_GSP_REFERENCE}
-                    subtitle={modelo.U_GSP_Desc}
-                    href={destinationUrl}
-                  />
+                  <div key={modelo.U_GSP_REFERENCE || modelo.id || index} className="relative group">
+                    <div className="absolute top-3 right-3 z-10">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusChipProps(normalizeStatus(modelo.Name)).className}`}>
+                        {getStatusChipProps(normalizeStatus(modelo.Name)).label}
+                      </span>
+                    </div>
+                    <CardReferencia
+                      imageSrc={fullImageSrc}
+                      title={modelo.U_GSP_REFERENCE}
+                      subtitle={modelo.U_GSP_Desc}
+                      href={destinationUrl}
+                    />
+                  </div>
                 );
               })}
             </div>
@@ -330,10 +355,7 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
           /* List view */
           <div className="divide-y divide-secondary-200">
             {filteredModelos.map((modelo, index) => {
-              const fullImageSrc = modelo.U_GSP_Picture
-                ? `${modelo.U_GSP_Picture.replace(/\\/g, '/')}`
-                : '/img/SIN FOTO.png';
-
+              const fullImageSrc = modelo.U_GSP_Picture || '/img/SIN FOTO.png';
               const destinationUrl = `/modules/referencia-detalle/${collectionId}/${modelo.U_GSP_REFERENCE}`;
 
               return (
@@ -348,9 +370,14 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-secondary-900 mb-1 truncate">
-                        {modelo.U_GSP_REFERENCE}
-                      </h3>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-lg font-semibold text-secondary-900 truncate">
+                          {modelo.U_GSP_REFERENCE}
+                        </h3>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusChipProps(normalizeStatus(modelo.Name)).className}`}>
+                          {getStatusChipProps(normalizeStatus(modelo.Name)).label}
+                        </span>
+                      </div>
                       <p className="text-sm text-secondary-600 line-clamp-2">
                         {modelo.U_GSP_Desc}
                       </p>
