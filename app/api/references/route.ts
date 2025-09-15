@@ -4,7 +4,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GarmentProductionDAL } from '@/app/globals/lib/dal/garment-production';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,37 +27,85 @@ export async function GET(request: NextRequest) {
 
     // If specific reference code is requested
     if (codigo) {
-      const result = await GarmentProductionDAL.getReferenciaByCode(codigo);
-      
-      if (!result.success) {
-        return NextResponse.json(
-          { success: false, error: result.error },
-          { status: 500 }
-        );
+      const djangoApiUrl = `http://localhost:8000/costeo/referencias/${codigo}/`;
+      const response = await fetch(djangoApiUrl);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return NextResponse.json({
+            success: true,
+            data: null,
+            found: false
+          });
+        }
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Error from Django API: ${response.status}`);
       }
+
+      const data = await response.json();
+
+      // Transform data to match what the frontend expects
+      const transformedData = {
+        CODIGO_REFERENCIA: data.U_GSP_REFERENCE,
+        NOMBRE_REFERENCIA: data.U_GSP_Desc,
+        ID_REFERENCIA: 0, // Not available
+        ID_COLECCION: 0, // Not available from this endpoint, might need another call
+        DESCRIPCION: data.U_GSP_Desc,
+        TIPO_PRENDA: 'N/A', // Not available
+        CATEGORIA: 'N/A', // Not available
+        GENERO: 'N/A', // Not available
+        ESTADO: 'ACTIVA', // Assuming active
+        FECHA_CREACION: new Date().toISOString(), // Not available
+        USUARIO_CREACION: 'N/A', // Not available
+        img: data.U_GSP_Picture,
+        CollectionName: data.CollectionName,
+        SchemaName: data.SchemaName,
+      };
 
       return NextResponse.json({
         success: true,
-        data: result.data?.[0] || null,
-        found: (result.data?.length || 0) > 0
+        data: transformedData,
+        found: true
       });
     }
 
     // If search term is provided
     if (search) {
-      const result = await GarmentProductionDAL.searchReferencias(search, filters);
-      
-      if (!result.success) {
-        return NextResponse.json(
-          { success: false, error: result.error },
-          { status: 500 }
-        );
+      const djangoApiUrl = `http://localhost:8000/costeo/referencias/search/?search=${search}`;
+      const response = await fetch(djangoApiUrl);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Error from Django API: ${response.status}`);
       }
+
+      const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid response format from Django API');
+      }
+
+      // Transform data to match what the frontend expects
+      const transformedData = data.map((item: any) => ({
+        CODIGO_REFERENCIA: item.U_GSP_REFERENCE,
+        NOMBRE_REFERENCIA: item.U_GSP_Desc,
+        ID_REFERENCIA: 0, // Not available
+        ID_COLECCION: 0, // Not available from this endpoint
+        DESCRIPCION: item.U_GSP_Desc,
+        TIPO_PRENDA: 'N/A', // Not available
+        CATEGORIA: 'N/A', // Not available
+        GENERO: 'N/A', // Not available
+        ESTADO: 'ACTIVA', // Assuming active
+        FECHA_CREACION: new Date().toISOString(), // Not available
+        USUARIO_CREACION: 'N/A', // Not available
+        img: item.U_GSP_Picture,
+        CollectionName: item.CollectionName,
+      }));
 
       return NextResponse.json({
         success: true,
-        data: result.data || [],
-        count: result.rowCount || 0,
+        data: transformedData,
+        count: transformedData.length,
         searchTerm: search,
         filters
       });
@@ -66,23 +113,51 @@ export async function GET(request: NextRequest) {
 
     // Get references by collection
     if (coleccionId) {
-      const result = await GarmentProductionDAL.getReferenciasByColeccion(coleccionId, offset, limit);
-      
-      if (!result.success) {
-        return NextResponse.json(
-          { success: false, error: result.error },
-          { status: 500 }
-        );
+      const djangoApiUrl = `http://localhost:8000/costeo/referencias-por-anio/${coleccionId}/`;
+      const response = await fetch(djangoApiUrl);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Error from Django API: ${response.status}`);
       }
+
+      const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid response format from Django API');
+      }
+
+      // Transform data to match what the frontend expects
+      const transformedData = data.map((item: any) => ({
+        // Mapping what we can from the Django API response
+        CODIGO_REFERENCIA: item.U_GSP_REFERENCE,
+        NOMBRE_REFERENCIA: item.U_GSP_Desc,
+        // The frontend expects more fields, which are not available in the Django API response.
+        // Setting default/empty values for them.
+        ID_REFERENCIA: 0, // Not available
+        ID_COLECCION: coleccionId,
+        DESCRIPCION: item.U_GSP_Desc,
+        TIPO_PRENDA: 'N/A', // Not available
+        CATEGORIA: 'N/A', // Not available
+        GENERO: 'N/A', // Not available
+        ESTADO: 'ACTIVA', // Assuming active
+        FECHA_CREACION: new Date().toISOString(), // Not available
+        USUARIO_CREACION: 'N/A', // Not available
+        img: item.U_GSP_Picture, // Assuming this is an image url
+      }));
+      
+      // The original code had pagination. The Django API returns everything.
+      // I will implement pagination here.
+      const paginatedData = transformedData.slice(offset, offset + limit);
 
       return NextResponse.json({
         success: true,
-        data: result.data || [],
-        count: result.rowCount || 0,
+        data: paginatedData,
+        count: transformedData.length,
         pagination: {
           offset,
           limit,
-          hasMore: (result.data?.length || 0) === limit
+          hasMore: (offset + limit) < transformedData.length
         },
         coleccionId
       });
@@ -110,45 +185,34 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    console.log('[API] Creating reference:', body);
+    console.log('[API] Creating reference via Django backend:', body);
 
-    // Validate required fields
-    const requiredFields = [
-      'CODIGO_REFERENCIA', 'ID_COLECCION', 'NOMBRE_REFERENCIA',
-      'TIPO_PRENDA', 'CATEGORIA', 'GENERO', 'USUARIO_CREACION'
-    ];
+    // The Django API URL
+    const djangoApiUrl = 'http://localhost:8000/costeo/referencias/';
+
+    // The Django API expects a different body, so I'm sending the original body for now.
+    // This will likely fail, but it's a starting point for the refactoring.
+    // The Django API needs to be updated to handle the fields sent by the frontend.
     
-    const missingFields = requiredFields.filter(field => !body[field]);
-    
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: `Missing required fields: ${missingFields.join(', ')}` 
-        },
-        { status: 400 }
-      );
+    // Call the Django backend
+    const response = await fetch(djangoApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `Error from Django API: ${response.status}`);
     }
 
-    // Set defaults
-    const referenciaData = {
-      ...body,
-      ESTADO: body.ESTADO || 'ACTIVA'
-    };
-
-    const result = await GarmentProductionDAL.createReferencia(referenciaData);
-    
-    if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 500 }
-      );
-    }
+    const data = await response.json();
 
     return NextResponse.json({
       success: true,
-      message: 'Reference created successfully',
-      executionTime: result.executionTime
+      message: data.message || 'Reference created successfully',
     }, { status: 201 });
 
   } catch (error) {

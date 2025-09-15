@@ -1,46 +1,106 @@
-import { Tag } from 'lucide-react';
+"use client";
 
-export default function CategoriasPage() {
+import React, { useState, useEffect } from 'react';
+import ParametroModal from '../../../globals/components/organisms/ParametroModal';
+
+// Se usa un tipo genérico ya que la estructura de los parámetros puede variar.
+type Parametro = {
+  [key: string]: string | number | boolean | null | undefined;
+};
+
+const CategoriasPage = () => {
+  const [parametros, setParametros] = useState<Parametro[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showParametrosModal, setShowParametrosModal] = useState(false);
+
+  const fetchParametros = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/parametros/');
+      if (!response.ok) {
+        throw new Error(`Error de red: ${response.statusText}`);
+      }
+      const data: Parametro[] = await response.json();
+      console.log("DATOS RECIBIDOS EN EL COMPONENTE (desde la ruta API):", data);
+      setParametros(data);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchParametros();
+  }, []); // El array vacío asegura que el fetch se ejecute solo una vez.
+
+  const handleParametroSuccess = () => {
+    // Recargar los datos después de crear un nuevo parámetro
+    fetchParametros();
+  };
+
+  if (loading) {
+    return <div className="p-6 text-center">Cargando datos...</div>;
+  }
+
+  if (error) {
+    return <div className="p-6 text-center text-red-500">Error al cargar los datos: {error}</div>;
+  }
+
+  if (!parametros || parametros.length === 0) {
+    return <div className="p-6 text-center">No se encontraron parámetros para mostrar.</div>;
+  }
+
+  // Obtener las cabeceras dinámicamente del primer objeto.
+  const headers = Object.keys(parametros[0]);
+
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <h1 className="page-title">Categorías</h1>
-        <p className="page-subtitle">Gestión de categorías del sistema</p>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-foreground">
+          Parámetros del Sistema
+        </h1>
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center gap-2"
+          onClick={() => setShowParametrosModal(true)}
+        >
+          <span className="text-lg">+</span>
+          Crear Parámetro
+        </button>
       </div>
-      
-      <div className="content-section">
-        <div className="section-body">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-accent-100 rounded-xl flex items-center justify-center mx-auto mb-6">
-              <Tag className="w-8 h-8 text-accent-600" />
-            </div>
-            <h3 className="heading-4 mb-3">Módulo en Desarrollo</h3>
-            <p className="body-medium mb-8">La gestión de categorías está siendo desarrollada y estará disponible próximamente.</p>
-            
-            <div className="bg-secondary-50 border border-secondary-200 rounded-xl p-6">
-              <h4 className="heading-5 mb-4">Funcionalidades planificadas:</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                  <span className="body-medium">Creación y edición de categorías</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                  <span className="body-medium">Organización jerárquica</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                  <span className="body-medium">Clasificación de productos</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                  <span className="body-medium">Filtros y búsquedas</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="border rounded-lg overflow-x-auto">
+        <table className="w-full text-sm text-left text-foreground">
+          <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
+            <tr>
+              {headers.map((header) => (
+                <th key={header} scope="col" className="px-6 py-3 font-medium">
+                  {header.replace(/_/g, ' ')}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {parametros.map((parametro, index) => (
+              <tr key={index} className="bg-background border-b last:border-b-0 border-border hover:bg-muted/50">
+                {headers.map((header) => (
+                  <td key={header} className="px-6 py-4">
+                    {String(parametro[header])}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      <ParametroModal
+        isOpen={showParametrosModal}
+        onClose={() => setShowParametrosModal(false)}
+        onSuccess={handleParametroSuccess}
+      />
     </div>
   );
-}
+};
+
+export default CategoriasPage;

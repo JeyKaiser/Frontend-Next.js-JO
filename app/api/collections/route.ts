@@ -4,7 +4,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GarmentProductionDAL } from '@/app/globals/lib/dal/garment-production';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,46 +13,55 @@ export async function GET(request: NextRequest) {
     const anio = searchParams.get('anio') ? parseInt(searchParams.get('anio')!) : undefined;
     const codigo = searchParams.get('codigo');
 
-    console.log('[API] Getting collections:', { offset, limit, anio, codigo });
+    console.log('[API] Getting collections from Django backend:', { offset, limit, anio, codigo });
 
-    // If specific collection code is requested
+    // The Django API URL
+    const djangoApiUrl = 'http://localhost:8000/api/colecciones/';
+
+    // Fetch data from Django backend
+    const response = await fetch(djangoApiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `Error from Django API: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid response format from Django API');
+    }
+
+    // The original code had logic for fetching a single collection by code.
+    // The Django API returns all collections. I will filter by code here if needed.
     if (codigo) {
-      const result = await GarmentProductionDAL.getColeccionByCode(codigo);
-      
-      if (!result.success) {
-        return NextResponse.json(
-          { success: false, error: result.error },
-          { status: 500 }
-        );
-      }
-
+      const collection = data.find(c => c.id === codigo);
       return NextResponse.json({
         success: true,
-        data: result.data?.[0] || null,
-        found: (result.data?.length || 0) > 0
+        data: collection || null,
+        found: !!collection
       });
     }
-
-    // Get collections with pagination
-    const result = await GarmentProductionDAL.getColecciones(offset, limit, anio);
     
-    if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 500 }
-      );
-    }
+    // The original code had pagination. The Django API returns everything.
+    // I will implement pagination here.
+    const paginatedData = data.slice(offset, offset + limit);
 
     return NextResponse.json({
       success: true,
-      data: result.data || [],
-      count: result.rowCount || 0,
+      data: paginatedData,
+      count: data.length,
       pagination: {
         offset,
         limit,
-        hasMore: (result.data?.length || 0) === limit
+        hasMore: (offset + limit) < data.length
       },
-      filters: { anio }
+      filters: { anio } // anio filter is not implemented in Django API yet
     });
 
   } catch (error) {
@@ -69,42 +77,37 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    console.log('[API] Creating collection:', body);
+    console.log('[API] Creating collection via Django backend:', body);
 
-    // Validate required fields
-    const requiredFields = ['CODIGO_COLECCION', 'NOMBRE_COLECCION', 'TEMPORADA', 'ANIO', 'FECHA_INICIO', 'USUARIO_CREACION'];
-    const missingFields = requiredFields.filter(field => !body[field]);
-    
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: `Missing required fields: ${missingFields.join(', ')}` 
-        },
-        { status: 400 }
-      );
-    }
+    // The Django API URL
+    const djangoApiUrl = 'http://localhost:8000/api/colecciones/';
 
-    // Set defaults
-    const coleccionData = {
-      ...body,
-      ESTADO: body.ESTADO || 'ACTIVA',
-      USUARIO_MODIFICACION: body.USUARIO_CREACION
+    // Transform the body to match what the Django API expects
+    const transformedBody = {
+      Code: body.CODIGO_COLECCION,
+      Name: body.NOMBRE_COLECCION,
+      U_GSP_SEASON: body.ANIO
     };
 
-    const result = await GarmentProductionDAL.createColeccion(coleccionData);
-    
-    if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 500 }
-      );
+    // Call the Django backend
+    const response = await fetch(djangoApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transformedBody),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `Error from Django API: ${response.status}`);
     }
+
+    const data = await response.json();
 
     return NextResponse.json({
       success: true,
-      message: 'Collection created successfully',
-      executionTime: result.executionTime
+      message: data.message || 'Collection created successfully',
     }, { status: 201 });
 
   } catch (error) {

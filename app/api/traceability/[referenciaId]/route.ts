@@ -4,7 +4,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GarmentProductionDAL } from '@/app/globals/lib/dal/garment-production';
 
 interface RouteParams {
   params: {
@@ -23,34 +22,37 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    console.log('[API] Getting traceability for reference:', referenciaId);
+    console.log('[API] Getting traceability for reference from Django backend:', referenciaId);
 
-    // Get full traceability for the reference
-    const traceabilityResult = await GarmentProductionDAL.getTrazabilidadByReferencia(referenciaId);
-    
-    if (!traceabilityResult.success) {
-      return NextResponse.json(
-        { success: false, error: traceabilityResult.error },
-        { status: 500 }
-      );
+    const traceabilityUrl = `http://localhost:8000/costeo/referencias/${referenciaId}/trazabilidad/`;
+    const currentPhaseUrl = `http://localhost:8000/costeo/referencias/${referenciaId}/trazabilidad/current/`;
+
+    const [traceabilityResponse, currentPhaseResponse] = await Promise.all([
+      fetch(traceabilityUrl),
+      fetch(currentPhaseUrl)
+    ]);
+
+    if (!traceabilityResponse.ok) {
+      const errorData = await traceabilityResponse.json().catch(() => ({}));
+      throw new Error(errorData.detail || `Error from Django API (traceability): ${traceabilityResponse.status}`);
     }
-
-    // Get current phase
-    const currentPhaseResult = await GarmentProductionDAL.getCurrentPhaseForReferencia(referenciaId);
     
-    const currentPhase = currentPhaseResult.success && currentPhaseResult.data?.length > 0 
-      ? currentPhaseResult.data[0] 
-      : null;
+    const traceabilityData = await traceabilityResponse.json();
+    
+    let currentPhase = null;
+    if (currentPhaseResponse.ok) {
+      currentPhase = await currentPhaseResponse.json();
+    }
 
     return NextResponse.json({
       success: true,
       data: {
         referenciaId,
-        traceability: traceabilityResult.data || [],
+        traceability: traceabilityData || [],
         currentPhase,
-        totalPhases: traceabilityResult.data?.length || 0,
-        completedPhases: traceabilityResult.data?.filter(
-          (t: any) => t.ESTADO === 'COMPLETADO'
+        totalPhases: traceabilityData?.length || 0,
+        completedPhases: traceabilityData?.filter(
+          (t: any) => t.PhaseName === 'COMPLETADO' // This is a guess, the data structure is not clear
         ).length || 0
       }
     });

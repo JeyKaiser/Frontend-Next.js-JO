@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     console.log('[API Consumos] Consultando consumos para referencia:', reference);
 
     // Hacer petición al backend externo
-    const backendUrl = `http://localhost:8000/api/consumos?reference=${encodeURIComponent(reference)}`;
+    const backendUrl = `http://localhost:8000/api/consumos/?reference=${encodeURIComponent(reference)}`;
     
     try {
       console.log('[API Consumos] Conectando al backend:', backendUrl);

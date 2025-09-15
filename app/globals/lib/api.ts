@@ -236,64 +236,7 @@ export function detectSearchType(query: string): 'pt' | 'md' | 'collection' | 'g
   return 'general';
 }
 
-/**
- * Validates if a search query matches expected patterns
- * @param query - The search query
- * @returns Object with validation result and suggestions
- */
-export function validateSearchQuery(query: string): { 
-  isValid: boolean; 
-  type: string; 
-  suggestions: string[] 
-} {
-  const cleanQuery = query.trim();
-  
-  if (!cleanQuery) {
-    return {
-      isValid: false,
-      type: 'empty',
-      suggestions: ['Ingresa un término de búsqueda', 'Ejemplos: PT003112, MD003422, Winter']
-    };
-  }
-  
-  const type = detectSearchType(cleanQuery);
-  
-  switch (type) {
-    case 'pt':
-      const ptPattern = /^pt\d{3,6}$/i;
-      return {
-        isValid: ptPattern.test(cleanQuery),
-        type: 'pt',
-        suggestions: ptPattern.test(cleanQuery) 
-          ? ['Código PT válido'] 
-          : ['Formato: PT seguido de 3-6 números', 'Ejemplos: PT003112, PT01662']
-      };
-      
-    case 'md':
-      const mdPattern = /^md\d{3,6}$/i;
-      return {
-        isValid: mdPattern.test(cleanQuery),
-        type: 'md',
-        suggestions: mdPattern.test(cleanQuery) 
-          ? ['Código MD válido (en desarrollo)'] 
-          : ['Formato: MD seguido de 3-6 números', 'Ejemplos: MD003422, MD12345']
-      };
-      
-    case 'collection':
-      return {
-        isValid: true,
-        type: 'collection',
-        suggestions: ['Búsqueda de colección', 'Intenta: Winter, Spring, Summer, Resort']
-      };
-      
-    default:
-      return {
-        isValid: true,
-        type: 'general',
-        suggestions: ['Búsqueda general', 'Para mejores resultados usa códigos PT o nombres de colecciones']
-      };
-  }
-}
+
 
 // Enhanced search function that handles multiple patterns
 export async function searchUniversal(query: string): Promise<SearchResponse | SearchError> {

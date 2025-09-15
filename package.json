@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@sap/hana-client": "^2.25.31",
+    "@radix-ui/react-tabs": "^1.1.13",
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",
@@ -21,7 +21,8 @@
     "next": "^14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -40,6 +41,7 @@
     "kill-port": "^2.0.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
+    "ts-prune": "^0.10.3",
     "tsx": "^4.20.4",
     "typescript": "^5.8.3"
   }

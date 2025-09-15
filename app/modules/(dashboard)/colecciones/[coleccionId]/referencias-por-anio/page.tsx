@@ -7,6 +7,21 @@ import type { ReferenciasAnioApiResponse } from '@/app/modules/types';
 import Link from 'next/link';
 import { ArrowLeft, Grid, List, Search, Package, Eye, Plus } from 'lucide-react';
 
+// Helper function to safely get image source
+const getSafeImageSrc = (path: string | null | undefined): string => {
+  const defaultImage = '/img/SIN FOTO.png';
+  if (!path) {
+    return defaultImage;
+  }
+  // Reemplaza las barras invertidas y comprueba si es una URL válida o una ruta relativa
+  const normalizedPath = path.replace(/\\/g, '/');
+  if (normalizedPath.startsWith('http') || normalizedPath.startsWith('/')) {
+    return normalizedPath;
+  }
+  // Si es una ruta inválida, devuelve la imagen por defecto
+  return defaultImage;
+};
+
 // Helper function to determine status chip styles
 const getStatusChipProps = (status: string | null): { className: string; label: string } => {
   if (!status) {
@@ -329,7 +344,7 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
           <div className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-6">
               {filteredModelos.map((modelo, index) => {
-                const fullImageSrc = modelo.U_GSP_Picture || '/img/SIN FOTO.png';
+                const fullImageSrc = getSafeImageSrc(modelo.U_GSP_Picture);
                 const destinationUrl = `/modules/referencia-detalle/${collectionId}/${modelo.U_GSP_REFERENCE}`;
                 console.log(`[ReferenciasListPage] Generando enlace para ${modelo.U_GSP_REFERENCE}: ${destinationUrl} collectionId: ${collectionId}`);
 
@@ -355,7 +370,7 @@ export default function ReferenciasListPage({ params }: ReferenciasListPageProps
           /* List view */
           <div className="divide-y divide-secondary-200">
             {filteredModelos.map((modelo, index) => {
-              const fullImageSrc = modelo.U_GSP_Picture || '/img/SIN FOTO.png';
+              const fullImageSrc = getSafeImageSrc(modelo.U_GSP_Picture);
               const destinationUrl = `/modules/referencia-detalle/${collectionId}/${modelo.U_GSP_REFERENCE}`;
 
               return (

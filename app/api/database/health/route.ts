@@ -1,47 +1,41 @@
 /**
- * Database Health Check API Route
- * Tests SAP HANA connection and provides health information
+ * Database Health Check API Route - Migrated to Backend
+ * Routes database health checks to Django backend
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { testDatabaseConnection, getDatabaseHealth } from '@/app/globals/lib/database';
 
-export async function GET(request: NextRequest) {
+const BACKEND_URL = 'http://localhost:8000/api/users/database/health/';
+
+export async function GET() {
   try {
-    console.log('[API] Database health check requested');
+    console.log('[API Database Health] Forwarding request to backend:', BACKEND_URL);
     
-    // Test basic connection
-    const connectionTest = await testDatabaseConnection();
-    
-    if (!connectionTest.success) {
-      console.error('[API] Database connection test failed:', connectionTest.error);
+    const response = await fetch(BACKEND_URL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
       return NextResponse.json(
         {
           success: false,
-          error: connectionTest.error,
+          error: errorData.error || `Backend error: ${response.statusText}`,
           timestamp: new Date().toISOString()
         },
-        { status: 503 } // Service Unavailable
+        { status: response.status }
       );
     }
-    
-    // Get detailed health information
-    const healthInfo = await getDatabaseHealth();
-    
-    return NextResponse.json({
-      success: true,
-      connection: {
-        status: 'connected',
-        version: connectionTest.data?.[0]?.VERSION || 'unknown',
-        executionTime: connectionTest.executionTime
-      },
-      health: healthInfo.success ? healthInfo.data : null,
-      timestamp: new Date().toISOString(),
-      schema: 'GARMENT_PRODUCTION_CONTROL'
-    });
+
+    const data = await response.json();
+    return NextResponse.json(data);
     
   } catch (error) {
-    console.error('[API] Database health check error:', error);
+    console.error('[API Database Health] Error:', error);
     
     return NextResponse.json(
       {
@@ -55,7 +49,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Handle OPTIONS for CORS
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
