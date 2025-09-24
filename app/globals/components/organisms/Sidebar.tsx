@@ -13,6 +13,7 @@ import {
   FileText,
   Eye,
   ChevronRight,
+  Wrench,
 } from 'lucide-react';
 
 interface NavItem {
@@ -41,8 +42,18 @@ const navigation: NavItem[] = [
     icon: Package,
   },
   {
-    href: '/modules/categorias',
-    label: 'Categorías',
+    href: '/modules/parametros',
+    label: 'Parámetros',
+    icon: Wrench,
+  },
+  // {
+  //   href: '/modules/referentes',
+  //   label: 'Referentes',
+  //   icon: Tag,
+  // },
+  {
+    href: '/modules/referentes',
+    label: 'Referentes',
     icon: Tag,
   },
   {

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Define las rutas que no requieren autenticación
-const publicPaths = ['/modules/login', '/modules/signin', '/modules/forgot-password', '/'];
+const publicPaths = ['/modules/login', '/modules/signin', '/modules/forgot-password', '/', '/modules/referentes'];
 
 // Define la ruta a la que se redirige un usuario ya autenticado si intenta acceder a una ruta pública
 const defaultRedirect = '/modules/dashboard';

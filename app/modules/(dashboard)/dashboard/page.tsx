@@ -210,8 +210,8 @@ export default function DashboardPage() {
                 <span>Gestionar Consumos</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/modules/categorias" className="btn-ghost w-full justify-between">
-                <span>Ver Categorías</span>
+              <Link href="/modules/referentes" className="btn-ghost w-full justify-between">
+                <span>Ver Referentes</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
