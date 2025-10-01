@@ -17,12 +17,21 @@ interface ImageData {
 }
 
 interface ConsumoData {
-  uso_en_prenda: string;
-  base_textil: string;
-  color: string;
-  ancho_tela: number;
-  propiedades: string;
-  consumo: number;
+  indice?: number;
+  uso_en_prenda?: string;
+  uso_tela?: string;
+  base_textil?: string;
+  color?: string;
+  caracteristica_color?: string;
+  consumo_mtr?: number;
+  ancho_tela?: number;
+  ancho_util_metros?: number;
+  consumo?: number;
+  propiedades?: string;
+  cantidad_telas?: number;
+  numero_variante?: string;
+  tipo_prenda?: string;
+  descripcion_variante?: string;
 }
 
 interface Filtros {
@@ -33,18 +42,36 @@ interface Filtros {
   ancho_util?: string;
 }
 
-interface ConteoTelas {
-  conteo_telas_unicas: number;
+interface ConteoVarianteData {
+  'cantidad_telas': number;
+  'numero_variante': string;
+  'descripcion_variante': string;
 }
+
+interface ConsumoEspecificoData {
+  uso_tela: string;
+  base_textil: string;
+  caracteristica_color: string;
+  consumo_mtr: number;
+  ancho_util_metros: number;
+}
+
+interface ConteoVarianteBackendData {
+  cantidad_telas: number;
+  numero_variante: string;
+  descripcion_variante: string;
+}
+
+
 
 export default function ReferentesPage() {
   const [prendas, setPrendas] = useState<Prenda[]>([]);
-  // const [images, setImages] = useState<ImageData[]>([]); // Comentado - solo usamos availableImages
   const [error, setError] = useState<string | null>(null);
 
   // Estados para la funcionalidad de consumo textil
   const [consumoData, setConsumoData] = useState<ConsumoData[]>([]);
-  const [conteosTelas, setConteosTelas] = useState<ConteoTelas[]>([]);
+  const [consumoDataOriginal, setConsumoDataOriginal] = useState<ConsumoData[]>([]);
+  const [conteosTelas, setConteosTelas] = useState<ConteoVarianteData[]>([]);
   const [filtros, setFiltros] = useState<Filtros>({});
   const [showTable, setShowTable] = useState(false);
   const [showConteoCards, setShowConteoCards] = useState(false);
@@ -52,10 +79,10 @@ export default function ReferentesPage() {
   const [loading, setLoading] = useState(false);
   const [availableImages, setAvailableImages] = useState<ImageData[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
-  const [showImageUpload, setShowImageUpload] = useState(false); // Controla la visibilidad de los inputs de edición (punto 1)
-  const [showConteoImageUpload, setShowConteoImageUpload] = useState(false); // Controla la visibilidad de los inputs de edición (punto 2)
-  const [uploadingImages, setUploadingImages] = useState<Set<string>>(new Set()); // Controla qué imágenes se están subiendo
-  const [refreshKey, setRefreshKey] = useState<number>(0); // Forzar actualización de las cards
+  const [showImageUpload, setShowImageUpload] = useState(false);
+  const [showConteoImageUpload, setShowConteoImageUpload] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState<Set<string>>(new Set());
+  const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const fetchPrendas = async () => {
     try {
@@ -79,7 +106,7 @@ export default function ReferentesPage() {
       }
       const data = await response.json();
       // setImages(data); // Comentado - solo usamos availableImages
-      setAvailableImages(data); // Guardar en availableImages para las cards de conteo
+      setAvailableImages(data); // Guardar en availableImages para las cards de prendas y conteos
       return data;
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -156,9 +183,14 @@ export default function ReferentesPage() {
     }
   };
 
-  // Función para manejar la subida de imágenes para cantidad de telas
-  const handleImageUploadForConteo = async (prendaNombre: string, cantidadTelas: number, file: File) => {
-    const uploadKey = `${prendaNombre}_${cantidadTelas}_TELAS`;
+
+
+
+
+
+  // Función para manejar la subida de imágenes para variantes
+  const handleImageUploadForVariante = async (prendaNombre: string, cantidadTelas: number, numeroVariante: string, file: File) => {
+    const uploadKey = `${prendaNombre}_${cantidadTelas}_${numeroVariante}_VARIANTE`;
 
     try {
       // Marcar como subiendo
@@ -166,9 +198,9 @@ export default function ReferentesPage() {
 
       const formData = new FormData();
       formData.append('image', file);
-      formData.append('title', `${prendaNombre.toUpperCase()}_${cantidadTelas}_TELAS`);
+      formData.append('title', `${prendaNombre.toUpperCase()}_${cantidadTelas}_${numeroVariante}_VARIANTE`);
 
-      console.log('Subiendo imagen para conteo:', uploadKey);
+      console.log('Subiendo imagen para variante:', uploadKey);
 
       const response = await fetch('http://localhost:8000/api/sap/images/upload/', {
         method: 'POST',
@@ -198,7 +230,7 @@ export default function ReferentesPage() {
       });
 
       // Mostrar mensaje de éxito
-      alert(`✅ Imagen subida exitosamente para ${prendaNombre} con ${cantidadTelas} tela${cantidadTelas > 1 ? 's' : ''}`);
+      alert(`✅ Imagen subida exitosamente para ${prendaNombre} - ${cantidadTelas} telas - Variante ${numeroVariante}`);
       console.log('Imagen subida exitosamente:', uploadKey);
       console.log('Nuevo refreshKey establecido');
     } catch (error) {
@@ -214,41 +246,33 @@ export default function ReferentesPage() {
     }
   };
 
-
-
-  // Función para obtener conteos de telas por prenda
-  const fetchConteosTelas = async (tipoPrenda?: string) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (tipoPrenda) {
-        params.append('tipo_prenda', tipoPrenda);
-      }
-
-      const url = `http://localhost:8000/api/sap/consumo-textil/${params.toString() ? '?' + params.toString() : ''}`;
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error('Error al obtener los conteos de telas');
-      }
-      const data = await response.json();
-      setConteosTelas(data);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Función para obtener la imagen correcta para cada prenda
-  const getPrendaImage = (prendaNombre: string, cantidadTelas?: number): ImageData | null => {
+  // Función para obtener la imagen correcta para cada prenda/variante
+  const getPrendaImage = (prendaNombre: string, cantidadTelas?: number, numeroVariante?: string): ImageData | null => {
     console.log('=== getPrendaImage ===');
     console.log('prendaNombre:', prendaNombre);
     console.log('cantidadTelas:', cantidadTelas);
+    console.log('numeroVariante:', numeroVariante);
     console.log('availableImages count:', availableImages.length);
     console.log('refreshKey:', refreshKey);
 
-    // Si hay cantidad de telas específica, buscar SOLO imagen específica para esa cantidad
+    // Si hay numero_variante, buscar imagen específica para esa variante
+    if (numeroVariante && cantidadTelas) {
+      const tituloVariante = `${prendaNombre.toUpperCase()}_${cantidadTelas}_${numeroVariante}_VARIANTE`;
+      console.log('Buscando imagen de variante:', tituloVariante);
+
+      const imagenVariante = availableImages.find(img =>
+        img.title.toUpperCase() === tituloVariante.toUpperCase()
+      );
+
+      if (imagenVariante) {
+        console.log('✅ Imagen de variante encontrada:', imagenVariante.title);
+        return imagenVariante;
+      }
+
+      console.log('❌ Imagen de variante no encontrada');
+    }
+
+    // Si hay cantidad de telas específica, buscar imagen específica para esa cantidad
     if (cantidadTelas) {
       const tituloEspecifico = `${prendaNombre.toUpperCase()}_${cantidadTelas}_TELAS`;
       console.log('Buscando imagen específica:', tituloEspecifico);
@@ -263,15 +287,14 @@ export default function ReferentesPage() {
       }
 
       console.log('❌ Imagen específica no encontrada');
-      // Si no se encuentra imagen específica, NO buscar alternativas
-      return null;
     }
 
     // Para prendas principales (sin cantidad de telas), buscar imagen de portada específica
     const imagenesEspecificas: { [key: string]: string } = {
       'BIKINI BOTTOM': 'PORTADA BIKINI BOTTOM',
       'BIKINI TOP': 'PORTADA BIKINI TOP',
-      'ONEPIECE': 'PORTADA ONEPIECE'
+      'ONEPIECE': 'PORTADA ONEPIECE',
+      'BIKINI BOTTOM PANTY': 'PORTADA BIKINI BOTTOM PANTY'
     };
 
     const tituloBuscado = imagenesEspecificas[prendaNombre];
@@ -294,37 +317,97 @@ export default function ReferentesPage() {
     return null;
   };
 
-  // Función para obtener datos de consumo textil
-  const fetchConsumoData = async (tipoPrenda: string, filtrosAdicionales: Filtros = {}) => {
+  // Función para obtener datos específicos de consumo textil
+  const fetchConsumoEspecifico = async (tipoPrenda: string, cantidadTelas: number, numeroVariante: string) => {
+    console.log('🔄 fetchConsumoEspecifico - tipoPrenda:', tipoPrenda);
+    console.log('🔄 fetchConsumoEspecifico - cantidadTelas:', cantidadTelas);
+    console.log('🔄 fetchConsumoEspecifico - numeroVariante:', numeroVariante);
+
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('tipo_prenda', tipoPrenda);
+      params.append('cantidad_telas', cantidadTelas.toString());
+
+      const url = `http://localhost:8000/api/sap/consumo-textil/?${params.toString()}`;
+      console.log('🔄 fetchConsumoEspecifico - URL:', url);
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Error al obtener los datos específicos de consumo');
+      }
+      const data = await response.json();
+      console.log('🔄 fetchConsumoEspecifico - Datos recibidos:', data.length, 'registros');
+      console.log('🔄 fetchConsumoEspecifico - Datos:', data);
+
+      // Mapear los datos para que coincidan con la interfaz ConsumoData
+      const mappedData = data.map((item: ConsumoEspecificoData, index: number) => ({
+        uso_tela: item.uso_tela,
+        base_textil: item.base_textil,
+        caracteristica_color: item.caracteristica_color,
+        consumo_mtr: item.consumo_mtr,
+        ancho_util_metros: item.ancho_util_metros,
+        cantidad_telas: cantidadTelas,
+        numero_variante: numeroVariante,
+        tipo_prenda: tipoPrenda,
+        // Agregar índice dinámico basado en la posición
+        indice: index + 1
+      }));
+
+      // Guardar datos originales para filtros
+      setConsumoDataOriginal(mappedData);
+
+
+      // Aplicar filtros actuales si existen
+      if (filtros && Object.keys(filtros).length > 0) {
+        const filteredData = applyFiltersToData(mappedData, filtros);
+        setConsumoData(filteredData);
+        setRecordCount(filteredData.length);
+        console.log('🔄 fetchConsumoEspecifico - Filtros aplicados automáticamente:', filteredData.length, 'registros');
+      } else {
+        setConsumoData(mappedData);
+        setRecordCount(data.length);
+      }
+    } catch (error) {
+      console.error('❌ fetchConsumoEspecifico - Error:', error);
+      setError(error instanceof Error ? error.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+  // Función para obtener conteos de telas y variantes por prenda
+  const fetchConteosTelas = async (tipoPrenda: string) => {
+    console.log('🔄 fetchConteosTelas - tipoPrenda:', tipoPrenda);
     setLoading(true);
     try {
       const params = new URLSearchParams();
       params.append('tipo_prenda', tipoPrenda);
 
-      if (filtrosAdicionales.cantidad_telas) {
-        params.append('cantidad_telas', filtrosAdicionales.cantidad_telas);
-      }
-      if (filtrosAdicionales.uso_tela) {
-        params.append('uso_tela', filtrosAdicionales.uso_tela);
-      }
-      if (filtrosAdicionales.base_textil) {
-        params.append('base_textil', filtrosAdicionales.base_textil);
-      }
-      if (filtrosAdicionales.caracteristica_color) {
-        params.append('caracteristica_color', filtrosAdicionales.caracteristica_color);
-      }
-      if (filtrosAdicionales.ancho_util) {
-        params.append('ancho_util', filtrosAdicionales.ancho_util);
-      }
+      const url = `http://localhost:8000/api/sap/consumo-textil/?${params.toString()}`;
+      console.log('🔄 fetchConteosTelas - URL:', url);
 
-      const response = await fetch(`http://localhost:8000/api/sap/consumo-textil/?${params.toString()}`);
+      const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Error al obtener los datos de consumo');
+        throw new Error('Error al obtener los conteos de telas');
       }
       const data = await response.json();
-      setConsumoData(data);
-      setRecordCount(data.length);
+      console.log('🔄 fetchConteosTelas - Datos recibidos:', data.length, 'registros');
+      console.log('🔄 fetchConteosTelas - Datos:', data);
+
+      // Mapear los datos para que coincidan con la interfaz ConteoVarianteData
+      const mappedData = data.map((item: ConteoVarianteBackendData) => ({
+        cantidad_telas: item.cantidad_telas,
+        numero_variante: item.numero_variante,
+        descripcion_variante: item.descripcion_variante
+      }));
+
+      setConteosTelas(mappedData);
+      setShowConteoCards(true);
     } catch (error) {
+      console.error('❌ fetchConteosTelas - Error:', error);
       setError(error instanceof Error ? error.message : 'Error desconocido');
     } finally {
       setLoading(false);
@@ -333,228 +416,235 @@ export default function ReferentesPage() {
 
   // Función para manejar el click en una card de prenda
   const handlePrendaClick = (tipoPrenda: string) => {
+    console.log('🔄 handlePrendaClick - tipoPrenda:', tipoPrenda);
     setSelectedPrenda(tipoPrenda);
-    setShowConteoCards(true);
-    // Obtener conteos de telas para mostrar las cards de conteo
+    setShowTable(false);
+    // Obtener conteos de telas y variantes para mostrar las cards intermedias
     fetchConteosTelas(tipoPrenda);
   };
 
-  // Función para manejar el click en una card de conteo
-  const handleConteoCardClick = (tipoPrenda: string, cantidadTelas?: number) => {
+  // Función para manejar el click en una card de conteos/variantes
+  const handleConteoCardClick = (tipoPrenda: string, cantidadTelas: number, numeroVariante: string, descripcionVariante: string) => {
+    console.log('🔄 handleConteoCardClick - tipoPrenda:', tipoPrenda);
+    console.log('🔄 handleConteoCardClick - cantidadTelas:', cantidadTelas);
+    console.log('🔄 handleConteoCardClick - numeroVariante:', numeroVariante);
+    console.log('🔄 handleConteoCardClick - descripcionVariante:', descripcionVariante);
     setShowTable(true);
     setShowConteoCards(false);
     setRecordCount(0);
-    // Si se especifica cantidadTelas, aplicarla como filtro inicial
-    if (cantidadTelas) {
-      setFiltros({ cantidad_telas: cantidadTelas.toString() });
-      fetchConsumoData(tipoPrenda, { cantidad_telas: cantidadTelas.toString() });
-    } else {
-      fetchConsumoData(tipoPrenda);
+    // Obtener datos específicos filtrados por tipo_prenda, cantidad_telas y numero_variante
+    fetchConsumoEspecifico(tipoPrenda, cantidadTelas, numeroVariante);
+  };
+
+
+  // Función para aplicar filtros en el frontend
+  const applyFiltersToData = (data: ConsumoData[], filters: Filtros): ConsumoData[] => {
+    if (!filters || Object.keys(filters).length === 0) {
+      return data;
     }
+
+    return data.filter(item => {
+      // Filtrar por uso_tela
+      if (filters.uso_tela && item.uso_tela !== filters.uso_tela) {
+        return false;
+      }
+
+      // Filtrar por base_textil
+      if (filters.base_textil && item.base_textil !== filters.base_textil) {
+        return false;
+      }
+
+      // Filtrar por caracteristica_color
+      if (filters.caracteristica_color && item.caracteristica_color !== filters.caracteristica_color) {
+        return false;
+      }
+
+      // Filtrar por ancho_util
+      if (filters.ancho_util && item.ancho_util_metros !== parseFloat(filters.ancho_util)) {
+        return false;
+      }
+
+      return true;
+    });
   };
 
-  // Función para volver a la vista de cards de prendas
-  const handleBackToPrendas = () => {
-    setShowTable(false);
-    setShowConteoCards(false);
-    setSelectedPrenda('');
-    setConsumoData([]);
-    setFiltros({});
-  };
 
-  // Función para volver a la vista de cards de conteo
-  const handleBackToConteo = () => {
-    setShowTable(false);
-    setShowConteoCards(true);
-    setConsumoData([]);
-    setFiltros({});
-    setRecordCount(0);
-  };
 
-  // Función para aplicar filtros
-  const handleApplyFilters = () => {
-    setRecordCount(0);
-    if (selectedPrenda) {
-      fetchConsumoData(selectedPrenda, filtros);
-    }
-  };
-
-  // Función para limpiar filtros
-  const handleClearFilters = () => {
-    setFiltros({});
-    setRecordCount(0);
-    if (selectedPrenda) {
-      fetchConsumoData(selectedPrenda);
-    }
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Referentes</h1>
+
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
 
       {/* Sección de prendas */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">
-            {showConteoCards ? `Telas para ${selectedPrenda}${showConteoImageUpload ? ' - Editando Imágenes' : ''}` : 'Prendas'}
-          </h2>
-          <div className="flex gap-2">
-            {/* Botón Editar Portadas - visible solo en vista de prendas principales */}
-            {!showTable && !showConteoCards && (
-              <button
-                onClick={() => setShowImageUpload(!showImageUpload)}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                  showImageUpload
-                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
-                }`}
-              >
-                {showImageUpload ? '❌ Terminar' : '✏️ Editar Portadas'}
-              </button>
-            )}
-
-            {/* Botón Editar Imágenes - visible solo en vista de conteo de telas */}
-            {!showTable && showConteoCards && (
-              <button
-                onClick={() => setShowConteoImageUpload(!showConteoImageUpload)}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                  showConteoImageUpload
-                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
-                }`}
-              >
-                {showConteoImageUpload ? '❌ Terminar' : '✏️ Editar Imágenes'}
-              </button>
-            )}
-
-            {(showTable || showConteoCards) && (
-              <button
-                onClick={showTable ? handleBackToConteo : handleBackToPrendas}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
-              >
-                ← Volver
-              </button>
-            )}
-          </div>
+        <div className="flex justify-end items-center mb-4">
+          {/* Botón Volver a Referentes - posicionado al lado derecho sin título */}
+          {(showTable || showConteoCards) && (
+            <button
+              onClick={() => {
+                window.location.href = 'http://localhost:3000/modules/referentes';
+              }}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+            >
+              ← Volver a Referentes
+            </button>
+          )}
         </div>
+
+        {/* Contenedor para botones de edición - solo cuando sea necesario */}
+        {(!showTable && !showConteoCards) && (
+          <div className="flex justify-start items-center mb-4">
+            {/* Botón Editar Portadas - visible solo en vista de prendas principales */}
+            <button
+              onClick={() => setShowImageUpload(!showImageUpload)}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                showImageUpload
+                  ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+              }`}
+            >
+              {showImageUpload ? '❌ Terminar' : '✏️ Editar Portadas'}
+            </button>
+          </div>
+        )}
+
+        {/* Contenedor para botones de edición en variantes - solo cuando sea necesario */}
+        {showConteoCards && !showTable && (
+          <div className="flex justify-start items-center mb-4">
+            {/* Botón Editar Imágenes - visible solo en vista de variantes */}
+            <button
+              onClick={() => setShowConteoImageUpload(!showConteoImageUpload)}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                showConteoImageUpload
+                  ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+              }`}
+            >
+              {showConteoImageUpload ? '❌ Terminar' : '✏️ Editar Imágenes'}
+            </button>
+          </div>
+        )}
 
 
         {!showTable && !showConteoCards ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {prendas.map((prenda) => {
-            const imagenPrenda = getPrendaImage(prenda.tipo_prenda_nombre, prenda.cantidad_telas);
-            const uploadKey = `PORTADA_${prenda.tipo_prenda_nombre}`;
-            const isUploading = uploadingImages.has(uploadKey);
+            {prendas.map((prenda) => {
+              const imagenPrenda = getPrendaImage(prenda.tipo_prenda_nombre, prenda.cantidad_telas);
+              const uploadKey = `PORTADA_${prenda.tipo_prenda_nombre}`;
+              const isUploading = uploadingImages.has(uploadKey);
 
-            return (
-              <div
-                key={`${prenda.prenda_id}-${refreshKey}`}
-                className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
-                  showImageUpload ? 'border-2 border-blue-300' : ''
-                }`}
-                onClick={() => !showImageUpload && handlePrendaClick(prenda.tipo_prenda_nombre)}
-              >
-                <div className="w-full h-48 bg-white rounded mb-4 flex items-center justify-center overflow-hidden shadow-inner border">
-                  {imagenPrenda ? (
-                    <img
-                      src={`http://localhost:8000${imagenPrenda.image_url}`}
-                      alt={prenda.tipo_prenda_nombre}
-                      className="w-full h-full object-contain rounded"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          parent.innerHTML = '<span class="text-gray-500 text-sm">Imagen no disponible</span>';
-                        }
-                      }}
-                    />
-                  ) : (
-                    <span className="text-gray-500 text-sm">Sin imagen asignada</span>
-                  )}
-                </div>
-
-                <h3 className="text-xl font-semibold mb-4">{prenda.tipo_prenda_nombre}</h3>
-
-                {/* Input de archivo - solo visible cuando showImageUpload es true */}
-                {showImageUpload && (
-                  <div className="space-y-3">
-                    <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
-                      <strong>Se guardará como:</strong><br />
-                      <code className="text-blue-600">PORTADA {prenda.tipo_prenda_nombre.toUpperCase()}</code>
-                    </div>
-
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept=".png"
-                        disabled={isUploading}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            handleImageUploadForPrenda(prenda.tipo_prenda_nombre, file);
-                            // Limpiar el input después de la subida
-                            e.target.value = '';
+              return (
+                <div
+                  key={`${prenda.prenda_id}-${refreshKey}`}
+                  className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
+                    showImageUpload ? 'border-2 border-blue-300' : ''
+                  }`}
+                  onClick={() => !showImageUpload && handlePrendaClick(prenda.tipo_prenda_nombre)}
+                >
+                  <div className="w-full h-48 bg-white rounded mb-4 flex items-center justify-center overflow-hidden shadow-inner border">
+                    {imagenPrenda ? (
+                      <img
+                        src={`http://localhost:8000${imagenPrenda.image_url}`}
+                        alt={prenda.tipo_prenda_nombre}
+                        className="w-full h-full object-contain rounded"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = '<span class="text-gray-500 text-sm">Imagen no disponible</span>';
                           }
                         }}
-                        className={`w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:cursor-pointer transition-all duration-200 ${
-                          isUploading
-                            ? 'file:bg-gray-400 file:text-white cursor-not-allowed'
-                            : 'file:bg-blue-500 file:text-white hover:file:bg-blue-600'
-                        }`}
                       />
-                      {isUploading && (
-                        <div className="absolute inset-0 bg-blue-100 bg-opacity-50 rounded flex items-center justify-center">
-                          <span className="text-blue-600 text-sm font-medium">Procesando...</span>
-                        </div>
-                      )}
-                    </div>
+                    ) : (
+                      <span className="text-gray-500 text-sm">Sin imagen asignada</span>
+                    )}
                   </div>
-                )}
 
-                {!showImageUpload && (
-                  <p className="text-gray-600 text-sm">Haz clic para ver telas disponibles</p>
-                )}
-              </div>
-            );
-          })}
+                  <h3 className="text-xl font-semibold mb-4">{prenda.tipo_prenda_nombre}</h3>
+
+                  {/* Input de archivo - solo visible cuando showImageUpload es true */}
+                  {showImageUpload && (
+                    <div className="space-y-3">
+                      <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
+                        <strong>Se guardará como:</strong><br />
+                        <code className="text-blue-600">PORTADA {prenda.tipo_prenda_nombre.toUpperCase()}</code>
+                      </div>
+
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept=".png"
+                          disabled={isUploading}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUploadForPrenda(prenda.tipo_prenda_nombre, file);
+                              // Limpiar el input después de la subida
+                              e.target.value = '';
+                            }
+                          }}
+                          className={`w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:cursor-pointer transition-all duration-200 ${
+                            isUploading
+                              ? 'file:bg-gray-400 file:text-white cursor-not-allowed'
+                              : 'file:bg-blue-500 file:text-white hover:file:bg-blue-600'
+                          }`}
+                        />
+                        {isUploading && (
+                          <div className="absolute inset-0 bg-blue-100 bg-opacity-50 rounded flex items-center justify-center">
+                            <span className="text-blue-600 text-sm font-medium">Procesando...</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {!showImageUpload && (
+                    <p className="text-gray-600 text-sm">Haz clic para ver variantes disponibles</p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : showConteoCards ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {loading ? (
               <div className="col-span-full text-center py-8">
-                <p className="text-gray-600">Cargando telas...</p>
+                <p className="text-gray-600">Cargando variantes...</p>
               </div>
             ) : (
-              Array.from({ length: conteosTelas.length }, (_, index) => {
-                const cantidadTelas = conteosTelas[index].conteo_telas_unicas;
-                const imagenEspecifica = getPrendaImage(selectedPrenda, cantidadTelas);
-                const uploadKey = `${selectedPrenda}_${cantidadTelas}_TELAS`;
+              conteosTelas.map((conteos, index) => {
+                const cantidadTelas = conteos.cantidad_telas;
+                const descripcionVariante = conteos.descripcion_variante;
+                const numeroVariante = conteos.numero_variante;
+                const imagenEspecifica = getPrendaImage(selectedPrenda, cantidadTelas, numeroVariante);
+                const uploadKey = `${selectedPrenda}_${cantidadTelas}_${numeroVariante}_VARIANTE`;
                 const isUploading = uploadingImages.has(uploadKey);
-                console.log(`Card de conteo ${cantidadTelas} telas - imagen encontrada:`, imagenEspecifica ? 'SÍ' : 'NO');
+                console.log(`Card de variante ${cantidadTelas} telas - variante: ${numeroVariante} - descripcion: ${descripcionVariante}`);
                 return (
                   <div
                     key={`${index}-${refreshKey}`}
                     className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
                       showConteoImageUpload ? 'border-2 border-blue-300' : ''
                     }`}
-                    onClick={() => !showConteoImageUpload && handleConteoCardClick(selectedPrenda, cantidadTelas)}
+                    onClick={() => !showConteoImageUpload && !isUploading && handleConteoCardClick(selectedPrenda, cantidadTelas, numeroVariante, descripcionVariante)}
                   >
                     <div className="w-full h-48 bg-white rounded mb-4 flex items-center justify-center overflow-hidden shadow-inner border">
                       {imagenEspecifica ? (
                         <img
                           src={`http://localhost:8000${imagenEspecifica.image_url}`}
-                          alt={`${cantidadTelas} Tela(s)`}
+                          alt={`${cantidadTelas} Tela(s) - ${descripcionVariante}`}
                           className="w-full h-full object-contain rounded"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
                             const parent = target.parentElement;
                             if (parent) {
-                              parent.innerHTML = '<span class="text-gray-500 text-sm">Sin imagen asignada</span>';
+                              parent.innerHTML = '<span class="text-gray-500 text-sm">Imagen no disponible</span>';
                             }
                           }}
                         />
@@ -563,14 +653,16 @@ export default function ReferentesPage() {
                       )}
                     </div>
 
-                    <h3 className="text-lg font-semibold mb-4">{cantidadTelas} Tela{cantidadTelas > 1 ? 's' : ''}</h3>
+                    <h3 className="text-lg font-semibold mb-2">{cantidadTelas} Tela{cantidadTelas > 1 ? 's' : ''}</h3>
+                    <p className="text-sm text-gray-600 mb-2">Variante: {numeroVariante}</p>
+                    <p className="text-sm text-gray-600 mb-4">{descripcionVariante}</p>
 
                     {/* Input de archivo - solo visible cuando showConteoImageUpload es true */}
                     {showConteoImageUpload && (
                       <div className="space-y-3">
                         <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
                           <strong>Se guardará como:</strong><br />
-                          <code className="text-blue-600">{selectedPrenda.toUpperCase()}_{cantidadTelas}_TELAS</code>
+                          <code className="text-blue-600">{selectedPrenda.toUpperCase()}_{cantidadTelas}_{numeroVariante}_VARIANTE</code>
                         </div>
 
                         <div className="relative">
@@ -581,7 +673,7 @@ export default function ReferentesPage() {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                handleImageUploadForConteo(selectedPrenda, cantidadTelas, file);
+                                handleImageUploadForVariante(selectedPrenda, cantidadTelas, numeroVariante, file);
                                 // Limpiar el input después de la subida
                                 e.target.value = '';
                               }
@@ -611,26 +703,33 @@ export default function ReferentesPage() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h3 className="text-xl font-semibold">Consumo Textil - {selectedPrenda}</h3>
-                {recordCount > 0 && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {recordCount} registro{recordCount !== 1 ? 's' : ''} encontrado{recordCount !== 1 ? 's' : ''}
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={handleBackToConteo}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-              >
-                ← Volver a Telas
-              </button>
+            <div className="mb-4">
+              <h3 className="text-xl font-semibold">Consumo Textil - {selectedPrenda} ({conteosTelas[0]?.cantidad_telas || 0} telas - V{conteosTelas[0]?.numero_variante || ''})</h3>
             </div>
 
             {/* Filtros */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h4 className="text-lg font-medium mb-3">Filtros</h4>
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-lg font-medium">Filtros</h4>
+                {recordCount > 0 && (
+                  <span className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full border">
+                    {recordCount} registro{recordCount !== 1 ? 's' : ''} encontrado{recordCount !== 1 ? 's' : ''}
+                  </span>
+                )}
+                <button
+                  onClick={() => {
+                    setShowTable(false);
+                    setShowConteoCards(true);
+                    // Restaurar datos originales cuando se vuelva a las variantes
+                    setConsumoData(consumoDataOriginal);
+                    setRecordCount(consumoDataOriginal.length);
+                    setFiltros({});
+                  }}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  ← Volver a Variantes
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -638,12 +737,23 @@ export default function ReferentesPage() {
                   </label>
                   <select
                     value={filtros.uso_tela || ''}
-                    onChange={(e) => setFiltros(prev => ({ ...prev, uso_tela: e.target.value }))}
+                    onChange={(e) => {
+                      const newFiltros = { ...filtros, uso_tela: e.target.value };
+                      setFiltros(newFiltros);
+                      // Aplicar filtros automáticamente
+                      if (consumoDataOriginal.length > 0) {
+                        const filteredData = applyFiltersToData(consumoDataOriginal, newFiltros);
+                        setConsumoData(filteredData);
+                        setRecordCount(filteredData.length);
+                      }
+                    }}
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Todos</option>
                     <option value="LUCIR">LUCIR</option>
                     <option value="FORRO">FORRO</option>
+                    <option value="SESGO">SESGO</option>
+                    <option value="FUSIONABLE">FUSIONABLE</option>
                   </select>
                 </div>
 
@@ -653,14 +763,24 @@ export default function ReferentesPage() {
                   </label>
                   <select
                     value={filtros.base_textil || ''}
-                    onChange={(e) => setFiltros(prev => ({ ...prev, base_textil: e.target.value }))}
+                    onChange={(e) => {
+                      const newFiltros = { ...filtros, base_textil: e.target.value };
+                      setFiltros(newFiltros);
+                      // Aplicar filtros automáticamente
+                      if (consumoDataOriginal.length > 0) {
+                        const filteredData = applyFiltersToData(consumoDataOriginal, newFiltros);
+                        setConsumoData(filteredData);
+                        setRecordCount(filteredData.length);
+                      }
+                    }}
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Todas</option>
                     <option value="LYCRA VITA">LYCRA VITA</option>
                     <option value="LYCRA BAHIA">LYCRA BAHIA</option>
-                    <option value="LYCRA CRINALE">LYCRA CRINALE</option>
-                    <option value="LYCRA BAHIA FORRO">LYCRA BAHIA FORRO</option>
+                    <option value="LYCRA CRINKLE">LYCRA CRINKLE</option>
+                    <option value="LYCRA SUMATRA">LYCRA SUMATRA</option>
+                    <option value="LYCRA SHIMMERING">LYCRA SHIMMERING</option>
                     <option value="FUSIONABLE">FUSIONABLE</option>
                   </select>
                 </div>
@@ -671,7 +791,16 @@ export default function ReferentesPage() {
                   </label>
                   <select
                     value={filtros.caracteristica_color || ''}
-                    onChange={(e) => setFiltros(prev => ({ ...prev, caracteristica_color: e.target.value }))}
+                    onChange={(e) => {
+                      const newFiltros = { ...filtros, caracteristica_color: e.target.value };
+                      setFiltros(newFiltros);
+                      // Aplicar filtros automáticamente
+                      if (consumoDataOriginal.length > 0) {
+                        const filteredData = applyFiltersToData(consumoDataOriginal, newFiltros);
+                        setConsumoData(filteredData);
+                        setRecordCount(filteredData.length);
+                      }
+                    }}
                     className="w-full p-2 border  rounded"
                   >
                     <option value="">Todos</option>
@@ -687,7 +816,16 @@ export default function ReferentesPage() {
                   </label>
                   <select
                     value={filtros.ancho_util || ''}
-                    onChange={(e) => setFiltros(prev => ({ ...prev, ancho_util: e.target.value }))}
+                    onChange={(e) => {
+                      const newFiltros = { ...filtros, ancho_util: e.target.value };
+                      setFiltros(newFiltros);
+                      // Aplicar filtros automáticamente
+                      if (consumoDataOriginal.length > 0) {
+                        const filteredData = applyFiltersToData(consumoDataOriginal, newFiltros);
+                        setConsumoData(filteredData);
+                        setRecordCount(filteredData.length);
+                      }
+                    }}
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Todos</option>
@@ -704,13 +842,14 @@ export default function ReferentesPage() {
 
               <div className="flex gap-2 mt-4">
                 <button
-                  onClick={handleApplyFilters}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-                >
-                  Aplicar Filtros
-                </button>
-                <button
-                  onClick={handleClearFilters}
+                  onClick={() => {
+                    console.log('🔄 Limpiar Filtros - Restaurando datos originales');
+                    setFiltros({});
+                    // Restaurar datos originales
+                    setConsumoData(consumoDataOriginal);
+                    setRecordCount(consumoDataOriginal.length);
+                    console.log('🔄 Limpiar Filtros - Datos restaurados:', consumoDataOriginal.length, 'registros');
+                  }}
                   className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
                 >
                   Limpiar Filtros
@@ -728,23 +867,21 @@ export default function ReferentesPage() {
                 <table className="min-w-full table-auto">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Uso en Prenda</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Uso Tela</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Base Textil</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Color</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ancho Tela</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Propiedades</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Consumo</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Característica Color</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Consumo (mtr)</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ancho Util (metros)</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {consumoData.map((item, index) => (
                       <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.uso_en_prenda}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.uso_tela}</td>
                         <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.base_textil}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.color}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.ancho_tela}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.propiedades}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.consumo}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.caracteristica_color}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.consumo_mtr}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.ancho_util_metros}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -752,7 +889,12 @@ export default function ReferentesPage() {
 
                 {consumoData.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-gray-600">No se encontraron registros con los filtros aplicados.</p>
+                    <p className="text-gray-600">
+                      {consumoDataOriginal.length === 0
+                        ? "No se encontraron registros para esta variante."
+                        : "No se encontraron registros con los filtros aplicados."
+                      }
+                    </p>
                   </div>
                 )}
               </div>
@@ -760,30 +902,6 @@ export default function ReferentesPage() {
           </div>
         )}
       </div>
-
-      {/* Sección de imágenes comentada - funcionalidad no requerida por ahora */}
-      {/* <div>
-        <h2 className="text-2xl font-semibold mb-4">Imágenes Subidas</h2>
-        {images.length === 0 ? (
-          <p className="text-gray-500">No hay imágenes subidas aún.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {images.map((image) => (
-              <div key={image.id} className="bg-white rounded-lg shadow-md p-4">
-                <img
-                  src={`http://localhost:8000${image.image_url}`}
-                  alt={image.title || `Imagen ${image.id}`}
-                  className="w-full h-32 object-cover rounded mb-2"
-                />
-                <h3 className="text-sm font-medium">{image.title || `Imagen ${image.id}`}</h3>
-                <p className="text-xs text-gray-500">
-                  {new Date(image.uploaded_at).toLocaleDateString()}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div> */}
     </div>
   );
 }
