@@ -328,6 +328,7 @@ export default function ReferentesPage() {
       const params = new URLSearchParams();
       params.append('tipo_prenda', tipoPrenda);
       params.append('cantidad_telas', cantidadTelas.toString());
+      params.append('numero_variante', numeroVariante);
 
       const url = `http://localhost:8000/api/sap/consumo-textil/?${params.toString()}`;
       console.log('🔄 fetchConsumoEspecifico - URL:', url);
@@ -693,9 +694,9 @@ export default function ReferentesPage() {
                       </div>
                     )}
 
-                    {!showConteoImageUpload && (
-                      <p className="text-gray-600 text-sm">Haz clic para ver detalles</p>
-                    )}
+                    {!showConteoImageUpload 
+                    // && (<p className="text-gray-600 text-sm">Haz clic para ver detalles</p>)
+                    }
                   </div>
                 );
               })
