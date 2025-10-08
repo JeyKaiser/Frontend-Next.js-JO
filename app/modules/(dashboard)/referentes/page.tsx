@@ -1,13 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-interface Prenda {
-  prenda_id: number;
-  tipo_prenda_nombre: string;
-  cantidad_telas?: number;
-  prenda_base?: string;
-}
+import { useSAPData } from '@/app/contexts/SAPDataContext';
+import { uploadImage, getConsumoTextil } from '@/app/services/sapService';
 
 interface ImageData {
   id: number;
@@ -46,6 +41,7 @@ interface ConteoVarianteData {
   'cantidad_telas': number;
   'numero_variante': string;
   'descripcion_variante': string;
+  'tipo_terminacion': string;
 }
 
 interface ConsumoEspecificoData {
@@ -60,12 +56,21 @@ interface ConteoVarianteBackendData {
   cantidad_telas: number;
   numero_variante: string;
   descripcion_variante: string;
+  tipo_terminacion: string;
 }
 
 
 
 export default function ReferentesPage() {
-  const [prendas, setPrendas] = useState<Prenda[]>([]);
+  // Usar el contexto para obtener prendas e imágenes
+  const {
+    prendas,
+    images: availableImages,
+    prendasError,
+    imagesError,
+    refreshImagesData
+  } = useSAPData();
+
   const [error, setError] = useState<string | null>(null);
 
   // Estados para la funcionalidad de consumo textil
@@ -77,47 +82,22 @@ export default function ReferentesPage() {
   const [showConteoCards, setShowConteoCards] = useState(false);
   const [selectedPrenda, setSelectedPrenda] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  const [availableImages, setAvailableImages] = useState<ImageData[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [showConteoImageUpload, setShowConteoImageUpload] = useState(false);
   const [uploadingImages, setUploadingImages] = useState<Set<string>>(new Set());
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
-  const fetchPrendas = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/api/sap/prendas/');
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Error al obtener los datos');
-      }
-      const data = await response.json();
-      setPrendas(data);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error desconocido');
-    }
-  };
-
-  const fetchImages = async (): Promise<ImageData[]> => {
-    try {
-      const response = await fetch('http://localhost:8000/api/sap/images/');
-      if (!response.ok) {
-        throw new Error('Error al obtener las imágenes');
-      }
-      const data = await response.json();
-      // setImages(data); // Comentado - solo usamos availableImages
-      setAvailableImages(data); // Guardar en availableImages para las cards de prendas y conteos
-      return data;
-    } catch (error) {
-      console.error('Error fetching images:', error);
-      return [];
-    }
-  };
-
+  // Ya no necesitamos fetchPrendas ni fetchImages porque vienen del contexto
+  
+  // Combinar errores del contexto con errores locales
   useEffect(() => {
-    fetchPrendas();
-    fetchImages();
-  }, []);
+    if (prendasError) {
+      setError(prendasError);
+    } else if (imagesError) {
+      setError(imagesError);
+    }
+  }, [prendasError, imagesError]);
 
   // Monitorear cambios en refreshKey y availableImages
   useEffect(() => {
@@ -133,29 +113,18 @@ export default function ReferentesPage() {
       // Marcar como subiendo
       setUploadingImages(prev => new Set(prev).add(uploadKey));
 
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('title', `PORTADA ${prendaNombre.toUpperCase()}`);
-
+      const title = `PORTADA ${prendaNombre.toUpperCase()}`;
+      
       console.log('Subiendo imagen para:', uploadKey);
 
-      const response = await fetch('http://localhost:8000/api/sap/images/upload/', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al subir la imagen');
-      }
-
-      await response.json(); // Consumir la respuesta
+      // Usar el servicio centralizado
+      await uploadImage(file, title);
 
       // Pequeño delay para asegurar que la imagen esté disponible en el servidor
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Refrescar la lista de imágenes para asegurar que se actualice
-      await fetchImages();
+      // Refrescar la lista de imágenes usando el contexto
+      await refreshImagesData();
 
       // Forzar un re-render actualizando el estado de error para trigger el re-render
       setError(null);
@@ -196,29 +165,18 @@ export default function ReferentesPage() {
       // Marcar como subiendo
       setUploadingImages(prev => new Set(prev).add(uploadKey));
 
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('title', `${prendaNombre.toUpperCase()}_${cantidadTelas}_${numeroVariante}_VARIANTE`);
-
+      const title = `${prendaNombre.toUpperCase()}_${cantidadTelas}_${numeroVariante}_VARIANTE`;
+      
       console.log('Subiendo imagen para variante:', uploadKey);
 
-      const response = await fetch('http://localhost:8000/api/sap/images/upload/', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al subir la imagen');
-      }
-
-      await response.json(); // Consumir la respuesta
+      // Usar el servicio centralizado
+      await uploadImage(file, title);
 
       // Pequeño delay para asegurar que la imagen esté disponible en el servidor
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Refrescar la lista de imágenes para asegurar que se actualice
-      await fetchImages();
+      // Refrescar la lista de imágenes usando el contexto
+      await refreshImagesData();
 
       // Forzar un re-render actualizando el estado de error para trigger el re-render
       setError(null);
@@ -246,6 +204,7 @@ export default function ReferentesPage() {
     }
   };
 
+
   // Función para obtener la imagen correcta para cada prenda/variante
   const getPrendaImage = (prendaNombre: string, cantidadTelas?: number, numeroVariante?: string): ImageData | null => {
     console.log('=== getPrendaImage ===');
@@ -265,11 +224,8 @@ export default function ReferentesPage() {
       );
 
       if (imagenVariante) {
-        console.log('✅ Imagen de variante encontrada:', imagenVariante.title);
         return imagenVariante;
       }
-
-      console.log('❌ Imagen de variante no encontrada');
     }
 
     // Si hay cantidad de telas específica, buscar imagen específica para esa cantidad
@@ -282,11 +238,8 @@ export default function ReferentesPage() {
       );
 
       if (imagenEspecifica) {
-        console.log('✅ Imagen específica encontrada:', imagenEspecifica.title);
         return imagenEspecifica;
       }
-
-      console.log('❌ Imagen específica no encontrada');
     }
 
     // Para prendas principales (sin cantidad de telas), buscar imagen de portada específica
@@ -307,22 +260,16 @@ export default function ReferentesPage() {
       );
 
       if (imagenEspecifica) {
-        console.log('✅ Imagen de portada encontrada:', imagenEspecifica.title);
         return imagenEspecifica;
       }
     }
 
-    console.log('❌ Imagen de portada no encontrada');
     // Si no se encuentra la imagen específica, NO buscar alternativas para evitar conflictos
     return null;
   };
 
   // Función para obtener datos específicos de consumo textil
   const fetchConsumoEspecifico = async (tipoPrenda: string, cantidadTelas: number, numeroVariante: string) => {
-    console.log('🔄 fetchConsumoEspecifico - tipoPrenda:', tipoPrenda);
-    console.log('🔄 fetchConsumoEspecifico - cantidadTelas:', cantidadTelas);
-    console.log('🔄 fetchConsumoEspecifico - numeroVariante:', numeroVariante);
-
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -330,16 +277,11 @@ export default function ReferentesPage() {
       params.append('cantidad_telas', cantidadTelas.toString());
       params.append('numero_variante', numeroVariante);
 
-      const url = `http://localhost:8000/api/sap/consumo-textil/?${params.toString()}`;
-      console.log('🔄 fetchConsumoEspecifico - URL:', url);
+      console.log('🔄 fetchConsumoEspecifico - Obteniendo datos...');
 
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Error al obtener los datos específicos de consumo');
-      }
-      const data = await response.json();
-      console.log('🔄 fetchConsumoEspecifico - Datos recibidos:', data.length, 'registros');
-      console.log('🔄 fetchConsumoEspecifico - Datos:', data);
+      // Usar el servicio centralizado
+      const data = await getConsumoTextil(tipoPrenda, cantidadTelas, numeroVariante) as ConsumoEspecificoData[];
+      console.log('Datos recibidos:', data.length, 'registros');
 
       // Mapear los datos para que coincidan con la interfaz ConsumoData
       const mappedData = data.map((item: ConsumoEspecificoData, index: number) => ({
@@ -360,17 +302,19 @@ export default function ReferentesPage() {
 
 
       // Aplicar filtros actuales si existen
+
+      // Aplicar filtros actuales si existen
       if (filtros && Object.keys(filtros).length > 0) {
         const filteredData = applyFiltersToData(mappedData, filtros);
         setConsumoData(filteredData);
         setRecordCount(filteredData.length);
-        console.log('🔄 fetchConsumoEspecifico - Filtros aplicados automáticamente:', filteredData.length, 'registros');
+        console.log('Filtros aplicados automáticamente:', filteredData.length, 'registros');
       } else {
         setConsumoData(mappedData);
         setRecordCount(data.length);
       }
     } catch (error) {
-      console.error('❌ fetchConsumoEspecifico - Error:', error);
+      console.error('Error:', error);
       setError(error instanceof Error ? error.message : 'Error desconocido');
     } finally {
       setLoading(false);
@@ -381,34 +325,33 @@ export default function ReferentesPage() {
 
   // Función para obtener conteos de telas y variantes por prenda
   const fetchConteosTelas = async (tipoPrenda: string) => {
-    console.log('🔄 fetchConteosTelas - tipoPrenda:', tipoPrenda);
+    console.log('🔄 fetchConteosTelas llamado con:', tipoPrenda);
+    console.log('🔄 fetchConteosTelas - tipoPrenda type:', typeof tipoPrenda);
+    console.log('🔄 fetchConteosTelas - tipoPrenda length:', tipoPrenda.length);
     setLoading(true);
     try {
       const params = new URLSearchParams();
       params.append('tipo_prenda', tipoPrenda);
 
-      const url = `http://localhost:8000/api/sap/consumo-textil/?${params.toString()}`;
-      console.log('🔄 fetchConteosTelas - URL:', url);
+      console.log('🔄 fetchConteosTelas - Obteniendo datos...');
 
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Error al obtener los conteos de telas');
-      }
-      const data = await response.json();
-      console.log('🔄 fetchConteosTelas - Datos recibidos:', data.length, 'registros');
-      console.log('🔄 fetchConteosTelas - Datos:', data);
+      // Usar el servicio centralizado
+      const data = await getConsumoTextil(tipoPrenda) as ConteoVarianteBackendData[];
+      console.log('✅ Datos recibidos:', data.length, 'registros');
+      console.log('📊 Datos:', data);
 
       // Mapear los datos para que coincidan con la interfaz ConteoVarianteData
       const mappedData = data.map((item: ConteoVarianteBackendData) => ({
         cantidad_telas: item.cantidad_telas,
         numero_variante: item.numero_variante,
-        descripcion_variante: item.descripcion_variante
+        descripcion_variante: item.descripcion_variante,
+        tipo_terminacion: item.tipo_terminacion
       }));
 
       setConteosTelas(mappedData);
       setShowConteoCards(true);
     } catch (error) {
-      console.error('❌ fetchConteosTelas - Error:', error);
+      console.error('Error:', error);
       setError(error instanceof Error ? error.message : 'Error desconocido');
     } finally {
       setLoading(false);
@@ -417,19 +360,23 @@ export default function ReferentesPage() {
 
   // Función para manejar el click en una card de prenda
   const handlePrendaClick = (tipoPrenda: string) => {
-    console.log('🔄 handlePrendaClick - tipoPrenda:', tipoPrenda);
+    console.log('🔄 handlePrendaClick llamado con:', tipoPrenda);
+    console.log('🔄 handlePrendaClick - tipoPrenda type:', typeof tipoPrenda);
+    console.log('🔄 handlePrendaClick - tipoPrenda length:', tipoPrenda.length);
+    console.log('🔄 handlePrendaClick - tipoPrenda charCodeAt:', tipoPrenda.charCodeAt(0));
+    if (!tipoPrenda || tipoPrenda.trim() === '') {
+      console.error('❌ tipoPrenda es undefined, null o vacío');
+      return;
+    }
     setSelectedPrenda(tipoPrenda);
     setShowTable(false);
+    setShowConteoCards(false);
     // Obtener conteos de telas y variantes para mostrar las cards intermedias
     fetchConteosTelas(tipoPrenda);
   };
 
   // Función para manejar el click en una card de conteos/variantes
-  const handleConteoCardClick = (tipoPrenda: string, cantidadTelas: number, numeroVariante: string, descripcionVariante: string) => {
-    console.log('🔄 handleConteoCardClick - tipoPrenda:', tipoPrenda);
-    console.log('🔄 handleConteoCardClick - cantidadTelas:', cantidadTelas);
-    console.log('🔄 handleConteoCardClick - numeroVariante:', numeroVariante);
-    console.log('🔄 handleConteoCardClick - descripcionVariante:', descripcionVariante);
+  const handleConteoCardClick = (tipoPrenda: string, cantidadTelas: number, numeroVariante: string) => {
     setShowTable(true);
     setShowConteoCards(false);
     setRecordCount(0);
@@ -475,7 +422,6 @@ export default function ReferentesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Referentes</h1>
-
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
@@ -544,7 +490,12 @@ export default function ReferentesPage() {
                   className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
                     showImageUpload ? 'border-2 border-blue-300' : ''
                   }`}
-                  onClick={() => !showImageUpload && handlePrendaClick(prenda.tipo_prenda_nombre)}
+                  onClick={() => {
+                    console.log('🔄 Card clickeada - prenda:', prenda.tipo_prenda_nombre);
+                    if (!showImageUpload && prenda.tipo_prenda_nombre) {
+                      handlePrendaClick(prenda.tipo_prenda_nombre);
+                    }
+                  }}
                 >
                   <div className="w-full h-48 bg-white rounded mb-4 flex items-center justify-center overflow-hidden shadow-inner border">
                     {imagenPrenda ? (
@@ -573,7 +524,7 @@ export default function ReferentesPage() {
                     <div className="space-y-3">
                       <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
                         <strong>Se guardará como:</strong><br />
-                        <code className="text-blue-600">PORTADA {prenda.tipo_prenda_nombre.toUpperCase()}</code>
+                        <code className="text-blue-600">PORTADA {prenda.tipo_prenda_nombre ? prenda.tipo_prenda_nombre.toUpperCase() : 'NOMBRE_PRENDA'}</code>
                       </div>
 
                       <div className="relative">
@@ -583,7 +534,7 @@ export default function ReferentesPage() {
                           disabled={isUploading}
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) {
+                            if (file && prenda.tipo_prenda_nombre) {
                               handleImageUploadForPrenda(prenda.tipo_prenda_nombre, file);
                               // Limpiar el input después de la subida
                               e.target.value = '';
@@ -622,6 +573,7 @@ export default function ReferentesPage() {
                 const cantidadTelas = conteos.cantidad_telas;
                 const descripcionVariante = conteos.descripcion_variante;
                 const numeroVariante = conteos.numero_variante;
+                const tipoTerminacion = conteos.tipo_terminacion;
                 const imagenEspecifica = getPrendaImage(selectedPrenda, cantidadTelas, numeroVariante);
                 const uploadKey = `${selectedPrenda}_${cantidadTelas}_${numeroVariante}_VARIANTE`;
                 const isUploading = uploadingImages.has(uploadKey);
@@ -632,7 +584,7 @@ export default function ReferentesPage() {
                     className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
                       showConteoImageUpload ? 'border-2 border-blue-300' : ''
                     }`}
-                    onClick={() => !showConteoImageUpload && !isUploading && handleConteoCardClick(selectedPrenda, cantidadTelas, numeroVariante, descripcionVariante)}
+                    onClick={() => !showConteoImageUpload && !isUploading && handleConteoCardClick(selectedPrenda, cantidadTelas, numeroVariante)}
                   >
                     <div className="w-full h-48 bg-white rounded mb-4 flex items-center justify-center overflow-hidden shadow-inner border">
                       {imagenEspecifica ? (
@@ -656,7 +608,10 @@ export default function ReferentesPage() {
 
                     <h3 className="text-lg font-semibold mb-2">{cantidadTelas} Tela{cantidadTelas > 1 ? 's' : ''}</h3>
                     <p className="text-sm text-gray-600 mb-2">Variante: {numeroVariante}</p>
-                    <p className="text-sm text-gray-600 mb-4">{descripcionVariante}</p>
+                    <p className="text-sm text-gray-600 mb-2">{descripcionVariante}</p>
+                    <p className="text-sm text-blue-700 font-medium bg-blue-100 rounded-full px-3 py-1 inline-block mb-4">
+                    {tipoTerminacion}
+                    </p>
 
                     {/* Input de archivo - solo visible cuando showConteoImageUpload es true */}
                     {showConteoImageUpload && (
@@ -844,12 +799,10 @@ export default function ReferentesPage() {
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => {
-                    console.log('🔄 Limpiar Filtros - Restaurando datos originales');
                     setFiltros({});
                     // Restaurar datos originales
                     setConsumoData(consumoDataOriginal);
                     setRecordCount(consumoDataOriginal.length);
-                    console.log('🔄 Limpiar Filtros - Datos restaurados:', consumoDataOriginal.length, 'registros');
                   }}
                   className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
                 >
@@ -903,6 +856,7 @@ export default function ReferentesPage() {
           </div>
         )}
       </div>
+
     </div>
   );
 }
