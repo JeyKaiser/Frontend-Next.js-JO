@@ -36,6 +36,9 @@ interface SAPDataContextType {
   
   // Función para obtener imagen por criterios
   getImageByTitle: (title: string) => ImageData | undefined;
+
+  // Función para añadir una imagen al estado local
+  addImage: (newImage: ImageData) => void;
 }
 
 const SAPDataContext = createContext<SAPDataContextType | undefined>(undefined);
@@ -129,6 +132,12 @@ export function SAPDataProvider({ children }: { children: React.ReactNode }) {
     );
   }, [images]);
 
+  // Función para añadir una imagen al estado sin hacer refetch
+  const addImage = useCallback((newImage: ImageData) => {
+    // Añade la nueva imagen al principio de la lista para que sea encontrada rápidamente
+    setImages(prevImages => [newImage, ...prevImages]);
+  }, []);
+
   // Cargar datos iniciales solo una vez
   useEffect(() => {
     loadPrendas();
@@ -145,6 +154,7 @@ export function SAPDataProvider({ children }: { children: React.ReactNode }) {
     refreshPrendasData,
     refreshImagesData,
     getImageByTitle,
+    addImage,
   };
 
   return (

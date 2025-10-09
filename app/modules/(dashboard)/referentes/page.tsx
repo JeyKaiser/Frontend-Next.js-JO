@@ -68,7 +68,8 @@ export default function ReferentesPage() {
     images: availableImages,
     prendasError,
     imagesError,
-    refreshImagesData
+    refreshImagesData,
+    addImage // <-- Importar la nueva función del contexto
   } = useSAPData();
 
   const [error, setError] = useState<string | null>(null);
@@ -117,21 +118,15 @@ export default function ReferentesPage() {
       
       console.log('Subiendo imagen para:', uploadKey);
 
-      // Usar el servicio centralizado
-      await uploadImage(file, title);
+      // 1. Usar el servicio y capturar la respuesta con los datos de la nueva imagen
+      const newImage = await uploadImage(file, title);
 
-      // Pequeño delay para asegurar que la imagen esté disponible en el servidor
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Refrescar la lista de imágenes usando el contexto
-      await refreshImagesData();
-
-      // Forzar un re-render actualizando el estado de error para trigger el re-render
-      setError(null);
+      // 2. Añadir la nueva imagen al estado del contexto manualmente
+      addImage(newImage);
 
       // Forzar re-render de las cards
       setRefreshKey(prev => {
-        console.log('Actualizando refreshKey de', prev, 'a', prev + 1);
+        console.log('Forzando re-render con refreshKey de', prev, 'a', prev + 1);
         return prev + 1;
       });
 
@@ -169,21 +164,15 @@ export default function ReferentesPage() {
       
       console.log('Subiendo imagen para variante:', uploadKey);
 
-      // Usar el servicio centralizado
-      await uploadImage(file, title);
+      // 1. Usar el servicio y capturar la respuesta con los datos de la nueva imagen
+      const newImage = await uploadImage(file, title);
 
-      // Pequeño delay para asegurar que la imagen esté disponible en el servidor
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Refrescar la lista de imágenes usando el contexto
-      await refreshImagesData();
-
-      // Forzar un re-render actualizando el estado de error para trigger el re-render
-      setError(null);
+      // 2. Añadir la nueva imagen al estado del contexto manualmente
+      addImage(newImage);
 
       // Forzar re-render de las cards
       setRefreshKey(prev => {
-        console.log('Actualizando refreshKey de', prev, 'a', prev + 1);
+        console.log('Forzando re-render con refreshKey de', prev, 'a', prev + 1);
         return prev + 1;
       });
 
@@ -242,26 +231,15 @@ export default function ReferentesPage() {
       }
     }
 
-    // Para prendas principales (sin cantidad de telas), buscar imagen de portada específica
-    const imagenesEspecificas: { [key: string]: string } = {
-      'BIKINI BOTTOM': 'PORTADA BIKINI BOTTOM',
-      'BIKINI TOP': 'PORTADA BIKINI TOP',
-      'ONEPIECE': 'PORTADA ONEPIECE',
-      'BIKINI BOTTOM PANTY': 'PORTADA BIKINI BOTTOM PANTY'
-    };
+    // Para prendas principales (sin cantidad de telas), buscar imagen de portada dinámicamente
+    const tituloPortada = `PORTADA ${prendaNombre.toUpperCase()}`;
 
-    const tituloBuscado = imagenesEspecificas[prendaNombre];
-    console.log('Buscando imagen de portada:', tituloBuscado);
+    const imagenPortada = availableImages.find(img => 
+      img.title.toUpperCase() === tituloPortada
+    );
 
-    if (tituloBuscado) {
-      // Buscar imagen por título exacto (insensible a mayúsculas/minúsculas)
-      const imagenEspecifica = availableImages.find(img =>
-        img.title.toUpperCase() === tituloBuscado.toUpperCase()
-      );
-
-      if (imagenEspecifica) {
-        return imagenEspecifica;
-      }
+    if (imagenPortada) {
+      return imagenPortada;
     }
 
     // Si no se encuentra la imagen específica, NO buscar alternativas para evitar conflictos
@@ -486,6 +464,7 @@ export default function ReferentesPage() {
 
               return (
                 <div
+                  // key={`${prenda.prenda_id}-${refreshKey}`}
                   key={`${prenda.prenda_id}-${refreshKey}`}
                   className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
                     showImageUpload ? 'border-2 border-blue-300' : ''
@@ -530,7 +509,7 @@ export default function ReferentesPage() {
                       <div className="relative">
                         <input
                           type="file"
-                          accept=".png"
+                          accept=".png, .webp"
                           disabled={isUploading}
                           onChange={(e) => {
                             const file = e.target.files?.[0];
@@ -624,7 +603,7 @@ export default function ReferentesPage() {
                         <div className="relative">
                           <input
                             type="file"
-                            accept=".png"
+                            accept=".png, .webp"
                             disabled={isUploading}
                             onChange={(e) => {
                               const file = e.target.files?.[0];
