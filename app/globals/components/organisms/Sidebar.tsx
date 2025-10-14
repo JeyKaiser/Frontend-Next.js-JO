@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -14,6 +15,7 @@ import {
   Eye,
   ChevronRight,
   Wrench,
+  ChevronDown,
 } from 'lucide-react';
 
 interface NavItem {
@@ -45,12 +47,7 @@ const navigation: NavItem[] = [
     href: '/modules/parametros',
     label: 'Parámetros',
     icon: Wrench,
-  },
-  // {
-  //   href: '/modules/referentes',
-  //   label: 'Referentes',
-  //   icon: Tag,
-  // },
+  }, 
   {
     href: '/modules/referentes',
     label: 'Referentes',
@@ -62,7 +59,7 @@ const navigation: NavItem[] = [
     icon: Users,
   },
   {
-    href: '#',
+    href: '/modules/dashboard',
     label: 'Reportes',
     icon: BarChart3,
     children: [
@@ -72,14 +69,25 @@ const navigation: NavItem[] = [
     ],
   },
   {
-    href: '/modules/configuracion',
+    href: '#', // Cambiado a '#' porque es un menú padre, no un enlace directo
     label: 'Configuración',
     icon: Settings,
+    children: [
+        {
+            href: '/modules/configuracion/crear-referente',
+            label: 'Crear Referente',
+            icon: FileText,
+        },
+    ]
   },
 ];
 
+
 export default function Sidebar() {
   const pathname = usePathname();
+  // 1. Mover el estado DENTRO del componente
+  // 2. Usar el label del item como identificador único para el submenú abierto
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
   const isActiveRoute = (href: string) => {
     if (href === '/modules/dashboard') return pathname === href;
@@ -102,15 +110,39 @@ export default function Sidebar() {
           {navigation.map((item) => (
             <div key={item.href}>
               {item.children ? (
-                // Expandable menu item (for future use)
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between p-3 text-secondary-700 hover:bg-secondary-50 rounded-lg transition-colors duration-200 cursor-pointer">
+                // --- LÓGICA PARA MENÚ DESPLEGABLE ---
+                <div>
+                  <button
+                    onClick={() => setOpenSubmenu(openSubmenu === item.label ? null : item.label)}
+                    className="flex items-center justify-between w-full p-3 text-secondary-700 hover:bg-secondary-50 rounded-lg transition-colors duration-200 cursor-pointer"
+                  >
                     <div className="flex items-center gap-3">
                       <item.icon className="w-5 h-5" />
                       <span className="font-medium">{item.label}</span>
                     </div>
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        openSubmenu === item.label ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {/* Renderiza el submenú si está abierto */}
+                  {openSubmenu === item.label && (
+                    <ul className="mt-1 ml-4 pl-5 border-l border-secondary-200 space-y-1">
+                      {item.children.map((subItem) => (
+                        <li key={subItem.href}>
+                          <Link
+                            href={subItem.href}
+                            className={`block p-2 text-sm rounded-md ${
+                              isActiveRoute(subItem.href) ? 'font-semibold text-primary-600' : 'text-secondary-600 hover:bg-secondary-100'
+                            }`}
+                          >
+                            {subItem.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               ) : (
                 // Regular menu item

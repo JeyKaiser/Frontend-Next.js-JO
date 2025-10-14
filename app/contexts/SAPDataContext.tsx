@@ -53,6 +53,7 @@ export function SAPDataProvider({ children }: { children: React.ReactNode }) {
   const [prendasError, setPrendasError] = useState<string | null>(null);
   const [imagesError, setImagesError] = useState<string | null>(null);
 
+
   // Cargar prendas
   const loadPrendas = useCallback(async () => {
     if (prendasLoading) return; // Evitar llamadas duplicadas
@@ -62,6 +63,7 @@ export function SAPDataProvider({ children }: { children: React.ReactNode }) {
     
     try {
       const data = await getPrendas();
+      console.log("Prendas recibidas: ",data);
       setPrendas(data);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -71,6 +73,7 @@ export function SAPDataProvider({ children }: { children: React.ReactNode }) {
       setPrendasLoading(false);
     }
   }, [prendasLoading]);
+
 
   // Cargar imágenes
   const loadImages = useCallback(async () => {
@@ -98,6 +101,7 @@ export function SAPDataProvider({ children }: { children: React.ReactNode }) {
     
     try {
       const data = await getPrendas();
+      console.log("Telas recibidas: ",data);
       setPrendas(data);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';

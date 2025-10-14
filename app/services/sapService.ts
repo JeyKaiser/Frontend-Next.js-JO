@@ -205,6 +205,7 @@ export const getConsumoTextil = async (
     cacheKey,
     async () => {
       const url = `http://localhost:8000/api/sap/consumo-textil/?${params.toString()}`;
+      console.log(url);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Error al obtener los datos de consumo');

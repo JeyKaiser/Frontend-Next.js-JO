@@ -39,11 +39,11 @@ export default function Navbar() {
                   Reportes
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/modules/configuracion" className="nav-link">
                   Configuración
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </nav>
         </div>

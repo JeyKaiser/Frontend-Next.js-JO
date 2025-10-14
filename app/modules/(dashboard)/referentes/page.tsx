@@ -196,6 +196,10 @@ export default function ReferentesPage() {
 
   // Función para obtener la imagen correcta para cada prenda/variante
   const getPrendaImage = (prendaNombre: string, cantidadTelas?: number, numeroVariante?: string): ImageData | null => {
+    if (!prendaNombre) {
+      console.warn('getPrendaImage: prendaNombre es undefined o vacío');
+      return null;
+    }
     console.log('=== getPrendaImage ===');
     console.log('prendaNombre:', prendaNombre);
     console.log('cantidadTelas:', cantidadTelas);
@@ -205,7 +209,7 @@ export default function ReferentesPage() {
 
     // Si hay numero_variante, buscar imagen específica para esa variante
     if (numeroVariante && cantidadTelas) {
-      const tituloVariante = `${prendaNombre.toUpperCase()}_${cantidadTelas}_${numeroVariante}_VARIANTE`;
+      const tituloVariante = `${prendaNombre?.toUpperCase() ?? ''}_${cantidadTelas}_${numeroVariante}_VARIANTE`;
       console.log('Buscando imagen de variante:', tituloVariante);
 
       const imagenVariante = availableImages.find(img =>
@@ -458,21 +462,21 @@ export default function ReferentesPage() {
         {!showTable && !showConteoCards ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {prendas.map((prenda) => {
-              const imagenPrenda = getPrendaImage(prenda.tipo_prenda_nombre, prenda.cantidad_telas);
-              const uploadKey = `PORTADA_${prenda.tipo_prenda_nombre}`;
+              // Para la vista principal, solo buscamos la imagen de portada. (Cambiado a prenda.nombre)
+              const imagenPrenda = getPrendaImage(prenda.nombre);
+              const uploadKey = `PORTADA_${prenda.nombre}`;
               const isUploading = uploadingImages.has(uploadKey);
 
               return (
                 <div
-                  // key={`${prenda.prenda_id}-${refreshKey}`}
                   key={`${prenda.prenda_id}-${refreshKey}`}
                   className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
                     showImageUpload ? 'border-2 border-blue-300' : ''
                   }`}
                   onClick={() => {
-                    console.log('🔄 Card clickeada - prenda:', prenda.tipo_prenda_nombre);
-                    if (!showImageUpload && prenda.tipo_prenda_nombre) {
-                      handlePrendaClick(prenda.tipo_prenda_nombre);
+                    console.log('🔄 Card clickeada - prenda:', prenda.nombre);
+                    if (!showImageUpload && prenda.nombre) {
+                      handlePrendaClick(prenda.nombre);
                     }
                   }}
                 >
@@ -480,7 +484,7 @@ export default function ReferentesPage() {
                     {imagenPrenda ? (
                       <img
                         src={`http://localhost:8000${imagenPrenda.image_url}`}
-                        alt={prenda.tipo_prenda_nombre}
+                        alt={prenda.nombre}
                         className="w-full h-full object-contain rounded"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
@@ -496,14 +500,14 @@ export default function ReferentesPage() {
                     )}
                   </div>
 
-                  <h3 className="text-xl font-semibold mb-4">{prenda.tipo_prenda_nombre}</h3>
+                  <h3 className="text-xl font-semibold mb-4">{prenda.nombre}</h3>
 
                   {/* Input de archivo - solo visible cuando showImageUpload es true */}
                   {showImageUpload && (
                     <div className="space-y-3">
                       <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
                         <strong>Se guardará como:</strong><br />
-                        <code className="text-blue-600">PORTADA {prenda.tipo_prenda_nombre ? prenda.tipo_prenda_nombre.toUpperCase() : 'NOMBRE_PRENDA'}</code>
+                        <code className="text-blue-600">PORTADA {prenda.nombre ? prenda.nombre.toUpperCase() : 'NOMBRE_PRENDA'}</code>
                       </div>
 
                       <div className="relative">
@@ -513,8 +517,8 @@ export default function ReferentesPage() {
                           disabled={isUploading}
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file && prenda.tipo_prenda_nombre) {
-                              handleImageUploadForPrenda(prenda.tipo_prenda_nombre, file);
+                            if (file && prenda.nombre) {
+                              handleImageUploadForPrenda(prenda.nombre, file);
                               // Limpiar el input después de la subida
                               e.target.value = '';
                             }
