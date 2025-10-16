@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/app/modules/(auth)/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 
@@ -15,7 +15,8 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (!loading && isAuthenticated) {
-            router.replace('modules/dashboard');
+            router.replace('/modules/dashboard');
+            // router.replace('modules/dashboard');
         }
     }, [loading, isAuthenticated, router]);
 

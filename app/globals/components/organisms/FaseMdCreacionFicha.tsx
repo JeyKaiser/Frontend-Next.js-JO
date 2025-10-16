@@ -2,8 +2,8 @@
 'use client'; // Es un Client Component porque usará useState para las pestañas
 
 import React, { useState } from 'react';
-import DataTable from '../molecules/DataTable'; 
-import { TelaData, InsumoData, MdCreacionFichaData } from '../../../../app/modules/types/index'; 
+import DataTable from '@/app/globals/components/molecules/DataTable'; // Asegúrate de que este componente esté correctamente importado
+import { TelaData, InsumoData, MdCreacionFichaData } from '@/app/modules/types'; 
 
 interface FaseMdCreacionFichaProps {
   data: MdCreacionFichaData; // Recibe todos los datos de la fase

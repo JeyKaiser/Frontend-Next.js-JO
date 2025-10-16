@@ -1,79 +1,67 @@
-// app/(dashboard)/colecciones/page.tsx
-'use client';
+import ColeccionesClient from './ColeccionesClient';
 
-import Card from '../../../globals/components/molecules/Card'; // Asegúrate de que la ruta sea correcta
-
-export default function ColeccionesPage() {
-  const colecciones = [
-    {
-      id: 'winter-sun',           // Usamos el slug como ID para la URL
-      label: 'Winter Sun',
-      img: '/img/winter-sun.jpg', 
-      bg: '#feea4d',
-    },
-    {
-      id: 'resort-rtw',
-      label: 'Resort RTW',
-      img: '/img/resort-rtw.jpg',
-      bg: '#70a7ff',
-    },
-    {
-      id: 'spring-summer',
-      label: 'Spring Summer',
-      img: '/img/spring-summer.jpg',
-      bg: '#81c963',
-    },
-    {
-      id: 'summer-vacation',
-      label: 'Summer Vacation',
-      img: '/img/summer-vacation.jpg',
-      bg: '#ff935f', 
-    },
-    {
-      id: 'pre-fall',
-      label: 'Pre - Fall',
-      img: '/img/pre-fall.jpg',
-      bg: '#c6b9b1',
-    },
-    {
-      id: 'fall-winter',
-      label: 'Fall Winter',
-      img: '/img/fall-winter.jpg',
-      bg: '#b03c5c',
-    },
-    {
-      id: 'prueba-api-django', // Un ID descriptivo para la URL
-      label: 'Prueba API Django',
-      img: '/img/fall-winter.jpg', // Usa una imagen existente o crea una para esto
-      bg: '#A0D9EF',
-    },
-  ];
-
-  return (
-    <div>
-      <header className="text-center mb-10 relative">
-        <h2 className="text-3xl font-semibold uppercase tracking-wider text-gray-800">
-          COLECCIONES
-        </h2>
-      </header>
-
-      <div className="grid grid-cols-[repeat(auto-fit,_250px)] justify-center gap-10 px-4 py-8 items-start">
-        {colecciones.length === 0 ? (
-          <p className="col-span-full text-center text-gray-600">No hay colecciones disponibles.</p>
-        ) : (
-          colecciones.map((anios) => (
-            <Card
-              key={anios.id}
-              title={anios.label}
-              imageSrc={anios.img}
-              bgColor={anios.bg}
-              // El href ahora apunta a la página de años de la colección, usando el ID/slug
-              href={`/colecciones/${anios.id}`}
-            />
-          ))
-        )}
-      </div>
-    </div>
-  );
+interface Reference {
+  codigo_coleccion: string;
+  codigo_referencia: string;
+  label: string;
+  img: string;
+  bg: string;
+  status: 'active' | 'archived' | 'planning';
+  lastUpdated: string;
+  season: 'Spring Summer' | 'Fall Winter' | 'Resort' | 'PreFall' | 'Summer Vacation' | 'Winter Sun';
 }
 
+interface Collection {
+  id: string;
+  label: string;
+  img: string;
+  bg: string;
+  status: 'active' | 'archived' | 'planning';
+  references: Reference[];
+  lastUpdated: string;
+  season: 'Spring Summer' | 'Fall Winter' | 'Resort' | 'PreFall' | 'Summer Vacation' | 'Winter Sun';
+}
+
+async function getColecciones(): Promise<Collection[]> {
+  const BACKEND_URL = 'http://localhost:8000/api/colecciones/';
+  try {
+    console.log('[Server Component] Fetching collections from:', BACKEND_URL);
+    const response = await fetch(BACKEND_URL, {
+      cache: 'no-store', // Fetch fresh data on each request
+    });
+
+    if (!response.ok) {
+      console.error('[Server Component] Backend error:', response.status, response.statusText);
+      throw new Error(`Error del backend: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('[Server Component] Success from backend:', data.length, 'collections');
+    return data;
+  } catch (error) {
+    console.error('[Server Component] Error connecting to backend:', error);
+    throw new Error('No se pudo conectar con el backend.');
+  }
+}
+
+export default async function ColeccionesPage() {
+  try {
+    const colecciones = await getColecciones();
+    return <ColeccionesClient initialColecciones={colecciones} />;
+  } catch (error) {
+    // This is a simplified error view. You can create a more sophisticated one.
+    return (
+      <div className="p-12 text-center">
+        <h3 className="text-lg font-semibold text-red-900 mb-2">
+          Error al cargar colecciones
+        </h3>
+        <p className="text-red-600 mb-4">
+          {error instanceof Error ? error.message : 'Error desconocido'}
+        </p>
+        <p className="text-sm text-gray-500">
+          Asegúrate de que el servicio del backend (Django) se esté ejecutando en {process.env.BACKEND_URL || 'http://localhost:8000'}.
+        </p>
+      </div>
+    );
+  }
+}

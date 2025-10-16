@@ -1,5 +1,5 @@
-import Card from '@/components/molecules/Card';
-import type { AniosColeccionApiResponse } from '../../../types';
+import Card from '@/app/globals/components/molecules/Card';
+import type { AniosColeccionApiResponse } from '@/app/modules/types';
 // Eliminamos: import React from 'react';
 
 interface AnioColeccionPageProps {
@@ -78,7 +78,7 @@ export default async function AnioColeccionPage({ params }: AnioColeccionPagePro
             subtitle={displayCollectionName} // Mostrar el nombre de la colección como subtítulo
             imageSrc={anio.img}
             bgColor={anio.bg}
-            href={`/referencias/${anio.id}`} // Redirige a la página de referencias con el ID del año
+            href={`/referencias-por-anio/${anio.id}`} // Redirige a la página de referencias con el ID del año
           />
         ))}
       </div>

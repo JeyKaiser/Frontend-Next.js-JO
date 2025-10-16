@@ -24,6 +24,7 @@ export interface ReferenciasAnioApiResponse {
   U_GSP_Picture: string;
   U_GSP_REFERENCE: string;
   U_GSP_Desc: string;
+  Name: string; // Estado de la referencia
   id?: string | number;
   color_fondo?: string;  
   // Si tu API de lista de referencias devuelve otros campos, añádelos aquí.
@@ -37,6 +38,9 @@ export interface ReferenciaData {
   nombre: string;            // Coincide con el campo 'nombre' de Django
   imagen_url: string;        // Coincide con el campo 'imagen_url' de Django
   fases_disponibles: FaseDisponible[]; // Coincide con el campo 'fases_disponibles' de Django
+  collection_id?: string;    // ID de la colección
+  collection_name?: string;  // Nombre de la colección
+  reference_name?: string;   // Nombre descriptivo de la referencia
 }
 
 
@@ -92,6 +96,9 @@ export interface ReferenciaDetalleAPI {
   nombre: string;
   imagen_url: string;
   fases_disponibles: FaseDisponible[];
+  collection_id?: string;    // ID de la colección
+  collection_name?: string;  // Nombre de la colección
+  reference_name?: string;   // Nombre descriptivo de la referencia
 }
 
 
@@ -118,8 +125,113 @@ export interface PTSearchResult {
   U_GSP_COLLECTION: string; // Necesitamos la colección para redirigir a la página de telas
   // Puedes añadir más campos si la búsqueda devuelve información adicional
 }
+
+// Enhanced search interfaces for multiple search types
+export interface SearchResult {
+  id: string;
+  title: string;
+  description: string;
+  type: 'reference' | 'collection' | 'phase' | 'document';
+  url: string;
+  collection?: string;
+  reference?: string;
+  phase?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface SearchResponse {
+  results: SearchResult[];
+  total: number;
+  query: string;
+  searchType: 'pt' | 'md' | 'collection' | 'general';
+}
+
+export interface SearchError {
+  message: string;
+  code: string;
+  suggestions?: string[];
+}
  // NUEVA INTERFAZ PARA LA RESPUESTA COMBINADA DEL MODELO DETALLE
 export interface ModeloDetalleResponse {
   telas: TelaData[];
   insumos: InsumoData[];
 }
+
+// User Management Interfaces
+export interface Usuario {
+  ID_USUARIO: number;
+  CODIGO_USUARIO: string;
+  NOMBRE_COMPLETO: string;
+  EMAIL?: string;
+  AREA: string;
+  ROL: string;
+  ESTADO: 'ACTIVO' | 'INACTIVO';
+  FECHA_CREACION: string;
+}
+
+export interface CreateUsuarioRequest {
+  CODIGO_USUARIO: string;
+  NOMBRE_COMPLETO: string;
+  EMAIL?: string;
+  AREA: string;
+  ROL: string;
+  ESTADO?: 'ACTIVO' | 'INACTIVO';
+}
+
+export interface UpdateUsuarioRequest {
+  CODIGO_USUARIO?: string;
+  NOMBRE_COMPLETO?: string;
+  EMAIL?: string;
+  AREA?: string;
+  ROL?: string;
+  ESTADO?: 'ACTIVO' | 'INACTIVO';
+}
+
+export interface UsuariosResponse {
+  success: boolean;
+  data?: Usuario[];
+  count?: number;
+  pagination?: {
+    offset: number;
+    limit: number;
+    hasMore: boolean;
+  };
+  error?: string;
+}
+
+// Tipos para el módulo de consumos
+export interface ConsumoData {
+  COLECCION: string;           // T3."Name" AS "COLECCION"
+  NOMBRE_REF: string;          // T1."U_GSP_Desc" AS "NOMBRE REF"
+  ESTADO: string;              // T5."Name" AS "ESTADO"
+  USO_EN_PRENDA: string;       // T2."U_GSP_SchLinName" AS "USO EN PRENDA"
+  COD_TELA: string;            // T2."U_GSP_ItemCode" AS "COD TELA"
+  NOMBRE_TELA: string;         // T2."U_GSP_ItemName" AS "NOMBRE TELA"
+  CONSUMO: number | null;      // T2."U_GSP_QuantMsr" AS "CONSUMO"
+  GRUPO_TALLAS: string;        // T1."U_GSP_GroupSizeCode" AS "GRUPO TALLAS"
+  LINEA: string;               // T4."Name" AS "LINEA"
+  TIPO: string;                // T2."U_GSP_SchName" AS "TIPO"
+}
+
+export interface ConsumosResponse {
+  success: boolean;
+  data?: ConsumoData[];
+  count?: number;
+  error?: string;
+  referenceCode?: string;
+}
+
+// Tipos adicionales para manejo de pestañas por tipo
+export interface ConsumosPorTipo {
+  [tipo: string]: ConsumoData[];
+}
+
+export interface TipoConsumo {
+  id: string;
+  nombre: string;
+  data: ConsumoData[];
+  count: number;
+}
+
+// Re-export production types for convenience
+export * from './production';

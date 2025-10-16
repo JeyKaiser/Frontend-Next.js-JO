@@ -1,7 +1,7 @@
 // app/(dashboard)/referencia-detalle/[collectionId]/[referenciaId]/page.tsx
 // Este archivo es el ENCARGADO de la redirección inicial
 
-import { getReferenciaData } from '../../../../../globals/lib/api';
+import { getReferenciaData } from '@/app/globals/lib/api';
 import { redirect } from 'next/navigation';
 
 interface ReferenciaDetallePageProps {
@@ -26,15 +26,15 @@ export default async function ReferenciaDetallePage({ params }: ReferenciaDetall
   //   redirect('/colecciones');
   // }
 
-  // Obtener los datos de la referencia para saber sus fases
-  const referenciaData = await getReferenciaData(referenciaId);
+  // Obtener los datos de la referencia para saber sus fases (con collectionId)
+  const referenciaData = await getReferenciaData(referenciaId, collectionId);
   const fases = referenciaData?.fases_disponibles || [];
 
   // Redirigir a la primera fase si existe
   if (fases.length > 0) {
     console.log(`[ReferenciaDetalle-Page] Redirigiendo a la primera fase: ${fases[0].slug} con collectionId: ${collectionId} (ahora como param)`);
     // *** CAMBIO CLAVE: La URL de redirección usa collectionId como parámetro de ruta ***
-    redirect(`/referencia-detalle/${collectionId}/${referenciaId}/fases/${fases[0].slug}`);
+    redirect(`/modules/referencia-detalle/${collectionId}/${referenciaId}/fases/${fases[0].slug}`);
   } else {
     // Si no hay fases, mostrar un mensaje de que no hay nada que ver
     return (

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(clear)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c:*)",
+      "Bash(powershell:*)",
+      "Bash(rm:*)",
+      "Bash(npm install:*)",
+      "Bash(rg:*)",
+      "Bash(mkdir:*)",
+      "Bash(grep:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "defaultMode": "acceptEdits"
+  }
+}

@@ -18,7 +18,7 @@ export default function Card({ title, imageSrc, bgColor, href, id, subtitle }: C
       className="relative overflow-hidden rounded-2xl shadow-md transition-all duration-300 ease-in-out transform
                  hover:scale-102 hover:shadow-lg hover:-translate-y-2.5
                  flex flex-col cursor-pointer
-                 w-[250px] h-[350px] mx-auto flex-shrink-0" // <-- Tamaño fijo de la tarjeta
+                 w-full max-w-[300px] aspect-[3/4]"
       style={{ backgroundColor: bgColor || '#f0f0f0' }} // Color por defecto si no se proporciona
      
     >

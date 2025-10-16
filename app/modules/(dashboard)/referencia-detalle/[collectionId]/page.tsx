@@ -1,7 +1,7 @@
 // app/(dashboard)/referencia-detalle/[referenciaId]/page.tsx
 // Este es un Server Component por defecto - pagina de redireccion inicial para una referencia específica
 
-import { getReferenciaData } from '../../../../globals/lib/api';
+import { getReferenciaData } from '@/app/globals/lib/api';
 import { redirect } from 'next/navigation';
 
 interface ReferenciaDetallePageProps {
@@ -37,7 +37,7 @@ export default async function ReferenciaDetallePage({ params, searchParams }: Re
     // IMPORTANTE: Construir la URL de redirección incluyendo el collectionId
     console.log(`[ReferenciaDetalle-Page] Redirigiendo a la primera fase: ${fases[0].slug} con collectionId: ${collectionId}`);
     // Esto asegura que la URL final de la fase sea algo como /fases/jo?collectionId=063
-    redirect(`/referencia-detalle/${referenciaId}/fases/${fases[0].slug}?collectionId=${collectionId}`);
+    redirect(`/modules/referencia-detalle/${referenciaId}/fases/${fases[0].slug}?collectionId=${collectionId}`);
   } else {
     // Si no hay fases, mostrar un mensaje de que no hay nada que ver
     return (

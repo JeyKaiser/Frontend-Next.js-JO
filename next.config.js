@@ -1,11 +1,18 @@
-// Archivo de configuración de Next.js para manejar imágenes remotas
+// Archivo de configuración de Next.js para manejar imágenes remotas y reescrituras de API
 // Este archivo reemplaza la configuración de 'images.domains' con 'images.remotePatterns'
 // y permite especificar patrones de URL para imágenes remotas.
-// Asegúrate de que tu servidor Django esté configurado para servir imágenes correctamente.
-
+// También configura 'rewrites' para redirigir las solicitudes de API al backend de Django.
 
 /** @type {import('next').NextConfig} */
-const nextConfig = { 
+const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:8000/api/:path*',
+      },
+    ];
+  },
   images: {   
     remotePatterns: [
       {
@@ -29,7 +36,6 @@ const nextConfig = {
         protocol: 'https',     // Las URLs que proporcionaste usan HTTPS
         hostname: 'johannaortiz.net',
         // No se especifica 'port' si usa el puerto estándar (80 para HTTP, 443 para HTTPS)
-        // No se especifica 'pathname' si quieres permitir cualquier path desde ese hostname
         // Si solo quieres permitir /media/ImagesJOServer/ desde ese dominio, puedes ser más específico:
         pathname: '/media/ImagesJOServer/**', 
       },

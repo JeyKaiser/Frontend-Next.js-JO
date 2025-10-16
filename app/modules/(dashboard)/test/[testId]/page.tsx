@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import type { TestDataApiResponse } from '../../../types'; // Ruta correcta para tus tipos
+import type { TestDataApiResponse } from '@/app/modules/types'; // Ruta correcta para tus tipos
 
 // Definimos la interfaz para las props que recibe el componente de página dinámica
 interface TestPageProps {
