@@ -1,5 +1,5 @@
 import Navbar from '@/app/globals/components/organisms/Navbar';
-import Sidebar from '@/app/globals/components/organisms/sidebar';
+import Sidebar from '@/app/globals/components/organisms/Sidebar';
 import { SAPDataProvider } from '@/app/contexts/SAPDataContext';
 
 export default function ModulesLayout({

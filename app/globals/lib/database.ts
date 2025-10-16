@@ -4,7 +4,20 @@
  * Schema: GARMENT_PRODUCTION_CONTROL
  */
 
-import hana from '@sap/hana-client';
+let hana: any = null;
+try {
+  hana = require('@sap/hana-client');
+} catch (error) {
+  console.warn('SAP HANA client not available, using mock implementation');
+  hana = {
+    createConnection: () => ({
+      connect: (callback: Function) => callback(new Error('SAP HANA client not available')),
+      exec: (sql: string, params: any[], callback: Function) => callback(new Error('SAP HANA client not available')),
+      on: () => {},
+      disconnect: (callback: Function) => callback()
+    })
+  };
+}
 
 // Database configuration interface
 interface DatabaseConfig {
