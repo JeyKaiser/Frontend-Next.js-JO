@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const BACKEND_URL = 'http://localhost:8000/api/sap/base_textil/';
+const BACKEND_URL = `${backendUrI}/api/sap/base_textil/`;
 
 export async function GET() {
   try {

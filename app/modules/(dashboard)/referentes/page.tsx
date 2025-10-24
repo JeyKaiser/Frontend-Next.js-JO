@@ -459,7 +459,11 @@ export default function ReferentesPage() {
         )}
 
 
-        {!showTable && !showConteoCards ? (
+        {loading ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-600">Cargando...</p>
+          </div>
+        ) : !showTable && !showConteoCards ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {prendas.map((prenda) => {
               // Para la vista principal, solo buscamos la imagen de portada. (Cambiado a prenda.nombre)
@@ -546,13 +550,8 @@ export default function ReferentesPage() {
             })}
           </div>
         ) : showConteoCards ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {loading ? (
-              <div className="col-span-full text-center py-8">
-                <p className="text-gray-600">Cargando variantes...</p>
-              </div>
-            ) : (
-              conteosTelas.map((conteos, index) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">            
+              {conteosTelas.map((conteos, index) => {
                 const cantidadTelas = conteos.cantidad_telas;
                 const descripcionVariante = conteos.descripcion_variante;
                 const numeroVariante = conteos.numero_variante;
@@ -638,9 +637,8 @@ export default function ReferentesPage() {
                   </div>
                 );
               })
-            )}
-          </div>
-        ) : (
+            }
+          </div>) : (
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="mb-4">
               <h3 className="text-xl font-semibold">Consumo Textil - {selectedPrenda} ({conteosTelas[0]?.cantidad_telas || 0} telas - V{conteosTelas[0]?.numero_variante || ''})</h3>
@@ -746,7 +744,7 @@ export default function ReferentesPage() {
                     <option value="SOLIDO">SOLIDO</option>
                     <option value="MODIFICACION">MODIFICACION</option>
                     <option value="UBICACION">UBICACION</option>
-                  </select>
+                    <option value="SOLIDO CON SENTIDO">SOLIDO CON SENTIDO</option>                                    </select>
                 </div>
 
                 <div>

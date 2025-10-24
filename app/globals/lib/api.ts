@@ -9,7 +9,8 @@ import type {
   SearchError 
 } from '@/app/modules/types';
 
-const DJANGO_API_BASE_URL = 'http://localhost:8000';
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
+const DJANGO_API_BASE_URL = backendUrI || 'http://localhost:8000';
 
 // Collection ID to Name mapping
 // This should ideally come from the backend, but for now we'll maintain this mapping

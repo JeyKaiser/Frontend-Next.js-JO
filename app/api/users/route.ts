@@ -5,7 +5,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = 'http://localhost:8000/api/users/';
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+const BACKEND_URL = `${backendUrI}/api/users/`;
 
 export async function GET(request: NextRequest) {
   try {

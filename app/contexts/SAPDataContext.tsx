@@ -5,8 +5,8 @@ import { getPrendas, getImages, refreshImages } from '@/app/services/sapService'
 
 interface Prenda {
   prenda_id: number;
-  tipo_prenda_nombre: string;
-  cantidad_telas?: number;
+  // Ajustamos el nombre del campo para que coincida con la respuesta de la API
+  nombre: string;
   prenda_base?: string;
 }
 

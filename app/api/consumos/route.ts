@@ -4,6 +4,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
     console.log('[API Consumos] Consultando consumos para referencia:', reference);
 
     // Hacer petición al backend externo
-    const backendUrl = `http://localhost:8000/api/consumos/?reference=${encodeURIComponent(reference)}`;
+    const backendUrl = `${backendUrI}/api/consumos/?reference=${encodeURIComponent(reference)}`;
     
     try {
       console.log('[API Consumos] Conectando al backend:', backendUrl);

@@ -1,7 +1,9 @@
 import Card from '@/app/globals/components/molecules/Card';
 import type { AniosColeccionApiResponse } from '@/app/modules/types';
+
 // Eliminamos: import React from 'react';
 
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
 interface AnioColeccionPageProps {
   params: {
     coleccionSlug: string;
@@ -10,7 +12,7 @@ interface AnioColeccionPageProps {
 
 // Función para obtener los años de la colección
 async function getAniosColeccion(coleccionSlug: string): Promise<AniosColeccionApiResponse | null> {
-  const DJANGO_API_BASE_URL = 'http://localhost:8000'; // Tu URL base de Django
+  const DJANGO_API_BASE_URL = backendUrI || 'http://localhost:8000'; // Tu URL base de Django
 
   try {
     const apiUrl = `${DJANGO_API_BASE_URL}/api/anio_coleccion/${coleccionSlug}/anios/`;

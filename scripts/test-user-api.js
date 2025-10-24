@@ -3,7 +3,9 @@
  * Run with: node scripts/test-user-api.js
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+const API_BASE_URL = backendUrI || 'http://localhost:3000/api';
 
 async function testAPI(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;

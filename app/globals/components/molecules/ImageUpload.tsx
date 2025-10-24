@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 interface ImageUploadProps {
   onUploadSuccess?: (imageData: any) => void;
 }
@@ -36,7 +38,7 @@ export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/sap/images/upload/', {
+      const response = await fetch(`${backendUrI}/api/sap/images/upload/`, {
         method: 'POST',
         body: formData,
       });

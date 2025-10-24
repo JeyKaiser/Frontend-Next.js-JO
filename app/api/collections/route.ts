@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -14,9 +16,10 @@ export async function GET(request: NextRequest) {
     const codigo = searchParams.get('codigo');
 
     console.log('[API] Getting collections from Django backend:', { offset, limit, anio, codigo });
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     // The Django API URL
-    const djangoApiUrl = 'http://localhost:8000/api/colecciones/';
+    const djangoApiUrl = `${backendUrl}/api/colecciones/`;
 
     // Fetch data from Django backend
     const response = await fetch(djangoApiUrl, {
@@ -80,7 +83,7 @@ export async function POST(request: NextRequest) {
     console.log('[API] Creating collection via Django backend:', body);
 
     // The Django API URL
-    const djangoApiUrl = 'http://localhost:8000/api/colecciones/';
+    const djangoApiUrl = `${backendUrl}/api/colecciones/`;
 
     // Transform the body to match what the Django API expects
     const transformedBody = {

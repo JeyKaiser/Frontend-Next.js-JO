@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const BACKEND_URL = 'http://localhost:8000/api/fases';
+const BACKEND_URL = `${backendUrI}/api/fases`;
 
 export async function GET(
   request: NextRequest,

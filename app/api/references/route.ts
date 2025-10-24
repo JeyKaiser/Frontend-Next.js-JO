@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // If specific reference code is requested
     if (codigo) {
-      const djangoApiUrl = `http://localhost:8000/costeo/referencias/${codigo}/`;
+      const djangoApiUrl = `${backendUrI}/costeo/referencias/${codigo}/`;
       const response = await fetch(djangoApiUrl);
 
       if (!response.ok) {
@@ -71,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     // If search term is provided
     if (search) {
-      const djangoApiUrl = `http://localhost:8000/costeo/referencias/search/?search=${search}`;
+      const djangoApiUrl = `${backendUrI}/costeo/referencias/search/?search=${search}`;
       const response = await fetch(djangoApiUrl);
 
       if (!response.ok) {
@@ -113,7 +115,7 @@ export async function GET(request: NextRequest) {
 
     // Get references by collection
     if (coleccionId) {
-      const djangoApiUrl = `http://localhost:8000/costeo/referencias-por-anio/${coleccionId}/`;
+      const djangoApiUrl = `${backendUrI}/costeo/referencias-por-anio/${coleccionId}/`;
       const response = await fetch(djangoApiUrl);
 
       if (!response.ok) {
@@ -188,7 +190,7 @@ export async function POST(request: NextRequest) {
     console.log('[API] Creating reference via Django backend:', body);
 
     // The Django API URL
-    const djangoApiUrl = 'http://localhost:8000/costeo/referencias/';
+    const djangoApiUrl = `${backendUrI}/costeo/referencias/`;
 
     // The Django API expects a different body, so I'm sending the original body for now.
     // This will likely fail, but it's a starting point for the refactoring.

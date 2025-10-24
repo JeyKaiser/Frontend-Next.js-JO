@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_URL = 'http://localhost:8000/api/sap/rotacion_molde/';
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+
+const BACKEND_URL = `${backendUrl}/api/sap/rotacion_molde/`;
 export async function GET() {
   try {
     const response = await fetch(BACKEND_URL);

@@ -2,8 +2,9 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"; // Importa jwtDecode desde jwt-decode
 
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
 // const API_BASE_URL = "http://localhost:8000/api"; // Asegúrate de que esta sea la URL de tu backend Django
-const API_BASE_URL = process.env.NEXT_PUBLIC_DJANGO_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = backendUrI || 'http://localhost:8000/api';
 
 interface Tokens {
     access: string;

@@ -14,9 +14,11 @@ import type {
   SearchError 
 } from '@/app/modules/types';
 
+
 // Configuration for data source preference
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
 const USE_DIRECT_DATABASE = process.env.USE_DIRECT_DATABASE === 'true';
-const DJANGO_API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+const DJANGO_API_BASE_URL = backendUrI || 'http://localhost:8000';
 
 // API Response types for our database bridge
 export interface DatabaseResponse<T> {

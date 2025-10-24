@@ -163,6 +163,22 @@ export default function CrearReferentePage() {
     setIsSubmitting(true);
     setSubmitError(null);
 
+    // --- INICIO: Mensaje de consola en el navegador ---
+    const logData = [
+      formData.prenda_id,
+      formData.cantidad_telas_id,
+      formData.uso_tela_id,
+      formData.base_textil_id,
+      formData.caracteristica_color_id,
+      formData.ancho_util_id,
+      formData.propiedades_tela_id,
+      formData.consumo_mtr,
+      formData.variante_id || 'N/A',
+      formData.descripcion_id || 'N/A',
+      formData.terminacion_id || 'N/A',
+    ].join(', ');
+    console.log(`Datos del formulario a enviar: ${logData}`);
+
     // --- INICIO DE LA VALIDACIÓN Y PREPARACIÓN DEL PAYLOAD ---
     const requiredFields: (keyof FormData)[] = [
       'prenda_id', 'cantidad_telas_id', 'uso_tela_id', 'base_textil_id',
@@ -170,8 +186,20 @@ export default function CrearReferentePage() {
     ];
 
     for (const field of requiredFields) {
-      if (!formData[field]) {
-        const errorMessage = `El campo "${field.replace('_id', '')}" es requerido.`;
+      const value = formData[field];
+      let isInvalid = false;
+
+      // Validación especial para consumo_mtr: permite 0, pero no vacío o espacios.
+      if (field === 'consumo_mtr') {
+        if (value === '' || String(value).trim() === '') {
+          isInvalid = true;
+        }
+      } else if (!value) { // Validación estándar para los demás campos.
+        isInvalid = true;
+      }
+
+      if (isInvalid) {
+        const errorMessage = `El campo "${field.replace('_id', '').replace('mtr', '(metros)')}" es requerido.`;
         setSubmitError(errorMessage);
         setIsSubmitting(false);
         alert(errorMessage);
@@ -203,7 +231,6 @@ export default function CrearReferentePage() {
 
       if (response.status === 201) {
         alert('¡Referente creado exitosamente!'); // Puedes reemplazar esto con una notificación más elegante
-        handleClearForm(); // Limpiar el formulario después del éxito
       }
     } catch (error) {
       console.error('Error al crear el referente:', error);

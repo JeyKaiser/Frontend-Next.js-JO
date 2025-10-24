@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+const backendUrI = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 interface RouteParams {
   params: {
     referenciaId: string;
@@ -24,8 +26,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     console.log('[API] Getting traceability for reference from Django backend:', referenciaId);
 
-    const traceabilityUrl = `http://localhost:8000/costeo/referencias/${referenciaId}/trazabilidad/`;
-    const currentPhaseUrl = `http://localhost:8000/costeo/referencias/${referenciaId}/trazabilidad/current/`;
+    const traceabilityUrl = `${backendUrI}/costeo/referencias/${referenciaId}/trazabilidad/`;
+    const currentPhaseUrl = `${backendUrI}/costeo/referencias/${referenciaId}/trazabilidad/current/`;
 
     const [traceabilityResponse, currentPhaseResponse] = await Promise.all([
       fetch(traceabilityUrl),
