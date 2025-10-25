@@ -5,7 +5,7 @@ import { useSAPData } from '@/app/contexts/SAPDataContext';
 import { uploadImage, getConsumoTextil } from '@/app/services/sapService';
 
 // Verificar y mostrar el valor de NEXT_PUBLIC_BACKEND_URL
-const backendUrl = 'http://192.168.0.40:8000';
+const backendUrl = 'http://localhost:8000';
 
 interface ImageData {
   id: number;
@@ -71,7 +71,8 @@ export default function ReferentesPage() {
     images: availableImages,
     prendasError,
     imagesError,
-    addImage // <-- Importar la nueva función del contexto
+    addImage, // <-- Importar la nueva función del contexto
+    refreshImagesData // <-- Importar la función de refresh
   } = useSAPData();
 
   const [error, setError] = useState<string | null>(null);
@@ -116,19 +117,33 @@ export default function ReferentesPage() {
       setUploadingImages(prev => new Set(prev).add(uploadKey));
 
       const title = `PORTADA ${prendaNombre.toUpperCase()}`;
-      
+
       console.log('Subiendo imagen para:', uploadKey);
+      console.log('Title exacto que se guardará:', title);
 
       // 1. Usar el servicio y capturar la respuesta con los datos de la nueva imagen
       const newImage = await uploadImage(file, title);
 
+      console.log('Nueva imagen subida:', newImage);
+      console.log('Title de la nueva imagen:', newImage.title);
+
       // 2. Añadir la nueva imagen al estado del contexto manualmente
       addImage(newImage);
+
+      // Forzar un refresh de las imágenes después de un pequeño delay para asegurar sincronización
+      setTimeout(async () => {
+        console.log('🔄 Forzando refresh de imágenes después de subida');
+        try {
+          await refreshImagesData();
+          console.log('✅ Imágenes refrescadas exitosamente');
+        } catch (error) {
+          console.error('❌ Error al refrescar imágenes:', error);
+        }
+      }, 500);
 
       // Mostrar mensaje de éxito
       alert(`✅ Imagen subida exitosamente para ${prendaNombre}`);
       console.log('Imagen subida exitosamente:', uploadKey);
-      console.log('Nuevo refreshKey establecido');
     } catch (error) {
       console.error('Error uploading image:', error);
       alert(`❌ Error al subir la imagen: ${error instanceof Error ? error.message : 'Error desconocido'}`);
@@ -231,13 +246,25 @@ export default function ReferentesPage() {
     console.log('  - prendaNombre:', prendaNombre);
     console.log('  - tituloPortada esperado:', tituloPortada);
     console.log('  - availableImages:', availableImages.map(img => ({id: img.id, title: img.title, url: img.image_url})));
-    console.log('  - imagen encontrada:', availableImages.find(img => 
+    console.log('  - imagen encontrada:', availableImages.find(img =>
       img.title.toUpperCase() === tituloPortada
     ));
 
-    const imagenPortada = availableImages.find(img => 
+    const imagenPortada = availableImages.find(img =>
       img.title.toUpperCase() === tituloPortada
     );
+
+    // Si no se encuentra la imagen exacta, intentar buscar sin espacios adicionales
+    if (!imagenPortada) {
+      const tituloPortadaAlternativo = tituloPortada.trim();
+      console.log('  - intentando búsqueda alternativa:', tituloPortadaAlternativo);
+      const imagenAlternativa = availableImages.find(img =>
+        img.title.trim().toUpperCase() === tituloPortadaAlternativo
+      );
+      if (imagenAlternativa) {
+        return imagenAlternativa;
+      }
+    }
 
 
     if (imagenPortada) {
@@ -473,7 +500,7 @@ export default function ReferentesPage() {
 
               return (
                 <div
-                  key={`prenda-${prenda.prenda_id}`}
+                  key={`prenda-${prenda.prenda_id || prenda.nombre || 'unknown'}`}
                   className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
                     showImageUpload ? 'border-2 border-blue-300' : ''
                   }`}
