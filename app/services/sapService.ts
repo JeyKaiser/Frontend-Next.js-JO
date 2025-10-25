@@ -1,5 +1,8 @@
 import axiosInstance from '@/utils/axiosInstance';
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL = `${backendUrl}/api`;
+
 // Interfaz para los datos de prendas
 interface Prenda {
   prenda_id: number;
@@ -128,7 +131,7 @@ export const getPrendas = async (): Promise<Prenda[]> => {
   return fetchWithCache(
     'prendas',
     async () => {
-      const response = await fetch('http://localhost:8000/api/sap/prendas/');
+      const response = await fetch(`${BACKEND_URL}/sap/prendas/`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Error al obtener los datos');
@@ -146,7 +149,7 @@ export const getImages = async (): Promise<ImageData[]> => {
   return fetchWithCache(
     'images',
     async () => {
-      const response = await fetch('http://localhost:8000/api/sap/images/');
+      const response = await fetch(`${BACKEND_URL}/sap/images/`);
       if (!response.ok) {
         throw new Error('Error al obtener las imágenes');
       }
@@ -164,7 +167,7 @@ export const uploadImage = async (file: File, title: string): Promise<ImageData>
   formData.append('image', file);
   formData.append('title', title);
 
-  const response = await fetch('http://localhost:8000/api/sap/images/upload/', {
+  const response = await fetch(`${BACKEND_URL}/sap/images/upload/`, {
     method: 'POST',
     body: formData,
   });
@@ -204,7 +207,7 @@ export const getConsumoTextil = async (
   return fetchWithCache(
     cacheKey,
     async () => {
-      const url = `http://localhost:8000/api/sap/consumo-textil/?${params.toString()}`;
+      const url = `${BACKEND_URL}/sap/consumo-textil/?${params.toString()}`;
       console.log(url);
       const response = await fetch(url);
       if (!response.ok) {

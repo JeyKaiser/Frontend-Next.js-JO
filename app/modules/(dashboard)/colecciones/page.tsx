@@ -1,5 +1,8 @@
 import ColeccionesClient from './ColeccionesClient';
 
+// const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+// const BACKEND_URL = `${backendUrl}/api/colecciones/`;
+
 interface Reference {
   codigo_coleccion: string;
   codigo_referencia: string;
@@ -23,7 +26,8 @@ interface Collection {
 }
 
 async function getColecciones(): Promise<Collection[]> {
-  const BACKEND_URL = 'http://localhost:8000/api/colecciones/';
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const BACKEND_URL = `${backendUrl}/api/colecciones/`;
   try {
     console.log('[Server Component] Fetching collections from:', BACKEND_URL);
     const response = await fetch(BACKEND_URL, {

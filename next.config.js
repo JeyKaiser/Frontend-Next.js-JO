@@ -9,19 +9,24 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8000/api/:path*',
+        destination: 'http://192.168.0.40:8000/api/:path*',
       },
     ];
   },
-  images: {   
+  images: {
     remotePatterns: [
       {
-        protocol: 'http',      // O 'https' si tu Django usa HTTPS
+        protocol: 'http',      // Backend en red local
+        hostname: '192.168.0.40',
+        port: '8000',
+        pathname: '/media/**', // Permite cualquier path bajo /media/
+      },
+      {
+        protocol: 'http',      // Backend localhost para desarrollo
         hostname: 'localhost',
         port: '8000',
         pathname: '/media/**', // Permite cualquier path bajo /media/
-
-      },    
+      },
       {
         protocol: 'https',
         hostname: 'johannaortiz.net',

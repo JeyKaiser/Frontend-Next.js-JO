@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Breadcrumb from '@/app/globals/components/molecules/Breadcrumb';
 import axios from 'axios'; // Usaremos axios para las peticiones
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL = `${backendUrl}/api/colecciones/`;
+
 // Definimos un tipo para las opciones que vendrán de la API
 interface DimensionOption {
   id: number; // El ID siempre será un número
@@ -94,16 +97,16 @@ export default function CrearReferentePage() {
     async function fetchAllOptions() {
       setIsLoading(true);
       const endpoints = {
-        prendas: 'http://localhost:8000/api/sap/dim_prenda/',
-        cantidadesTelas: 'http://localhost:8000/api/sap/dim_cantidad_telas/',
-        usosTela: 'http://localhost:8000/api/sap/dim_uso_tela/',
-        basesTextiles: 'http://localhost:8000/api/sap/dim_base_textil/',
-        caracteristicasColor: 'http://localhost:8000/api/sap/dim_caracteristica_color/',
-        anchosUtil: 'http://localhost:8000/api/sap/dim_ancho_util/',
-        propiedadesTela: 'http://localhost:8000/api/sap/dim_propiedades_tela/',
-        variantes: 'http://localhost:8000/api/sap/dim_variante/',
-        descripciones: 'http://localhost:8000/api/sap/dim_descripcion/',
-        terminaciones: 'http://localhost:8000/api/sap/dim_terminacion/',
+        prendas: `${BACKEND_URL}/sap/dim_prenda/`,
+        cantidadesTelas: `${BACKEND_URL}/sap/dim_cantidad_telas/`,
+        usosTela: `${BACKEND_URL}/sap/dim_uso_tela/`,
+        basesTextiles: `${BACKEND_URL}/sap/dim_base_textil/`,
+        caracteristicasColor: `${BACKEND_URL}/sap/dim_caracteristica_color/`,
+        anchosUtil: `${BACKEND_URL}/sap/dim_ancho_util/`,
+        propiedadesTela: `${BACKEND_URL}/sap/dim_propiedades_tela/`,
+        variantes: `${BACKEND_URL}/sap/dim_variante/`,
+        descripciones: `${BACKEND_URL}/sap/dim_descripcion/`,
+        terminaciones: `${BACKEND_URL}/sap/dim_terminacion/`,
       };
 
       try {
@@ -225,7 +228,7 @@ export default function CrearReferentePage() {
       };
 
       const response = await axios.post(
-        'http://localhost:8000/api/sap/fact_consumo/',
+        `${BACKEND_URL}/sap/fact_consumo/`,
         payload
       );
 

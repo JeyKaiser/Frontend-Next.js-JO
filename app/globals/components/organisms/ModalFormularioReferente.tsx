@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Modal from '../atoms/Modal';
 import Button from '../atoms/Button';
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL = `${backendUrl}/api/colecciones/`;
+
 interface DimensionOption {
   id: number;
   nombre: string;
@@ -77,16 +80,16 @@ export default function ModalFormularioReferente({ isOpen, onClose, onSave }: Mo
       setLoading(true);
       try {
         const endpoints = [
-          { key: 'prendas', url: 'http://localhost:8000/api/sap/dim_prenda/' },
-          { key: 'cantidadesTelas', url: 'http://localhost:8000/api/sap/dim_cantidad_telas/' },
-          { key: 'usosTela', url: 'http://localhost:8000/api/sap/dim_uso_tela/' },
-          { key: 'basesTextiles', url: 'http://localhost:8000/api/sap/dim_base_textil/' },
-          { key: 'caracteristicasColor', url: 'http://localhost:8000/api/sap/dim_caracteristica_color/' },
-          { key: 'anchosUtil', url: 'http://localhost:8000/api/sap/dim_ancho_util/' },
-          { key: 'propiedadesTela', url: 'http://localhost:8000/api/sap/dim_propiedades_tela/' },
-          { key: 'variantes', url: 'http://localhost:8000/api/sap/dim_variante/' },
-          { key: 'descripciones', url: 'http://localhost:8000/api/sap/dim_descripcion/' },
-          { key: 'terminaciones', url: 'http://localhost:8000/api/sap/dim_terminacion/' },
+          { key: 'prendas', url: `${BACKEND_URL}/sap/dim_prenda/` },
+          { key: 'cantidadesTelas', url: `${BACKEND_URL}/sap/dim_cantidad_telas/` },
+          { key: 'usosTela', url: `${BACKEND_URL}/sap/dim_uso_tela/` },
+          { key: 'basesTextiles', url: `${BACKEND_URL}/sap/dim_base_textil/` },
+          { key: 'caracteristicasColor', url: `${BACKEND_URL}/sap/dim_caracteristica_color/` },
+          { key: 'anchosUtil', url: `${BACKEND_URL}/sap/dim_ancho_util/` },
+          { key: 'propiedadesTela', url: `${BACKEND_URL}/sap/dim_propiedades_tela/` },
+          { key: 'variantes', url: `${BACKEND_URL}/sap/dim_variante/` },
+          { key: 'descripciones', url: `${BACKEND_URL}/sap/dim_descripcion/` },
+          { key: 'terminaciones', url: `${BACKEND_URL}/sap/dim_terminacion/` },
         ];
 
         const promises = endpoints.map(async ({ key, url }) => {

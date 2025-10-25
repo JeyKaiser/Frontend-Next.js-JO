@@ -3,7 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_DJANGO_API_URL || 'http://localhost:8000/api', // Asegúrate de que esta sea la URL de tu API Django
+    baseURL: process.env.NEXT_PUBLIC_DJANGO_API_URL || 'http://192.168.0.40:8000/api',
     headers: {
         'Content-Type': 'application/json',
     },

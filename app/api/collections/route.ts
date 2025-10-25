@@ -16,9 +16,7 @@ export async function GET(request: NextRequest) {
     const codigo = searchParams.get('codigo');
 
     console.log('[API] Getting collections from Django backend:', { offset, limit, anio, codigo });
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-    // The Django API URL
+    //const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const djangoApiUrl = `${backendUrl}/api/colecciones/`;
 
     // Fetch data from Django backend

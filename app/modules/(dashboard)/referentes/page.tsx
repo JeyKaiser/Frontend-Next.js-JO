@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useSAPData } from '@/app/contexts/SAPDataContext';
 import { uploadImage, getConsumoTextil } from '@/app/services/sapService';
 
+// Verificar y mostrar el valor de NEXT_PUBLIC_BACKEND_URL
+const backendUrl = 'http://192.168.0.40:8000';
+
 interface ImageData {
   id: number;
   title: string;
@@ -68,7 +71,6 @@ export default function ReferentesPage() {
     images: availableImages,
     prendasError,
     imagesError,
-    refreshImagesData,
     addImage // <-- Importar la nueva función del contexto
   } = useSAPData();
 
@@ -87,7 +89,6 @@ export default function ReferentesPage() {
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [showConteoImageUpload, setShowConteoImageUpload] = useState(false);
   const [uploadingImages, setUploadingImages] = useState<Set<string>>(new Set());
-  const [refreshKey, setRefreshKey] = useState<number>(0);
 
   // Ya no necesitamos fetchPrendas ni fetchImages porque vienen del contexto
   
@@ -100,10 +101,10 @@ export default function ReferentesPage() {
     }
   }, [prendasError, imagesError]);
 
-  // Monitorear cambios en refreshKey y availableImages
+  // Monitorear cambios en availableImages
   useEffect(() => {
-    console.log('🔄 Estado actualizado - refreshKey:', refreshKey, 'availableImages:', availableImages.length);
-  }, [refreshKey, availableImages]);
+    console.log('🔄 Estado actualizado - availableImages:', availableImages.length);
+  }, [availableImages]);
 
 
   // Función para manejar la subida de imágenes de portadas para prendas
@@ -123,12 +124,6 @@ export default function ReferentesPage() {
 
       // 2. Añadir la nueva imagen al estado del contexto manualmente
       addImage(newImage);
-
-      // Forzar re-render de las cards
-      setRefreshKey(prev => {
-        console.log('Forzando re-render con refreshKey de', prev, 'a', prev + 1);
-        return prev + 1;
-      });
 
       // Mostrar mensaje de éxito
       alert(`✅ Imagen subida exitosamente para ${prendaNombre}`);
@@ -170,12 +165,6 @@ export default function ReferentesPage() {
       // 2. Añadir la nueva imagen al estado del contexto manualmente
       addImage(newImage);
 
-      // Forzar re-render de las cards
-      setRefreshKey(prev => {
-        console.log('Forzando re-render con refreshKey de', prev, 'a', prev + 1);
-        return prev + 1;
-      });
-
       // Mostrar mensaje de éxito
       alert(`✅ Imagen subida exitosamente para ${prendaNombre} - ${cantidadTelas} telas - Variante ${numeroVariante}`);
       console.log('Imagen subida exitosamente:', uploadKey);
@@ -205,7 +194,7 @@ export default function ReferentesPage() {
     console.log('cantidadTelas:', cantidadTelas);
     console.log('numeroVariante:', numeroVariante);
     console.log('availableImages count:', availableImages.length);
-    console.log('refreshKey:', refreshKey);
+
 
     // Si hay numero_variante, buscar imagen específica para esa variante
     if (numeroVariante && cantidadTelas) {
@@ -238,16 +227,26 @@ export default function ReferentesPage() {
     // Para prendas principales (sin cantidad de telas), buscar imagen de portada dinámicamente
     const tituloPortada = `PORTADA ${prendaNombre.toUpperCase()}`;
 
+    console.log('🔍 DEBUG getPrendaImage:');
+    console.log('  - prendaNombre:', prendaNombre);
+    console.log('  - tituloPortada esperado:', tituloPortada);
+    console.log('  - availableImages:', availableImages.map(img => ({id: img.id, title: img.title, url: img.image_url})));
+    console.log('  - imagen encontrada:', availableImages.find(img => 
+      img.title.toUpperCase() === tituloPortada
+    ));
+
     const imagenPortada = availableImages.find(img => 
       img.title.toUpperCase() === tituloPortada
     );
 
+
     if (imagenPortada) {
       return imagenPortada;
-    }
-
+    }   
     // Si no se encuentra la imagen específica, NO buscar alternativas para evitar conflictos
     return null;
+
+    
   };
 
   // Función para obtener datos específicos de consumo textil
@@ -415,6 +414,7 @@ export default function ReferentesPage() {
           {(showTable || showConteoCards) && (
             <button
               onClick={() => {
+                //window.location.href = 'http://localhost:3000/modules/referentes';
                 window.location.href = 'http://localhost:3000/modules/referentes';
               }}
               className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
@@ -473,7 +473,7 @@ export default function ReferentesPage() {
 
               return (
                 <div
-                  key={`${prenda.prenda_id}-${refreshKey}`}
+                  key={`prenda-${prenda.prenda_id}`}
                   className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
                     showImageUpload ? 'border-2 border-blue-300' : ''
                   }`}
@@ -486,8 +486,7 @@ export default function ReferentesPage() {
                 >
                   <div className="w-full h-48 bg-white rounded mb-4 flex items-center justify-center overflow-hidden shadow-inner border">
                     {imagenPrenda ? (
-                      <img
-                        src={`http://localhost:8000${imagenPrenda.image_url}`}
+                      <img src={`${backendUrl}${imagenPrenda.image_url}`}
                         alt={prenda.nombre}
                         className="w-full h-full object-contain rounded"
                         onError={(e) => {
@@ -562,7 +561,7 @@ export default function ReferentesPage() {
                 console.log(`Card de variante ${cantidadTelas} telas - variante: ${numeroVariante} - descripcion: ${descripcionVariante}`);
                 return (
                   <div
-                    key={`${index}-${refreshKey}`}
+                    key={`variante-${index}`}
                     className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
                       showConteoImageUpload ? 'border-2 border-blue-300' : ''
                     }`}
@@ -571,7 +570,7 @@ export default function ReferentesPage() {
                     <div className="w-full h-48 bg-white rounded mb-4 flex items-center justify-center overflow-hidden shadow-inner border">
                       {imagenEspecifica ? (
                         <img
-                          src={`http://localhost:8000${imagenEspecifica.image_url}`}
+                          src={`${backendUrl}${imagenEspecifica.image_url}`}
                           alt={`${cantidadTelas} Tela(s) - ${descripcionVariante}`}
                           className="w-full h-full object-contain rounded"
                           onError={(e) => {
