@@ -133,7 +133,6 @@ export default function CrearReferentePage() {
         setOptions(newOptions);
       } catch (error) {
         console.error("Error al obtener las opciones para el formulario:", error);
-        // Aquí podrías manejar el error, por ejemplo, mostrando una notificación
       } finally {
         // Marcamos que la carga ha terminado (incluso si falló)
         setIsLoading(false);

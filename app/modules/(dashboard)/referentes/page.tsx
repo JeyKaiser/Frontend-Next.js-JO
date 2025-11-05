@@ -715,8 +715,10 @@ export default function ReferentesPage() {
                     <option value="">Todos</option>
                     <option value="LUCIR">LUCIR</option>
                     <option value="FORRO">FORRO</option>
-                    <option value="SESGO">SESGO</option>
                     <option value="FUSIONABLE">FUSIONABLE</option>
+                    <option value="SESGO LUCIR">SESGO LUCIR</option>
+                    <option value="SESGO FORRO">SESGO FORRO</option>
+                    <option value="SESGO FUSIONABLE">SESGO FUSIONABLE</option>                    
                   </select>
                 </div>
 
@@ -770,7 +772,7 @@ export default function ReferentesPage() {
                     <option value="SOLIDO">SOLIDO</option>
                     <option value="MODIFICACION">MODIFICACION</option>
                     <option value="UBICACION">UBICACION</option>
-                    <option value="SOLIDO CON SENTIDO">SOLIDO CON SENTIDO</option>                                    </select>
+                    <option value="ALL OVER CON SENTIDO">ALL OVER CON SENTIDO</option>                                    </select>
                 </div>
 
                 <div>
