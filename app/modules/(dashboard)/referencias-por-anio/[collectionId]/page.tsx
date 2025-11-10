@@ -6,6 +6,8 @@ import Breadcrumb from '@/app/globals/components/molecules/Breadcrumb';
 import type { ReferenciasAnioApiResponse } from '@/app/modules/types';
 import Link from 'next/link';
 import { ArrowLeft, Grid, List, Filter, Search, Package, Eye, Plus } from 'lucide-react';
+import { getBackendUrl} from '@/utils/backendUrl';
+
 
 interface ReferenciasListPageProps {
   params: {
@@ -14,7 +16,10 @@ interface ReferenciasListPageProps {
 }
 
 async function getReferenciasList(collectionId: string): Promise<ReferenciasAnioApiResponse[] | null> {
-  const DJANGO_API_BASE_URL = 'http://localhost:8000';
+  
+  // const DJANGO_API_BASE_URL = 'http://localhost:8000';
+  const DJANGO_API_BASE_URL = getBackendUrl().replace('/api', ''); 
+  
   try {
     const apiUrl = `${DJANGO_API_BASE_URL}/api/referencias-por-anio/${collectionId}/`;
     console.log(`[Next.js SC - Referencias List] Solicitando API: ${apiUrl}`);
