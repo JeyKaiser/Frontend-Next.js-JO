@@ -43,11 +43,11 @@ const navigation: NavItem[] = [
     label: 'Consumos',
     icon: Package,
   },
-  {
-    href: '/modules/parametros',
-    label: 'Parámetros',
-    icon: Wrench,
-  }, 
+  // {
+  //   href: '/modules/parametros',
+  //   label: 'Parámetros',
+  //   icon: Wrench,
+  // }, 
   {
     href: '/modules/referentes',
     label: 'Referentes',

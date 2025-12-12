@@ -1,9 +1,11 @@
 // app/services/auth.ts
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"; // Importa jwtDecode desde jwt-decode
+import { getBackendUrl } from "@/utils/backendUrl"; 
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-const API_BASE_URL = backendUrl || 'http://localhost:8000/api';
+// const API_BASE_URL = backendUrl || 'http://localhost:8000/api';
+const API_BASE_URL = getBackendUrl() + '/api';
 
 interface Tokens {
     access: string;

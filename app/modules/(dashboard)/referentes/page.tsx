@@ -34,7 +34,7 @@ interface ConsumoData {
 
 interface Filtros {
   cantidad_telas?: string;
-  uso_tela?: string;
+  uso_tela?: string; 
   base_textil?: string;
   caracteristica_color?: string;
   ancho_util?: string;
