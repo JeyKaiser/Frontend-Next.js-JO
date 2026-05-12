@@ -4,6 +4,10 @@ import { jwtDecode } from "jwt-decode"; // Importa jwtDecode desde jwt-decode
 
 // const API_BASE_URL = "http://localhost:8000/api"; // Asegúrate de que esta sea la URL de tu backend Django
 const API_BASE_URL = process.env.NEXT_PUBLIC_DJANGO_API_URL || 'http://localhost:8000/api';
+const authClient = axios.create({
+    baseURL: API_BASE_URL,
+    timeout: 5000,
+});
 
 interface Tokens {
     access: string;
@@ -27,7 +31,7 @@ export const login = async (
     password: string
 ): Promise<Tokens> => {
     try {
-        const response = await axios.post<Tokens>(`${API_BASE_URL}/token/`, {
+        const response = await authClient.post<Tokens>('/token/', {
             username,
             password,
         });
@@ -50,8 +54,8 @@ export const login = async (
  */
 export const refreshToken = async (refreshToken: string): Promise<string> => {
     try {
-        const response = await axios.post<{ access: string }>(
-            `${API_BASE_URL}/token/refresh/`,
+        const response = await authClient.post<{ access: string }>(
+            '/token/refresh/',
             {
                 refresh: refreshToken,
             }
@@ -76,7 +80,7 @@ export const refreshToken = async (refreshToken: string): Promise<string> => {
 export const verifyToken = async (accessToken: string): Promise<boolean> => {
     try {
         // La API de verificación de Django Simple JWT devuelve un 200 OK si es válido, 401 si no.
-        await axios.post(`${API_BASE_URL}/token/verify/`, {
+        await authClient.post('/token/verify/', {
             token: accessToken,
         });
         return true;

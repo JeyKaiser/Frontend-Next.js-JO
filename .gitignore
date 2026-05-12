@@ -28,7 +28,11 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
+.env
+.env.*
 .env*.local
+!.env.example
+!.env*.example
 
 # vercel
 .vercel
@@ -38,3 +42,21 @@ yarn-error.log*
 next-env.d.ts
 
 # End of https://www.toptal.com/developers/gitignore/api/nextjs
+
+# secrets and credentials
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+*.crt
+
+# local Python artifacts accidentally created in this folder
+.venv/
+venv/
+env/
+__pycache__/
+
+# OS/editor
+.vscode/
+.idea/

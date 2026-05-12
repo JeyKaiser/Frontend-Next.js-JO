@@ -6,7 +6,7 @@ import {
   ClockIcon,
   ExclamationTriangleIcon,
   ChartBarIcon,
-  RefreshIcon,
+  ArrowPathIcon,
   InformationCircleIcon,
   CalendarIcon,
   CheckCircleIcon
@@ -63,7 +63,7 @@ const ProductionTimeline: React.FC<ProductionTimelineProps> = ({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <RefreshIcon className="w-8 h-8 text-primary-500 animate-spin mx-auto mb-4" />
+          <ArrowPathIcon className="w-8 h-8 text-primary-500 animate-spin mx-auto mb-4" />
           <p className="text-secondary-600">Cargando línea de tiempo de producción...</p>
         </div>
       </div>
@@ -124,7 +124,7 @@ const ProductionTimeline: React.FC<ProductionTimelineProps> = ({
               disabled={loading}
               className="flex items-center gap-2"
             >
-              <RefreshIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Actualizar
             </Button>
             <Button

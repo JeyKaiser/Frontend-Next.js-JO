@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { GarmentProductionDAL } from '@/app/globals/lib/dal/garment-production';
 
 interface RouteParams {
   params: {

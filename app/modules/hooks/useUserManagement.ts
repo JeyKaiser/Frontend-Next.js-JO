@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Usuario, CreateUsuarioRequest, UpdateUsuarioRequest, UsuariosResponse } from '@/app/modules/types';
-import type { UserChangeEvent } from '@/app/api/users/events/route';
+import type { UserChangeEvent } from '@/app/api/users/user-events';
 
 // Backend API URL (Django backend)
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000';

@@ -144,12 +144,12 @@ function generateSearchSuggestions(query: string, users: any[]): string[] {
   });
   
   // Add similar names (first word matches)
-  const queryWords = queryLower.split(' ');
-  users.forEach(user => {
+  const queryWords: string[] = queryLower.split(' ');
+  users.forEach((user: any) => {
     if (user.NOMBRE_COMPLETO) {
-      const nameWords = user.NOMBRE_COMPLETO.toLowerCase().split(' ');
-      queryWords.forEach(queryWord => {
-        nameWords.forEach(nameWord => {
+      const nameWords: string[] = user.NOMBRE_COMPLETO.toLowerCase().split(' ');
+      queryWords.forEach((queryWord: string) => {
+        nameWords.forEach((nameWord: string) => {
           if (nameWord.startsWith(queryWord) && nameWord.length > queryWord.length) {
             suggestions.add(user.NOMBRE_COMPLETO);
           }

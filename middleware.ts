@@ -12,7 +12,9 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value;
 
   // Comprueba si la ruta actual es una de las rutas públicas
-  const isPublic = publicPaths.some(p => path.startsWith(p));
+  const isPublic = publicPaths.some((publicPath) =>
+    publicPath === '/' ? path === '/' : path.startsWith(publicPath)
+  );
 
   // Si el usuario está autenticado (tiene un token)
   if (token) {

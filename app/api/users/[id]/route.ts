@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GarmentProductionDAL } from '@/app/globals/lib/dal/garment-production';
 import type { UpdateUsuarioRequest } from '@/app/modules/types';
-import { userEventEmitter, type UserChangeEvent } from '../events/route';
+import { userEventEmitter, type UserChangeEvent } from '../user-events';
 
 interface RouteParams {
   params: {

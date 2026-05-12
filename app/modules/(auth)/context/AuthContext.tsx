@@ -13,6 +13,15 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie'; // 1. Importar la librería js-cookie
 import { login, refreshToken, decodeToken, verifyToken } from '../services/auth';
 
+const ACCESS_COOKIE = 'auth_token';
+const REFRESH_COOKIE = 'refresh_token';
+
+const getCookieOptions = (days: number) => ({
+    expires: days,
+    secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
+    sameSite: 'lax' as const,
+});
+
 // ... (la interfaz AuthContextType no cambia)
 interface AuthContextType {
     accessToken: string | null;
@@ -40,27 +49,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             try {
                 const decoded = decodeToken(newAccessToken);
                 setUser({ id: decoded.user_id });
-                // CLAVE: Guardamos el access token en una cookie. El middleware buscará esta.                
-                Cookies.set('auth-token', newAccessToken, { expires: 7, secure: true, sameSite: 'strict' });
-                console.log('[AuthContext - updateTokens] Token de acceso guardado en cookie "auth-token".');
+                Cookies.set(ACCESS_COOKIE, newAccessToken, getCookieOptions(7));
+                console.log(`[AuthContext - updateTokens] Token de acceso guardado en cookie "${ACCESS_COOKIE}".`);
             } catch (error) {
                 console.error('[AuthContext - updateTokens] Error al decodificar o guardar access token:', error);
                 setUser(null);
-                Cookies.remove('auth-token');
+                Cookies.remove(ACCESS_COOKIE);
             }
         } else {
             setUser(null);
-            Cookies.remove('auth-token');
-            console.log('[AuthContext - updateTokens] Cookie "auth-token" removida.');
+            Cookies.remove(ACCESS_COOKIE);
+            console.log(`[AuthContext - updateTokens] Cookie "${ACCESS_COOKIE}" removida.`);
         }
 
         if (newRefreshToken) {
-            // El refresh token también se guarda en una cookie para persistencia.
-            Cookies.set('refresh-token', newRefreshToken, { expires: 30, secure: true, sameSite: 'strict' });
+            Cookies.set(REFRESH_COOKIE, newRefreshToken, getCookieOptions(30));
             console.log('[AuthContext - updateTokens] Refresh token guardado en cookie.');
         } else {
-            Cookies.remove('refresh-token');
-            console.log('[AuthContext - updateTokens] Cookie "refresh-token" removida.');
+            Cookies.remove(REFRESH_COOKIE);
+            console.log(`[AuthContext - updateTokens] Cookie "${REFRESH_COOKIE}" removida.`);
         }
     }, []);
 
@@ -89,8 +96,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logoutUser = useCallback(() => {
         console.log('[AuthContext - logoutUser] Llamado. Limpiando tokens de cookies.');
         updateTokens(null, null);
-        router.push('/login');
-        console.log('[AuthContext - logoutUser] Redirigiendo a /login.');
+        router.push('/modules/login');
+        console.log('[AuthContext - logoutUser] Redirigiendo a /modules/login.');
     }, [router, updateTokens]);
 
     // 3. Modificamos checkAuthStatus para leer desde Cookies
@@ -98,8 +105,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log('[AuthContext - checkAuthStatus] Iniciando verificación desde Cookies.');
         setLoading(true);
 
-        const storedAccessToken = Cookies.get('auth-token');
-        const storedRefreshToken = Cookies.get('refresh-token');
+        const storedAccessToken = Cookies.get(ACCESS_COOKIE);
+        const storedRefreshToken = Cookies.get(REFRESH_COOKIE);
         console.log(`[AuthContext - checkAuthStatus] Cookies - Access: ${storedAccessToken ? 'presente' : 'nulo'}, Refresh: ${storedRefreshToken ? 'presente' : 'nulo'}`);
 
         if (!storedAccessToken && !storedRefreshToken) {
@@ -137,18 +144,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         checkAuthStatus();
 
         const refreshInterval = setInterval(() => {
-            const currentAccessToken = Cookies.get('auth-token');
-            const currentRefreshToken = Cookies.get('refresh-token');
+            const currentAccessToken = Cookies.get(ACCESS_COOKIE);
+            const currentRefreshToken = Cookies.get(REFRESH_COOKIE);
             if (currentRefreshToken && currentAccessToken) {
-                const decoded = decodeToken(currentAccessToken);
-                const currentTime = Date.now() / 1000;
-                if (decoded.exp - currentTime < 60) {
-                    refreshToken(currentRefreshToken)
-                        .then((newAccess) => updateTokens(newAccess, currentRefreshToken))
-                        .catch((err) => {
-                            console.error('[AuthContext - Interval] Fallo al auto-refrescar token:', err);
-                            logoutUser();
-                        });
+                try {
+                    const decoded = decodeToken(currentAccessToken);
+                    const currentTime = Date.now() / 1000;
+                    if (decoded.exp - currentTime < 60) {
+                        refreshToken(currentRefreshToken)
+                            .then((newAccess) => updateTokens(newAccess, currentRefreshToken))
+                            .catch((err) => {
+                                console.error('[AuthContext - Interval] Fallo al auto-refrescar token:', err);
+                                logoutUser();
+                            });
+                    }
+                } catch (error) {
+                    console.error('[AuthContext - Interval] Token invalido en cookies:', error);
+                    logoutUser();
                 }
             }
         }, 30000);

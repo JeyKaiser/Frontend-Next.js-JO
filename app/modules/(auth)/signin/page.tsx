@@ -1,5 +1,5 @@
+import { redirect } from 'next/navigation';
 
-
-
-
-//-------------POR DESARROLLAR
+export default function SignInPage() {
+  redirect('/modules/login');
+}
