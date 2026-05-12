@@ -1,10 +1,11 @@
 /**
- * Traceability API Route for specific reference
- * Handles traceability operations for references (T_TRAZABILIDAD)
+ * Traceability API Route
+ * Proxies traceability operations to the Django backend.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GarmentProductionDAL } from '@/app/globals/lib/dal/garment-production';
+
+const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
 interface RouteParams {
   params: {
@@ -14,52 +15,49 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const referenciaId = parseInt(params.referenciaId);
-    
-    if (isNaN(referenciaId)) {
+    if (!/^\d+$/.test(params.referenciaId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid reference ID' },
         { status: 400 }
       );
     }
 
-    console.log('[API] Getting traceability for reference from Django backend:', referenciaId);
-
-    const traceabilityUrl = `http://localhost:8000/costeo/referencias/${referenciaId}/trazabilidad/`;
-    const currentPhaseUrl = `http://localhost:8000/costeo/referencias/${referenciaId}/trazabilidad/current/`;
+    const traceabilityUrl = `${BACKEND_BASE_URL}/api/referencias/${params.referenciaId}/trazabilidad/`;
+    const currentPhaseUrl = `${BACKEND_BASE_URL}/api/referencias/${params.referenciaId}/trazabilidad/current/`;
 
     const [traceabilityResponse, currentPhaseResponse] = await Promise.all([
-      fetch(traceabilityUrl),
-      fetch(currentPhaseUrl)
+      fetch(traceabilityUrl, { headers: { Accept: 'application/json' } }),
+      fetch(currentPhaseUrl, { headers: { Accept: 'application/json' } }),
     ]);
 
     if (!traceabilityResponse.ok) {
       const errorData = await traceabilityResponse.json().catch(() => ({}));
-      throw new Error(errorData.detail || `Error from Django API (traceability): ${traceabilityResponse.status}`);
+      return NextResponse.json(
+        {
+          success: false,
+          error: errorData.error || `Backend error: ${traceabilityResponse.statusText}`,
+        },
+        { status: traceabilityResponse.status }
+      );
     }
-    
+
     const traceabilityData = await traceabilityResponse.json();
-    
-    let currentPhase = null;
-    if (currentPhaseResponse.ok) {
-      currentPhase = await currentPhaseResponse.json();
-    }
+    const currentPhase = currentPhaseResponse.ok ? await currentPhaseResponse.json() : null;
 
     return NextResponse.json({
       success: true,
       data: {
-        referenciaId,
+        referenciaId: params.referenciaId,
         traceability: traceabilityData || [],
         currentPhase,
         totalPhases: traceabilityData?.length || 0,
         completedPhases: traceabilityData?.filter(
-          (t: any) => t.PhaseName === 'COMPLETADO' // This is a guess, the data structure is not clear
-        ).length || 0
-      }
+          (item: { ESTADO?: string; estado?: string }) =>
+            String(item.ESTADO || item.estado || '').toLowerCase() === 'completado'
+        ).length || 0,
+      },
     });
-
   } catch (error) {
-    console.error('[API] Traceability GET error:', error);
     return NextResponse.json(
       { success: false, error: `Failed to get traceability: ${(error as Error).message}` },
       { status: 500 }
@@ -69,56 +67,40 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const referenciaId = parseInt(params.referenciaId);
-    const body = await request.json();
-    
-    if (isNaN(referenciaId)) {
+    if (!/^\d+$/.test(params.referenciaId)) {
       return NextResponse.json(
         { success: false, error: 'Invalid reference ID' },
         { status: 400 }
       );
     }
 
-    console.log('[API] Creating traceability record for reference:', referenciaId, body);
-
-    // Validate required fields
-    const requiredFields = ['ID_FASE', 'ID_USUARIO_RESPONSABLE', 'FECHA_INICIO', 'ESTADO'];
-    const missingFields = requiredFields.filter(field => !body[field]);
-    
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: `Missing required fields: ${missingFields.join(', ')}` 
+    const body = await request.json();
+    const response = await fetch(
+      `${BACKEND_BASE_URL}/api/referencias/${params.referenciaId}/trazabilidad/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        { status: 400 }
-      );
-    }
+        body: JSON.stringify(body),
+      }
+    );
 
-    // Add reference ID to the data
-    const trazabilidadData = {
-      ...body,
-      ID_REFERENCIA: referenciaId
-    };
-
-    const result = await GarmentProductionDAL.createTrazabilidad(trazabilidadData);
-    
-    if (!result.success) {
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
       return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 500 }
+        {
+          success: false,
+          error: errorData.error || `Backend error: ${response.statusText}`,
+        },
+        { status: response.status }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Traceability record created successfully',
-      referenciaId,
-      executionTime: result.executionTime
-    }, { status: 201 });
-
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error('[API] Traceability POST error:', error);
     return NextResponse.json(
       { success: false, error: `Failed to create traceability record: ${(error as Error).message}` },
       { status: 500 }
@@ -126,13 +108,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// Handle OPTIONS for CORS
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });

@@ -1,15 +1,10 @@
-/**
- * Database Health Check API Route - Migrated to Backend
- * Routes database health checks to Django backend
- */
+import { NextResponse } from 'next/server';
 
-import { NextRequest, NextResponse } from 'next/server';
-
-const BACKEND_URL = 'http://localhost:8000/api/users/database/health/';
+const BACKEND_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/health/`;
 
 export async function GET() {
   try {
-    console.log('[API Database Health] Forwarding request to backend:', BACKEND_URL);
+    console.log('[API Health] Forwarding request to backend:', BACKEND_URL);
     
     const response = await fetch(BACKEND_URL, {
       method: 'GET',
@@ -35,7 +30,7 @@ export async function GET() {
     return NextResponse.json(data);
     
   } catch (error) {
-    console.error('[API Database Health] Error:', error);
+    console.error('[API Health] Error:', error);
     
     return NextResponse.json(
       {

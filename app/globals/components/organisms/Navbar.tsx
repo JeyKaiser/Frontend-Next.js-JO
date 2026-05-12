@@ -4,10 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import SearchBar from '@/app/globals/components/molecules/SearchBar';
 import { Bell, User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { useAuth } from '@/app/modules/(auth)/context/AuthContext';
 
 export default function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
+  const { logoutUser } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 h-16 bg-white border-b border-secondary-200 shadow-sm">
@@ -102,7 +104,14 @@ export default function Navbar() {
                     Configuración
                   </Link>
                   <hr className="my-2 border-secondary-100" />
-                  <button className="flex items-center gap-3 px-4 py-2 text-sm text-error-600 hover:bg-error-50 transition-colors duration-200 w-full text-left">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      logoutUser();
+                    }}
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-error-600 hover:bg-error-50 transition-colors duration-200 w-full text-left"
+                  >
                     <LogOut className="w-4 h-4" />
                     Cerrar Sesión
                   </button>
@@ -120,4 +129,3 @@ export default function Navbar() {
     </nav>
   );
 }
-

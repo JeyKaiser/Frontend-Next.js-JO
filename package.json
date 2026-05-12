@@ -6,9 +6,7 @@
     "dev": "kill-port 3000 && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "db:init": "npx tsx scripts/init-database.ts",
-    "db:health": "curl http://localhost:3000/api/database/health || echo 'Start the dev server first with npm run dev'"
+    "lint": "next lint"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -42,7 +40,6 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "ts-prune": "^0.10.3",
-    "tsx": "^4.20.4",
     "typescript": "^5.8.3"
   }
 }
